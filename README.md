@@ -30,11 +30,11 @@ Para comenzar a trabajar con el sistema en tu equipo local, asegúrate de tener 
     - Abre la terminal integrada (`Terminal > Nueva Terminal`)
     - En la terminal *(De preferencia Git Bash)*, compila el programa con el siguiente comando:
         ```
-        gcc tdas/*.c tarea3.c -Wno-unused-result -o tarea3
+        gcc tdas/*.c proyecto.c -Wno-unused-result -o proyecto
         ```
     - Una vez compilado, puedes ejecutar el programa en la misma terminal, con:
         ```
-        ./tarea3
+        ./proyecto
         ```
 
 ## 🧠 Funcionalidades:
