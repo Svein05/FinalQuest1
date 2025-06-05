@@ -1,0 +1,26 @@
+ID,Name,HP,Damage,Defense,Difficulty
+1,Murciélago Subterráneo,50,5,2,1
+2,Goblin de las Cavernas,70,7,4,1
+3,Serpiente Subterránea,60,6,3,1
+4,Espíritu del Bosque,90,10,6,2
+5,Lobo Sombrío,80,8,5,2
+6,Planta Carnívora,100,12,7,2
+7,Kraken Menor,150,20,12,2
+8,Espectro Corrupto,120,15,10,2
+9,Zombi Errante,110,10,5,2
+10,Golem de Piedra,150,20,15,2
+11,Espectro del Desierto,90,14,8,2
+12,Serpiente de Arena,85,12,6,2
+13,Mirage,70,18,4,2
+14,Hechicero Oscuro,200,30,20,3
+15,Golem Arcano,250,35,25,3
+16,Espíritu Anciano,180,28,22,3
+17,Kraken Mayor,220,40,30,3
+18,Guerrero Celestial,220,40,30,3
+19,Águila de Cristal,210,35,28,3
+20,Dragón Volador,250,45,35,3
+21,Elemental de Lava,300,50,40,3
+22,Demonio del Fuego,270,45,35,3
+23,Golem de Magma,350,60,50,3
+24,Guardián del Templo,350,60,45,3
+25,Serpiente de Piedra,330,55,40,3
