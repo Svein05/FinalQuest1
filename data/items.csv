@@ -1,1 +1,23 @@
-ID,Name,Type,Rare,Damage,Heal,Defense,Cost,Rate,Difficulty
+ID,Name,Type,Rarity,Damage,Heal,Defense,Cost,Difficulty
+1,Rusty Sword,Weapon,Common,10,0,0,30,1
+2,Minor Healing Potion,Potion,Common,0,25,0,25,1
+3,Wooden Shield,Armor,Common,0,0,5,40,1
+4,Throwing Knife,Weapon,Common,8,0,0,20,1
+5,Light Armor,Armor,Uncommon,0,0,8,60,1
+6,Short Bow,Weapon,Uncommon,12,0,0,50,1
+7,Depth Echo Blade,Weapon,Uncommon,14,0,0,60,1
+8,Cloak of Whispering Leaves,Armor,Uncommon,0,0,10,70,1
+9,Ancient Whisper Amulet,Accessory,Rare,5,10,5,90,1
+10,Windcutter Sword,Weapon,Rare,22,0,0,130,2
+11,Echo Helm,Armor,Uncommon,0,0,12,100,2
+12,Nomad's Boots,Potion,Uncommon,0,20,5,80,2
+13,Reinforced Armor,Armor,Uncommon,0,0,12,100,2
+14,Firebomb,Weapon,Rare,18,0,0,100,2
+15,Shadow Gauntlets,Weapon,Rare,25,0,3,160,3
+16,Forgotten City Fragment,Accessory,Rare,10,10,10,180,3
+17,Starblade,Weapon,Epic,35,0,0,260,3
+18,Plate of Frozen Time,Armor,Legendary,0,0,40,450,3
+19,Divine Elixir,Potion,Legendary,0,150,0,350,3
+20,Blade of Eternity,Weapon,Legendary,45,0,0,450,3
+
+
