@@ -6,6 +6,7 @@ ID,Name,HP,Damage,Defense,Difficulty
 5,Slime Pegajoso,55,3,2,1
 6,Esqueleto Marchito,65,6,3,1
 7,Araña de Cueva,60,5,2,1
+// mini jefe -> mayorID
 8,Espíritu del Bosque,90,10,6,2
 9,Lobo Sombrío,80,8,5,2
 10,Planta Carnívora,100,12,7,2
@@ -16,6 +17,7 @@ ID,Name,HP,Damage,Defense,Difficulty
 15,Espectro del Desierto,90,14,8,2
 16,Serpiente de Arena,85,12,6,2
 17,Mirage,70,18,4,2
+// mini jefe -> mayorID
 18,Hechicero Oscuro,200,30,20,3
 19,Golem Arcano,250,35,25,3
 20,Espíritu Anciano,180,28,22,3
@@ -28,3 +30,4 @@ ID,Name,HP,Damage,Defense,Difficulty
 27,Golem de Magma,350,60,50,3
 28,Guardián del Templo,350,60,45,3
 29,Serpiente de Piedra,330,55,40,3
+// jefe final -> mayorID

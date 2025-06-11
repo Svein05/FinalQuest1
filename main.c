@@ -45,11 +45,6 @@ int main() {
 
                 break;
             
-            // TIENDA
-            case 2:
-                gestionar_tienda(&jugador, items_mapa);
-                break;
-            
             // ALEATORIO
             case 3:
                 gestionar_evento_aleatorio(&jugador);
@@ -78,3 +73,5 @@ int main() {
     return 0;
 }
 #pragma endregion
+
+// primer parte: tienda

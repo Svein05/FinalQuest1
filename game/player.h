@@ -3,7 +3,7 @@
 
 #include "tdas/list.h"
 
-typedef struct{
+typedef struct {
     char* nombre;
     List* inventario;
     int hp;
