@@ -1,6 +1,7 @@
 #ifndef ESCENARIO_H
 #define ESCENARIO_H
 
+
 #include <stdio.h>
 
 typedef struct Enemy {
@@ -24,6 +25,7 @@ typedef struct Mapa {
 
 // Funciones para mapas
 Mapa* crearMapa(int id, const char* nombre, const char* descripcion, int dificultad);
+
 
 void insertarMapa(Mapa** lista, Mapa* nuevoMapa);
 

@@ -12,6 +12,8 @@
 #include "game/scenario.h"
 #include "game/data_loader.h"
 
+#include"game/data_types.h"
+
 #pragma region MAIN
 int main() {
     // Logica del Juego
