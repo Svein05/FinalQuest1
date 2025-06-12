@@ -1,7 +1,7 @@
 ID,Nombre,Tipo,Rareza,Daño,Curación,Defensa,Costo,Dificultad
-1,Espada Oxidada,Arma,Común,10,0,0,30,1
-2,Poción de Curación Menor,Poción,Común,0,25,0,25,1
-3,Escudo de Madera,Armadura,Común,0,0,5,40,1
+1,Espada Oxidada,1,Común,10,0,0,30,1
+2,Poción de Curación Menor,3,Común,0,25,0,25,1
+3,Escudo de Madera,2,Común,0,0,5,40,1
 4,Cuchillo Arrojadizo,Arma,Común,8,0,0,20,1
 5,Armadura Ligera,Armadura,Poco Común,0,0,8,60,1
 6,Arco Corto,Arma,Poco Común,12,0,0,50,1
@@ -20,6 +20,6 @@ ID,Nombre,Tipo,Rareza,Daño,Curación,Defensa,Costo,Dificultad
 19,Elixir Divino,Poción,Legendaria,0,150,0,350,3
 20,Hoja de la Eternidad,Arma,Legendaria,45,0,0,450,3
 
-
+// arma 1, armadura 2, pocion 3
 // armadura 1 slot
 // 
