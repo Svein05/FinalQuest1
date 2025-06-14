@@ -29,6 +29,3 @@ int player_choose_action();
 
 // Aplica el daño a una entidad (jugador o enemigo).
 void apply_damage(int* target_hp, int damage_dealt);
-
-
-#endif

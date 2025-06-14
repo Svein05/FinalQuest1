@@ -10,6 +10,8 @@
 #include "game/shop.h"       // Funciones de tienda
 #include "game/scenario.h"   // Funciones de escenario
 #include "tdas/extra.h"
+#include "tdas/stack.h"
+#include "tdas/hashmap.h"
 
 // --- RUTAS A TUS ARCHIVOS CSV ---
 #define SCENARIOS_CSV_PATH "data/scenarios.csv"
