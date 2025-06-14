@@ -4,6 +4,7 @@
 #include "tdas/map.h"
 #include "tdas/list.h"
 #include "tdas/extra.h"
+#include "tdas/stack.h"
 #include "tdas/hashmap.h"
 
 #include "game/player.h"
@@ -11,6 +12,7 @@
 #include "game/shop.h"
 #include "game/scenario.h"
 #include "game/data_loader.h"
+
 
 #include"game/data_types.h"
 
@@ -22,13 +24,13 @@ int main() {
     // feature/<funcion>
     // bugfix/<error>
     // Update (fusionar con la rama main)
-
-    List* game_list = cargar_mapa();
-    Map* enemigos_mapa = cargar_enemigos(); // POR ID
-    Map* items_mapa = cargar_items(); // POR ID
+    
+    Stack* game_map = load_map(); // Pregeneramos el mapa en una pila. 
+    List* enemies_list = load_enemies(); // rellenamos una lista enlazada de enemigos, en base a ID del 0 al N
+    Map* items_mapa = load_items(); // ??
     Jugador* jugador = iniciar_jugador();
 
-    Mapa* mapa_actual = list_first(game_list);
+    Mapa* mapa_actual = stack_top(game_map);
     while (jugador->hp > 0 && mapa_actual != NULL)
     {
         int tipo_escenario = obtener_tipo_escenario(mapa_actual);
