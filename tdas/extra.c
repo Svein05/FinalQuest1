@@ -1,4 +1,5 @@
 #include "extra.h"
+#include <string.h> // Para strdup, strlen, strcpy, etc.
 
 
 #define MAX_LINE_LENGTH 4096

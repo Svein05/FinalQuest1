@@ -2,7 +2,7 @@
 #define SHOP_H
 
 #include <stdbool.h>
-#include <data_types.h>
+#include "data_types.h"
 
 // --- ESTRUCTURA DE TIENDA ---
 
