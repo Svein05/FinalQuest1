@@ -1,7 +1,0 @@
-ID,Nombre,currentHP,attack,defense,goldReward,difficulty
-1,Goblin,30,8,2,20,1
-2,Esqueleto,40,10,3,30,1
-3,Murcielago Gigante,25,12,1,15,1
-4,Orco,60,15,5,50,2
-5,Sombra Acechante,50,18,4,40,2
-6,Dragon Anciano,200,30,10,500,3

@@ -95,10 +95,11 @@ List *split_string(const char *str, const char *delim) {
 }
 
 // Función para limpiar la pantalla
-void limpiarPantalla() { system("clear"); }
+void clearScreen() {
+  printf("\033[H\033[J");
+}
 
-void presioneTeclaParaContinuar() {
-  puts("Presione una tecla para continuar...");
-  while (getchar() != '\n'); // Consume el '\n' del buffer de entrada
-  getchar(); // Espera a que el usuario presione una tecla
+void waitForKeyPress() {
+  printf("Presione Enter para continuar...");
+  while (getchar() != '\n');
 }

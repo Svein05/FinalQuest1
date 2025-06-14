@@ -11,7 +11,6 @@
 #include "game/scenario.h"   // Funciones de escenario
 #include "tdas/extra.h"
 #include "tdas/stack.h"
-#include "tdas/hashmap.h"
 
 // --- RUTAS A TUS ARCHIVOS CSV ---
 #define SCENARIOS_CSV_PATH "data/scenarios.csv"
@@ -22,11 +21,11 @@
 // --- FUNCIÓN PRINCIPAL DEL JUEGO ---
 int main() {
     SetConsoleOutputCP(CP_UTF8);
-    limpiarPantalla();
+    clearScreen();
     printf("--- ¡BIENVENIDO A TU AVENTURA! ---\n");
     printf("Un juego de rol sencillo en C.\n");
-    presioneTeclaParaContinuar();
-    limpiarPantalla();
+    waitForKeyPress();
+    clearScreen();
 
     // --- 1. Inicializar Jugador ---
     Player player;
@@ -73,7 +72,7 @@ int main() {
     int scenario_counter = 1;
 
     while (currentScenario != NULL) {
-        limpiarPantalla();
+        clearScreen();
         printf("\n--- ESCENARIO %d ---\n", scenario_counter);
         printf("Estas en: %s\n", currentScenario->description);
 
@@ -102,7 +101,7 @@ int main() {
                 } else {
                     printf("\nHas superado el combate en %s!\n", currentScenario->description);
                 }
-                presioneTeclaParaContinuar();
+                waitForKeyPress();
                 break;
             }
             case SCENARIO_TYPE_SHOP: {
@@ -114,7 +113,7 @@ int main() {
                 } else {
                     printf("No se pudo iniciar la tienda.\n");
                 }
-                presioneTeclaParaContinuar();
+                waitForKeyPress();
                 break;
             }
             case SCENARIO_TYPE_EVENT: {
@@ -124,7 +123,7 @@ int main() {
                     printf("\n¡Tu aventura ha terminado!\n");
                     currentScenario = NULL; // Forzar salida
                 }
-                presioneTeclaParaContinuar();
+                waitForKeyPress();
                 break;
             }
             case SCENARIO_TYPE_BOSS: {
@@ -149,12 +148,12 @@ int main() {
                     printf("Recompensa del Jefe: %d oro.\n", combatBossCopy.goldReward * 2);
                     currentScenario = NULL; // El juego termina después del jefe
                 }
-                presioneTeclaParaContinuar();
+                waitForKeyPress();
                 break;
             }
             default:
                 printf("Tipo de escenario desconocido. Saltando...\n");
-                presioneTeclaParaContinuar();
+                waitForKeyPress();
                 break;
         }
 

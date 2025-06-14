@@ -20,14 +20,14 @@ typedef struct {
  * Asigna memoria para la tienda y sus ítems, y los carga.
  * @return Un puntero a la estructura Shop inicializada, o NULL en caso de error.
  */
-Shop* shop_initialize_start_shop();
+Shop* shop_initialize_start_shop(const char* itemsCsvPath) ;
 
 /**
  * @brief Inicializa un mercader aleatorio con ítems únicos para eventos.
  * Esta función es llamada cuando se encuentra un mercader en un evento aleatorio.
  * @return Un puntero a la estructura Shop del mercader, o NULL en caso de error.
  */
-Shop* shop_initialize_random_merchant();
+Shop* shop_initialize_random_merchant(const char* itemsCsvPath, int minDifficulty, int maxDifficulty);
 
 /**
  * @brief Gestiona la interacción principal del jugador con una tienda.

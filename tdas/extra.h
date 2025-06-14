@@ -42,8 +42,8 @@ char **leer_linea_csv(FILE *archivo, char separador);
 List *split_string(const char *str, const char *delim);
 
 // Función para limpiar la pantalla
-void limpiarPantalla();
+void clearScreen();
 
-void presioneTeclaParaContinuar();
+void waitForKeyPress();
 
 #endif
