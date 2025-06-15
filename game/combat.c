@@ -68,12 +68,7 @@ int player_choose_action(Player* player) {
     return choice;
 }
 
-/**
- * @brief Aplica una cantidad de daño a la vida actual de una entidad.
- * Asegura que la vida no baje de 0.
- * @param current_hp Puntero a la vida actual de la entidad que recibe el daño.
- * @param damage_dealt La cantidad de daño a aplicar.
- */
+
 void apply_damage(int* current_hp, int damage_dealt) {
     if (current_hp == NULL) return;
 
@@ -83,14 +78,7 @@ void apply_damage(int* current_hp, int damage_dealt) {
     }
 }
 
-// --- FUNCIÓN PRINCIPAL DE COMBATE ---
-
-/**
- * @brief Gestiona el bucle de combate por turnos entre el jugador y un enemigo.
- * @param player Puntero a la estructura del Jugador actual.
- * @param enemy Puntero a la estructura del Enemigo actual al que se enfrenta.
- * @return true si el jugador gana el combate, false si el jugador es derrotado.
- */
+// --- FUNCIÓN PRINCIPAL DE COMBATE 
 bool combat_manage_turn(Player* player, Enemy* enemy) {
     if (player == NULL || enemy == NULL) {
         printf("Error: Jugador o enemigo nulo para el combate.\n");
@@ -99,7 +87,6 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
 
     printf("\n--- ¡COMBATE INICIADO! %s vs %s ---\n", player->name, enemy->name);
 
-    // Bucle principal de combate: se ejecuta mientras ambos estén vivos
     while (player->currentHP > 0 && enemy->currentHP > 0) {
         display_combat_status(player, enemy);
 
@@ -115,11 +102,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             printf("%s ataca a %s y le inflige %d de daño.\n",
                    player->name, enemy->name, damage_to_enemy);
 
-        } else if (action_choice == 2) { // Usar Ítem
-            // Lógica para mostrar inventario y permitir al jugador seleccionar un ítem.
-            // Esta parte requerirá la función player_use_consumable del módulo player.
-            // NOTA: Para este esqueleto, solo es un placeholder. La implementación completa
-            // de player_use_consumable y el menú de selección de inventario iría aquí.
+        } else if (action_choice == 2) { 
             printf("--- Inventario de %s ---\n", player->name);
             if (player->inventoryCount == 0) {
                 printf("Tu inventario esta vacio.\n");
@@ -139,18 +122,13 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
                 int item_choice = atoi(item_input);
 
                 if (item_choice > 0 && item_choice <= player->inventoryCount) {
-                    // Llama a la función de usar consumible del módulo player.
-                    // ¡Asegúrate de que player_use_consumable esté implementada en player.c
-                    // y declarada en player.h (probablemente descomentando la línea)!
-                    // player_use_consumable(player, item_choice - 1);
-                    printf("Usando item del inventario (Lógica player_use_consumable pendiente).\n"); // Placeholder
+                    printf("Usando item del inventario (Lógica player_use_consumable pendiente).\n"); 
                 } else {
                     printf("Cancelando uso de item.\n");
                 }
             }
         } else {
             printf("Accion invalida. Pierdes tu turno.\n");
-            // Si la acción es inválida, simplemente se salta el turno del jugador.
         }
 
         // --- Verificar si el enemigo fue derrotado después del turno del jugador ---
@@ -159,11 +137,8 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             return true; // Jugador gana
         }
 
-        // --- Actualizar efectos temporales del jugador (al final de su turno) ---
-        // ¡Asegúrate de que player_update_temporary_boosts esté implementada en player.c
-        // y declarada en player.h (probablemente descomentando la línea)!
-        // player_update_temporary_boosts(player);
-        printf("Actualizando efectos temporales del jugador (Lógica player_update_temporary_boosts pendiente).\n"); // Placeholder
+
+        printf("Actualizando efectos temporales del jugador (Lógica player_update_temporary_boosts pendiente).\n"); 
 
         // --- TURNO DEL ENEMIGO ---
         printf("\nEs el turno de %s!\n", enemy->name);
@@ -172,17 +147,12 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
         printf("%s ataca a %s y le inflige %d de daño.\n",
                enemy->name, player->name, enemy_damage_to_player);
 
-        // --- Verificar si el jugador fue derrotado después del turno del enemigo ---
+
         if (player->currentHP <= 0) {
             printf("%s ha sido derrotado por %s!\n", player->name, enemy->name);
             return false; // Jugador pierde
         }
-        // Puedes añadir una pausa o esperar una tecla para continuar al siguiente turno aquí.
-        // system("pause"); // Solo en Windows
-        // getchar(); // Espera un Enter
     }
 
-    // Esto debería ser inalcanzable si el bucle funciona correctamente,
-    // pero es un fallback.
-    return false; // Por defecto, si sale del bucle por alguna razón no intencionada
+    return false; 
 }

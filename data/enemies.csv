@@ -28,3 +28,4 @@ ID,Name,HP,Damage,Defense,Difficulty
 27,Golem de Magma,350,60,50,3
 28,Guardián del Templo,350,60,45,3
 29,Serpiente de Piedra,330,55,40,3
+30,NULLVOID,999,999,999,4

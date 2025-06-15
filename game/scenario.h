@@ -42,5 +42,6 @@ Enemy* getEnemyForScenario(Scenario* Scenario, Enemy* allEnemies, int numEnemies
 void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies);
 
 void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios);
+bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies);
 
 #endif // SCENARIO_H

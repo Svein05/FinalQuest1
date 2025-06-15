@@ -61,10 +61,13 @@ void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios) {
     srand(time(NULL)); // semilla de RNG
 
     // Listas temporales para escenarios por dificultad
-    Scenario* dificultad1[10] = {NULL}; int count1 = 0;
-    Scenario* dificultad2[10] = {NULL}; int count2 = 0;
-    Scenario* dificultad3[10] = {NULL}; int count3 = 0;
-
+    Scenario* dificultad1[10] = {NULL};
+    Scenario* dificultad2[10] = {NULL}; 
+    Scenario* dificultad3[10] = {NULL}; 
+    int count1 = 0;
+    int count2 = 0;
+    int count3 = 0;
+    
     // Clasificar escenarios por dificultad
     for (int i = 0; i < numScenarios; i++) {
         if (escenarios[i].difficulty < 1 || escenarios[i].difficulty > 3) {
@@ -80,10 +83,10 @@ void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios) {
         }
     }
 
-    // Empujar un escenario de cada dificultad (1 → 2 → 3)
+    // Empujar escenarios en orden inverso: 3 → 2 → 1
     int pushed = 0;
-    if (count1 > 0) {
-        Scenario* s = dificultad1[rand() % count1];
+    if (count3 > 0) {
+        Scenario* s = dificultad3[rand() % count3];
         stack_push(game_map, s);
         pushed++;
     }
@@ -92,8 +95,8 @@ void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios) {
         stack_push(game_map, s);
         pushed++;
     }
-    if (count3 > 0) {
-        Scenario* s = dificultad3[rand() % count3];
+    if (count1 > 0) {
+        Scenario* s = dificultad1[rand() % count1];
         stack_push(game_map, s);
         pushed++;
     }
@@ -104,7 +107,8 @@ void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios) {
 }
 
 
-void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies) {
+
+void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, int currentScenarioDifficulty) {
     if (player == NULL || allItems == NULL || numItems == 0 || allEnemies == NULL || numEnemies == 0) {
         printf("Error: Datos incompletos para gestionar evento.\n");
         return;
@@ -116,7 +120,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
     if (event_type == 0) { // Combate
         printf("Has encontrado un enemigo inesperado!\n");
 
-        Enemy* randomEnemy = &allEnemies[rand() % numEnemies];
+        Enemy* randomEnemy = spawnRandomEnemy(currentScenarioDifficulty, allEnemies, numEnemies);
         printf("¡Un %s aparece!\n", randomEnemy->name);
 
 
@@ -187,4 +191,13 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         }
     }
     printf("--- FIN DE EVENTO ---\n");
+}
+
+bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
+    // Aquí podrías implementar la lógica del jefe final.
+    // Por ahora, simplemente retornamos true para simular que el jugador lo derrotó.
+    printf("¡Has llegado al jefe final! Preparándote para la batalla...\n");
+    // Simulación de combate con el jefe final
+    // Aquí podrías llamar a combat_manage_turn() con un enemigo especial.
+    return true; // Simulamos que el jugador gana
 }
