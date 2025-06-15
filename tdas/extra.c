@@ -5,64 +5,92 @@
 #define MAX_LINE_LENGTH 4096
 #define MAX_FIELDS      128
 
-char **leer_linea_csv(FILE *archivo, char separador) {
-    static char linea[MAX_LINE_LENGTH];
-    static char *campos[MAX_FIELDS];
-    int idx = 0;
-
-    if (fgets(linea, MAX_LINE_LENGTH, archivo) == NULL)
-        return NULL;  // fin de fichero
-
-    // quitar salto de línea
-    linea[strcspn(linea, "\r\n")] = '\0';
-
-    char *ptr = linea;
-    while (*ptr && idx < MAX_FIELDS - 1) {
-        char *start;
-
-        if (*ptr == '\"') {
-            // campo entrecomillado
-            ptr++;              // saltar la comilla inicial
-            start = ptr;
-
-            // compactar contenido: convertir "" → " y copiar el resto
-            char *dest = ptr;
-            while (*ptr) {
-                if (*ptr == '\"' && *(ptr + 1) == '\"') {
-                    *dest++ = '\"';  // una comilla literal
-                    ptr += 2;        // saltar ambas
-                }
-                else if (*ptr == '\"') {
-                    ptr++;           // fin del campo
-                    break;
-                }
-                else {
-                    *dest++ = *ptr++;
-                }
-            }
-            *dest = '\0';        // terminar cadena
-
-            // ahora ptr apunta justo después de la comilla de cierre
-            if (*ptr == separador) ptr++;
-        }
-        else {
-            // campo sin comillas
-            start = ptr;
-            while (*ptr && *ptr != separador)
-                ptr++;
-            if (*ptr == separador) {
-                *ptr = '\0';
-                ptr++;
-            }
-        }
-
-        campos[idx++] = start;
+char** read_csv_line(FILE* file, char separator) {
+    char line[MAX_LINE_LENGTH];
+    if (fgets(line, MAX_LINE_LENGTH, file) == NULL) {
+        return NULL;
     }
 
-    campos[idx] = NULL;
-    return campos;
-}
+    // Eliminar saltos de línea
+    line[strcspn(line, "\r\n")] = '\0';
 
+    char** fields = malloc(MAX_FIELDS * sizeof(char*));
+    if (!fields) return NULL;
+
+    int field_count = 0;
+    char* current = line;
+    int in_quotes = 0;
+
+    while (*current && field_count < MAX_FIELDS - 1) {
+        // Saltar espacios iniciales
+        while (*current == ' ') current++;
+
+        // Determinar inicio del campo
+        char* start = current;
+        if (*current == '"') {
+            in_quotes = 1;
+            start = ++current;  // Saltar comilla inicial
+        }
+
+        // Buscar fin del campo
+        char* end = current;
+        while (*current) {
+            if (in_quotes) {
+                if (*current == '"' && *(current + 1) == '"') {
+                    current += 2;  // Saltar comillas escapadas
+                } else if (*current == '"') {
+                    break;  // Fin de campo entrecomillado
+                } else {
+                    current++;
+                }
+            } else {
+                if (*current == separator) break;
+                current++;
+            }
+        }
+
+        // Guardar posición final
+        end = current;
+
+        // Procesar fin de campo
+        if (in_quotes && *current == '"') {
+            *end = '\0';  // Terminar campo
+            current++;    // Saltar comilla final
+            if (*current == separator) current++;  // Saltar separador
+            in_quotes = 0;
+        } else if (!in_quotes && *current == separator) {
+            *end = '\0';  // Terminar campo
+            current++;    // Saltar separador
+        } else if (*current == '\0') {
+            *end = '\0';  // Último campo
+        }
+
+        // Copiar campo (manejando comillas escapadas)
+        char* field = malloc(strlen(start) + 1);
+        if (!field) {
+            for (int i = 0; i < field_count; i++) free(fields[i]);
+            free(fields);
+            return NULL;
+        }
+
+        char* dest = field;
+        char* src = start;
+        while (*src) {
+            if (*src == '"' && *(src + 1) == '"') {
+                *dest++ = '"';
+                src += 2;
+            } else {
+                *dest++ = *src++;
+            }
+        }
+        *dest = '\0';
+
+        fields[field_count++] = field;
+    }
+
+    fields[field_count] = NULL;
+    return fields;
+}
 
 List *split_string(const char *str, const char *delim) {
   List *result = list_create();
@@ -96,7 +124,7 @@ List *split_string(const char *str, const char *delim) {
 
 // Función para limpiar la pantalla
 void clearScreen() {
-  printf("\033[H\033[J");
+  printf("CLEARSCREEN\n");
 }
 
 void waitForKeyPress() {

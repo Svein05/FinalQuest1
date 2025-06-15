@@ -9,104 +9,6 @@
 #include "player.h" // Incluido para las funciones de jugador
 #include "../tdas/extra.h" // Asegúrate de que esta ruta es correcta para tu extra.h y extra.c
 
-// NO NECESITAMOS free_tokens AQUÍ SI leer_linea_csv NO USA strdup
-// y su buffer es estático o gestiona la memoria de otra forma interna.
-// Si leer_linea_csv usa strdup, SÍ NECESITARÍAMOS free_tokens.
-// Basado en la simplificación que discutimos, asumiremos que leer_linea_csv
-// NO usa strdup y la memoria devuelta no necesita ser liberada por el llamador.
-
-/**
- * @brief Parsea un arreglo de tokens de cadena en una estructura Item.
- * Asume el orden de las columnas del CSV:
- * ID,Nombre,Tipo,Rareza,Damage,Defense,Heal,Costo,Dificultad,EffectDuration
- * @param tokens Arreglo de cadenas (char**) a parsear.
- * @param item Puntero a la estructura Item donde se guardarán los datos.
- * @return true si el parseo fue exitoso, false en caso de error.
- */
-bool parse_item_from_tokens(char** tokens, Item* item) {
-    if (tokens == NULL || item == NULL) return false;
-
-    item->id = atoi(tokens[0]);
-    strncpy(item->name, tokens[1], sizeof(item->name) - 1);
-    item->name[sizeof(item->name) - 1] = '\0';
-
-    item->type = atoi(tokens[2]);
-    strncpy(item->rarity, tokens[3], sizeof(item->rarity) - 1);
-    item->rarity[sizeof(item->rarity) - 1] = '\0';
-
-    item->damage = atoi(tokens[4]);
-    item->defense = atoi(tokens[5]);
-    item->heal = atoi(tokens[6]);
-    item->cost = atoi(tokens[7]);
-    item->difficulty = atoi(tokens[8]);
-    item->effectDuration = atoi(tokens[9]);
-
-    return true;
-}
-
-// --- IMPLEMENTACIÓN DE FUNCIONES DEL MÓDULO SHOP ---
-
-Shop* shop_initialize_start_shop(const char* itemsCsvPath) {
-    FILE* file = fopen(itemsCsvPath, "r");
-    if (file == NULL) {
-        perror("Error al abrir el archivo de items para la tienda inicial");
-        return NULL;
-    }
-
-    Shop* startShop = (Shop*) malloc(sizeof(Shop));
-    if (startShop == NULL) {
-        perror("Error al asignar memoria para la tienda inicial");
-        fclose(file);
-        return NULL;
-    }
-    startShop->items = NULL;
-    startShop->itemCount = 0;
-
-    int capacity = 10; // Capacidad inicial para el arreglo de items
-    startShop->items = (Item*) malloc(sizeof(Item) * capacity);
-    if (startShop->items == NULL) {
-        perror("Error al asignar memoria inicial para los items de la tienda");
-        free(startShop);
-        fclose(file);
-        return NULL;
-    }
-
-    char** tokens = NULL;
-    char separator = ','; // Definimos el separador de tu CSV
-
-    // Saltar la línea de encabezado del CSV
-    tokens = leer_linea_csv(file, separator); 
-
-    // Leer ítems del CSV
-    while ((tokens = leer_linea_csv(file, separator)) != NULL) {
-        Item tempItem;
-        if (parse_item_from_tokens(tokens, &tempItem)) {
-            // Se asume que TODOS los ítems en 'initial_items.csv' son los que queremos
-            // para la tienda inicial y ya tienen la dificultad 0 asignada en el CSV.
-            if (startShop->itemCount >= capacity) {
-                capacity *= 2;
-                Item* temp_items = (Item*) realloc(startShop->items, sizeof(Item) * capacity);
-                if (temp_items == NULL) {
-                    perror("Error al redimensionar memoria para items de la tienda");
-                    shop_free(startShop);
-                    fclose(file);
-                    return NULL;
-                }
-                startShop->items = temp_items;
-            }
-            startShop->items[startShop->itemCount] = tempItem; // Copia el ítem a la tienda
-            startShop->itemCount++;
-        } else {
-            printf("Advertencia: Error al parsear un item en la tienda inicial. Saltando linea.\n");
-        }
-    }
-
-    fclose(file);
-    // Mensaje actualizado para reflejar que se cargan todos los items del CSV inicial
-    printf("Tienda inicial cargada con %d items desde %s.\n", startShop->itemCount, itemsCsvPath);
-    return startShop;
-}
-
 Shop* shop_initialize_random_merchant(const char* itemsCsvPath, int minDifficulty, int maxDifficulty) {
     // Inicializar el generador de números aleatorios si no se ha hecho
     static bool seeded = false;
@@ -135,30 +37,6 @@ Shop* shop_initialize_random_merchant(const char* itemsCsvPath, int minDifficult
     char** tokens = NULL;
     char separator = ',';
 
-    // Saltar la línea de encabezado
-    tokens = leer_linea_csv(file, separator);
-
-    while ((tokens = leer_linea_csv(file, separator)) != NULL) {
-        Item tempItem; // Creamos una instancia temporal del Item
-        if (parse_item_from_tokens(tokens, &tempItem)) {
-            // Filtrar por dificultad (aquí se mantiene el filtro por rango)
-            if (tempItem.difficulty >= minDifficulty && tempItem.difficulty <= maxDifficulty) {
-                if (suitableItemCount >= capacity) {
-                    capacity *= 2;
-                    Item* temp_realloc = (Item*) realloc(suitableItems, sizeof(Item) * capacity);
-                    if (temp_realloc == NULL) {
-                        perror("Error al redimensionar memoria para items adecuados");
-                        free(suitableItems); // Libera el arreglo de Items (sus cadenas fijas se liberan con la Item)
-                        fclose(file);
-                        return NULL;
-                    }
-                    suitableItems = temp_realloc;
-                }
-                suitableItems[suitableItemCount++] = tempItem; // Copiar el ítem COMPLETO (cadenas fijas incluidas)
-            }
-        }
-    }
-    fclose(file);
 
     // Ahora, seleccionar un número aleatorio de ítems de 'suitableItems' para el mercader
     int merchantItemCount = 0;
@@ -231,7 +109,7 @@ void shop_interact(Player* player, Shop* currentShop) {
         } else {
             for (int i = 0; i < currentShop->itemCount; i++) {
                 printf("   %d. %s (%s) - Costo: %d oro. ",
-                       i + 1, currentShop->items[i].name, currentShop->items[i].rarity, currentShop->items[i].cost);
+                       i + 1, currentShop->items[i].name, currentShop->items[i].rarity, currentShop->items[i].price);
 
                 if (currentShop->items[i].type == 1) { // Arma
                     printf("Daño: %d.\n", currentShop->items[i].damage);
@@ -300,16 +178,16 @@ bool shop_buy_item(Player* player, Shop* currentShop, int itemIndex) {
 
     Item itemToBuy = currentShop->items[itemIndex];
 
-    if (player->gold < itemToBuy.cost) {
+    if (player->gold < itemToBuy.price) {
         printf("No tienes suficiente oro para comprar %s (necesitas %d, tienes %d).\n",
-               itemToBuy.name, itemToBuy.cost, player->gold);
+               itemToBuy.name, itemToBuy.price, player->gold);
         return false;
     }
 
     // player_add_item_to_inventory ahora maneja el equipamiento automático si es mejor
     // Si player_add_item_to_inventory devuelve true, el ítem fue añadido o equipado con éxito.
     if (player_add_item_to_inventory(player, itemToBuy)) {
-        player->gold -= itemToBuy.cost;
+        player->gold -= itemToBuy.price;
 
         // **AQUÍ ESTÁ LA CORRECCIÓN**
         // Si el ítem es un arma o armadura y no fue equipado automáticamente (es decir,

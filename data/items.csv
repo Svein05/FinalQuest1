@@ -1,10 +1,21 @@
-ID,Nombre,Tipo,Rareza,Damage,Defense,Heal,Costo,Dificultad,EffectDuration
-1,Espada Corta,1,Comun,10,0,0,100,1,0
-2,Armadura Ligera,2,Comun,0,5,0,80,1,0
-3,Pocion Curacion Pequeña,3,Comun,0,0,25,30,1,0
-4,Pocion de Furia,3,Rara,15,0,0,120,2,2
-5,Escudo de Roble,2,Rara,0,10,0,180,2,0
-6,Pocion de Proteccion,3,Epica,0,10,0,150,2,3
-7,Espada Grande,1,Rara,25,0,0,250,2,0
-8,Armadura Pesada,2,Epica,0,20,0,300,3,0
-9,Elixir de Poder,3,Legendaria,20,20,100,500,3,3
+ID,Nombre,Tipo,Rareza,Daño,Curación,Defensa,Costo,Dificultad
+1,Espada Oxidada,1,Común,10,0,0,30,1
+2,Poción de Curación,4,Común,0,25,0,25,1
+4,Cuchillo Arrojadizo,1,Común,8,0,0,20,1
+3,Escudo de Madera,2,Común,0,0,5,40,1
+5,Armadura Ligera,2,Común,0,0,8,60,1
+6,Arco Corto,1,Común,12,0,0,50,1
+7,Hoja del Eco Profundo,1,Común,14,0,0,60,1
+8,Capa de las Hojas Susurrantes,2,Común,0,0,10,70,1
+9,Amuleto del Susurro Antiguo,3,Común,5,10,5,90,1
+10,Espada Cortaviento,1,Poco Común,22,0,0,130,2
+11,Casco de Ecos,2,Poco Común,0,0,12,100,2
+12,Botas del Nómada,3,Poco Común,0,20,5,80,2
+13,Armadura Reforzada,2,Rara,0,0,12,100,2
+14,Bomba Ígnea,4,Rara,18,0,0,100,2
+15,Guanteletes de Hielo,1,Rara,25,0,3,160,3
+16,Pendiente de Ciudad Perdida,3,Rara,10,10,10,180,3
+17,Espada Sanguinia,1,Épica,35,0,0,260,3
+18,Coraza del Tiempo Oscuro,2,Legendaria,0,0,40,450,3
+19,Elixir Divino,4,Legendaria,0,150,0,350,3
+20,Hoja de la infinidad,1,Legendaria,45,0,0,450,3

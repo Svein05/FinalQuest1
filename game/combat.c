@@ -8,31 +8,17 @@
 #include "player.h"     // Funciones del jugador (initializePlayer, player_add_item_to_inventory, etc.)
 
 // --- FUNCIONES AUXILIARES DEL MÓDULO COMBATE ---
-
-/**
- * @brief Calcula el daño real que se inflige, teniendo en cuenta el ataque del atacante
- * y la defensa del defensor. El daño mínimo siempre es 1.
- * @param attack Puntos de ataque del atacante.
- * @param defense Puntos de defensa del defensor.
- * @return El daño final que se debe aplicar.
- */
 int calculate_damage(int attack, int defense) {
     // Calcular el daño base.
     int damage_dealt = attack - defense;
 
-    // Asegurar que el daño mínimo siempre sea 1, incluso si la defensa es muy alta.
+    // Asegurar que el daño mínimo siempre sea 0, incluso si la defensa es muy alta.
     if (damage_dealt < 1) {
-        damage_dealt = 1;
+        damage_dealt = 0;
     }
     return damage_dealt;
 }
 
-/**
- * @brief Muestra el estado actual del combate, incluyendo la vida del jugador y del enemigo.
- * También muestra los boosts temporales activos del jugador.
- * @param player Puntero a la estructura del Jugador.
- * @param enemy Puntero a la estructura del Enemigo.
- */
 void display_combat_status(Player* player, Enemy* enemy) {
     if (player == NULL || enemy == NULL) return;
 

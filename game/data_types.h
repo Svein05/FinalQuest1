@@ -11,33 +11,33 @@
 
 // Struct de items
 typedef struct {
-    int id;                                 // ID unico del Item
-    char name[MAX_NAME_LENGTH];             // Nombre del Item
+    int id;                                
+    char name[MAX_NAME_LENGTH];          
     int type;                               // Tipo del item (1. Consumible, 2. Arma, 3. Armadura)
-    char rarity[MAX_RARITY_LENGTH];         // Rareza del Item (Ilustrativo)
-    int damage;                             // Daño (Permanente si es Arma, Temporal si es Pocion)
-    int defense;        // Defensa (Permanente si es Armadura, Temporal si es Pocion)
-    int heal;           // Curacion (Solo para Pociones)
-    int cost;           // Costo para comprar Item
+    char rarity[MAX_RARITY_LENGTH];         // Rareza del Item 
+    int damage;                             
+    int defense;        
+    int heal;           // (Solo para Pociones)
+    int price;          // Valor del Item
     int difficulty;     // Enlazar a Mapa - Tienda
-    int effectDuration;  // Duracion de Turnos para Efectos de Pociones
+    int effectDuration;  
 } Item;
 
 // Struct de Player
 typedef struct {
-    char name[MAX_NAME_LENGTH];         // Nombre del Jugador
-    int maxHP;                          // Maxima Vida
-    int currentHP;                      // Vida Actual
-    int attack;                         // Ataque o Daño
-    int defense;                        // Defensa (Reduccion de Daño)
-    int gold;                           // Oro para Utilizar
-    Item inventory[INVENTORY_SLOTS];    // Arreglo de Items (Inventario)
-    Item equippedWeapon;                // Puntero a el Arma (Item)
-    Item equippedArmor;                 // Puntero a la Armadura (Item)
+    char name[MAX_NAME_LENGTH];         
+    int maxHP;                         
+    int currentHP;                      
+    int attack;                         
+    int defense;                       
+    int gold;                           
+    Item inventory[INVENTORY_SLOTS];    
     int inventoryCount;                 // Cantidad de Items en Inventario
+    Item equippedWeapon;                
+    Item equippedArmor;                 
 
     // Estos campos gestionan los efectos TEMPORALES ACTUALMENTE APLICADOS al jugador.
-    // Una poción podría aumentar solo ataque, solo defensa, o ambos.
+    // Una poción podría aumentar solo ataque, solo defensa, o ambos. 
     int tempAttackBoost;    // Cantidad de ataque temporal ACTIVA en el jugador
     int tempDefenseBoost;   // Cantidad de defensa temporal ACTIVA en el jugador
     int attackBoostTurns;   // Turnos restantes para el aumento de ataque
@@ -46,28 +46,21 @@ typedef struct {
 
 // Struct de Enemy
 typedef struct {
-    int id;                     // ID unico
-    char name[MAX_NAME_LENGTH]; // Nombre del Enemigo
-    int currentHP;              // Vida Actual
-    int attack;                 // Puntos de Ataque
-    int defense;                // Puntos de Defensa
-    int goldReward;             // Oro de Recompensa
-    int difficulty;             // Dificultad
+    int id;                    
+    char name[MAX_NAME_LENGTH]; 
+    int HP;       
+    int currentHP;     
+    int attack;                 
+    int defense;               
+    int difficulty; // Dificultad del enemigo (1, 2 o 3)
 } Enemy;
 
 // Struct de Escenario
-typedef struct ScenarioNode {
-    int id;                                             // Identificador único del escenario
+typedef struct {
+    int id;                                             
     int difficulty;                                     // Dificultad del escenario (1, 2 o 3)
+    char name[MAX_NAME_LENGTH];                        // Nombre del escenario
     char description[MAX_DESCRIPTION_LENGTH];           // Descripción breve del lugar
-    struct ScenarioNode* next;                          // Puntero al siguiente escenario en el mapa lineal
-    Enemy* boss;                                        // Enemigo enlazado al Escenario (OPCIONAL)
-
-    int type;                   // Tipos de Escenario
-    // 1: Combate
-    // 2: Tienda (solo la inicial)
-    // 3: Evento Aleatorio (combate, mercader o bonus)
-    // 4: Jefe
-} ScenarioNode;
+} Scenario;
 
 #endif

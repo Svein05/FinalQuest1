@@ -24,7 +24,7 @@ static void initializeEmptyItem(Item* item) {
     item->damage = 0;
     item->defense = 0;
     item->heal = 0;
-    item->cost = 0;
+    item->price = 0;
     item->difficulty = 0;
     item->effectDuration = 0;
 }
@@ -272,7 +272,7 @@ void displayPlayerMenu(Player* player) {
                 currentItem.id != player->equippedWeapon.id && // Asume que un ítem equipado no tiene un duplicado en inventario por ID
                 currentItem.id != player->equippedArmor.id) {
                 printf("%d. %s (Tipo: %d, Rareza: %s, Costo: %d",
-                       i + 1, currentItem.name, currentItem.type, currentItem.rarity, currentItem.cost);
+                       i + 1, currentItem.name, currentItem.type, currentItem.rarity, currentItem.price);
                 if (currentItem.type == 1) printf(", Daño: %d)\n", currentItem.damage);
                 else if (currentItem.type == 2) printf(", Defensa: %d)\n", currentItem.defense);
                 else if (currentItem.type == 3) {
