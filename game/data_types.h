@@ -21,6 +21,7 @@ typedef struct {
     int price;          // Valor del Item
     int difficulty;     // Enlazar a Mapa - Tienda
     int effectDuration;  
+    char class[16];     // Clase a la que pertenece el item (Guerrero, Tanque, Asesino)
 } Item;
 
 // Struct de Player

@@ -8,6 +8,7 @@
 #include "data_types.h"
 #include "player.h" // Incluido para las funciones de jugador
 #include "../tdas/extra.h" // Asegúrate de que esta ruta es correcta para tu extra.h y extra.c
+#include "data_loader.h"
 
 Shop* shop_initialize_random_merchant(const char* itemsCsvPath, int minDifficulty, int maxDifficulty) {
     // Inicializar el generador de números aleatorios si no se ha hecho
@@ -88,6 +89,25 @@ Shop* shop_initialize_random_merchant(const char* itemsCsvPath, int minDifficult
     printf("Un mercader misterioso ha aparecido con %d items de dificultad %d-%d!\n",
            randomMerchant->itemCount, minDifficulty, maxDifficulty);
     return randomMerchant;
+}
+
+Shop* shop_initialize_start_shop(const char* itemsCsvPath) {
+    int numItems = 0;
+    Item* items = load_items(itemsCsvPath, &numItems);
+    if (items == NULL || numItems == 0) {
+        fprintf(stderr, "Error: No se pudieron cargar los ítems para la tienda inicial.\n");
+        return NULL;
+    }
+    Shop* startShop = (Shop*) malloc(sizeof(Shop));
+    if (startShop == NULL) {
+        perror("Error al asignar memoria para la tienda inicial");
+        freeItems(items);
+        return NULL;
+    }
+    startShop->items = items;
+    startShop->itemCount = numItems;
+    printf("Tienda inicial creada con %d ítems.\n", numItems);
+    return startShop;
 }
 
 void shop_interact(Player* player, Shop* currentShop) {

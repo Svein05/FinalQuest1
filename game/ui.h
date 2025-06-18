@@ -6,6 +6,7 @@
 #include "../tdas/extra.h"
 #include "player.h"
 #include <windows.h>
+
 // Funciones de impresión para el usuario
 void welcome_zero(Player* player);
 void mostrarInstrucciones();

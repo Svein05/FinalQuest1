@@ -106,7 +106,9 @@ void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios) {
     }
 }
 
-
+// --- Variables de control para eventos aleatorios ---
+static int merchant_count = 0;
+static int last_event_type = -1;
 
 void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, int currentScenarioDifficulty) {
     if (player == NULL || allItems == NULL || numItems == 0 || allEnemies == NULL || numEnemies == 0) {
@@ -116,19 +118,35 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
 
     printf("\n--- EVENTO ALEATORIO ---\n");
 
-    int event_type = rand() % NUM_EVENT_TYPES; 
+    int event_type = -1;
+    int roll = rand() % 100;
+    // 0-54: combate (55%), 55-69: mercader (15%), 70-99: bonus (30%)
+    if (roll < 55) {
+        event_type = 0; // Combate
+    } else if (roll < 70) {
+        event_type = 1; // Mercader
+    } else {
+        event_type = 2; // Bonus
+    }
+
+    // Limitar mercader a 2 por escenario y nunca seguidos
+    if (event_type == 1) {
+        if (merchant_count >= 2 || last_event_type == 1) {
+            event_type = (roll < 85) ? 0 : 2; // Si no puede ser mercader, prioriza combate
+        } else {
+            merchant_count++;
+        }
+    }
+    if (event_type != 1) merchant_count = 0; // Reset si no es mercader
+
+    last_event_type = event_type;
+
     if (event_type == 0) { // Combate
         printf("Has encontrado un enemigo inesperado!\n");
-
         Enemy* randomEnemy = spawnRandomEnemy(currentScenarioDifficulty, allEnemies, numEnemies);
         printf("¡Un %s aparece!\n", randomEnemy->name);
-
-
         Enemy combatEnemy = *randomEnemy;
-
         bool combatWon = combat_manage_turn(player, &combatEnemy);
-        
-
         if (combatWon) {
             int base = rand() % 51 + 50;
             int multiplier = 133 + (rand() % 3) * 33;
@@ -137,38 +155,42 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
             player->gold += won_gold; 
         } else {
             printf("Has sido derrotado por %s!.\n", combatEnemy.name);
-            player->currentHP = 0; // Asegurarse de que el jugador esté "muerto"
+            player->currentHP = 0;
         }
-
     } else if (event_type == 1) { // Mercader
         printf("Has encontrado a un mercader errante!\n");
-        // Para este mercader aleatorio, podríamos usar un rango de dificultad basado en la dificultad del escenario actual
-        // o del jugador. Por ahora, un rango fijo para la demostración.
         Shop* randomMerchant = shop_initialize_random_merchant(
-            "items.csv", // Ruta a tu CSV de ítems global
-            1, // Dificultad mínima de ítems del mercader
-            3  // Dificultad máxima de ítems del mercader
+            "items.csv",
+            1,
+            3
         );
         if (randomMerchant != NULL) {
             shop_interact(player, randomMerchant);
-            shop_free(randomMerchant); // Liberar la memoria del mercader después de la interacción
+            shop_free(randomMerchant);
         } else {
             printf("El mercader no tenia nada que vender o hubo un error.\n");
         }
-
-    } else { // event_type == 2: Bonificación (Oro o Ítem o Stats)
+    } else { // Bonus
         printf("Has descubierto algo interesante!\n");
-        int bonus_type = rand() % 3; // 0: Oro, 1: Ítem, 2: Stats
-
-        if (bonus_type == 0) { // Oro
-            int gold_found = (rand() % 100) + 50; // Entre 50 y 149 oro
+        int bonus_type = rand() % 10; // 0-3: oro (40%), 4-6: stats (30%), 7-9: item (30%)
+        if (bonus_type < 4) { // Oro
+            int gold_found = (rand() % 100) + 50;
             player->gold += gold_found;
             printf("Encontraste %d oro!\n", gold_found);
-        } else if (bonus_type == 1) { // Ítem
+        } else if (bonus_type < 7) { // Stats
+            int stat_choice = rand() % 2;
+            if (stat_choice == 0) {
+                int atk_boost = (rand() % 5) + 1;
+                player->attack += atk_boost;
+                printf("Te sientes mas fuerte! Tu ataque aumento en %d.\n", atk_boost);
+            } else {
+                int def_boost = (rand() % 3) + 1;
+                player->defense += def_boost;
+                printf("Tu piel se ha endurecido! Tu defensa aumento en %d.\n", def_boost);
+            }
+        } else { // Ítem (menos frecuente)
             if (numItems > 0) {
-                Item randomItem = allItems[rand() % numItems]; // Obtener un ítem aleatorio
-                // Si el ítem ya es un arma o armadura equipada, no debería darlo así.
-                // O solo dar ítems consumibles.
+                Item randomItem = allItems[rand() % numItems];
                 if (player_add_item_to_inventory(player, randomItem)) {
                     printf("Encontraste un %s!\n", randomItem.name);
                 } else {
@@ -176,17 +198,6 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
                 }
             } else {
                 printf("No se encontraron ítems para dar como bonificación.\n");
-            }
-        } else { // Stats
-            int stat_choice = rand() % 2; // 0: Ataque, 1: Defensa
-            if (stat_choice == 0) {
-                int atk_boost = (rand() % 5) + 1; // +1 a +5 ataque
-                player->attack += atk_boost;
-                printf("Te sientes mas fuerte! Tu ataque aumento en %d.\n", atk_boost);
-            } else {
-                int def_boost = (rand() % 3) + 1; // +1 a +3 defensa
-                player->defense += def_boost;
-                printf("Tu piel se ha endurecido! Tu defensa aumento en %d.\n", def_boost);
             }
         }
     }

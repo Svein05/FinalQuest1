@@ -10,10 +10,10 @@
 #include "game/combat.h"   
 #include "game/shop.h"       
 #include "game/scenario.h"  
+#include "game/ui.h"        
 #include "tdas/extra.h"      
 #include "tdas/stack.h"
 #include "tdas/list.h"
-#include "game/ui.h"        
 
 // Rutas a archivos CSV
 #define SCENARIOS_CSV_PATH "data/scenarios.csv"
@@ -29,14 +29,29 @@ int main() {
     clearScreen();
     printf("--- ¡BIENVENIDO A TU AVENTURA! ---\n");
     printf("Un juego de rol sencillo en C.\n");
-    waitForKeyPress();
-    clearScreen();
-
-    // --- 1. Inicializar Jugador ---
+    printf("Elige tu clase:\n");
+    printf("1. Guerrero (Balanceado)\n");
+    printf("2. Tanque (Mucha defensa y vida, menos daño)\n");
+    printf("3. Asesino (Mucho daño, poca vida y defensa)\n");
+    int clase = 0;
+    while (clase < 1 || clase > 3) {
+        printf("Ingresa el número de tu clase: ");
+        char input[10];
+        fgets(input, sizeof(input), stdin);
+        clase = atoi(input);
+    }
+    char* nombreClase;
+    int hp, atk, def, oro;
+    switch (clase) {
+        case 1: nombreClase = "Guerrero"; hp = 100; atk = 10; def = 5; oro = 200; break;
+        case 2: nombreClase = "Tanque";   hp = 130; atk = 7;  def = 12; oro = 200; break;
+        case 3: nombreClase = "Asesino";  hp = 70;  atk = 18; def = 2; oro = 200; break;
+    }
     Player player;
-    initializePlayer(&player, "Heroe Valiente", 100, 10, 5, 200); 
+    initializePlayer(&player, nombreClase, hp, atk, def, oro); 
     // HP, Atk, Def, Oro inicial
 
+    // Añadir TDAS
     Enemy* enemy_array = NULL;
     Item* item_array = NULL;
     Scenario* scenario_array = NULL;
@@ -48,7 +63,7 @@ int main() {
 
     // --- 2. Cargar Datos del Juego ---
     printf("Cargando datos del juego\n");
-    wait_three_points();
+    //wait_three_points();
 
     enemy_array = load_enemies(ENEMIES_CSV_PATH, &numEnemies);
     if (enemy_array == NULL) {
@@ -89,22 +104,26 @@ int main() {
             // Añadir ítems iniciales al inventario del jugador
             int numInitialItems = 0;
             Item* initialItems = load_initial_items(INITIAL_ITEMS_CSV_PATH, &numInitialItems);
-            
             if (initialItems == NULL) {
                 printf("No se encontraron ítems iniciales para añadir al inventario.\n");
                 exit(EXIT_FAILURE);
             }
 
+            // Solo añadir los ítems de la clase elegida
             for (int i = 0; i < numInitialItems; i++) {
-                if (!player_add_item_to_inventory(&player, initialItems[i])) {
-                    printf("No se pudo añadir el ítem %s al inventario.\n", initialItems[i].name);
+                if ((clase == 1 && strcmp(initialItems[i].class, "Guerrero") == 0) ||
+                    (clase == 2 && strcmp(initialItems[i].class, "Tanque") == 0) ||
+                    (clase == 3 && strcmp(initialItems[i].class, "Asesino") == 0)) {
+                    if (!player_add_item_to_inventory(&player, initialItems[i])) {
+                        printf("No se pudo añadir el ítem %s al inventario.\n", initialItems[i].name);
                     } else Sleep(1000);
-                } 
+                }
+            }
             freeItems(initialItems); // Liberar memoria de los ítems iniciales
             
             printf("Automaticamente te equiparás con tu mejor equipamiento.\n");
             waitForKeyPress();
-            scenario_counter++; 
+            scenario_counter++;
         } else {
             printf("\n--- ESCENARIO %d ---\n", scenario_counter);
             printf("Estas en: %s\n", currentScenario->name);
@@ -112,7 +131,7 @@ int main() {
             int steps = MAX_STEPS_PER_SCENARIO; // Simular pasos del jugador en el escenario actual
             
             while (steps) { 
-                scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies); // Manejar el evento del escenario actual
+                scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario->difficulty); // Manejar el evento del escenario actual
                 printf("Pasos restantes: %d\n", steps);
                 steps--;
                 if (player.currentHP <= 0) { // Si el jugador ha muerto, termina el juego

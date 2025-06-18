@@ -30,21 +30,21 @@ void free_tokens(char** tokens) {
 void freeEnemies(Enemy* enemies) {
     if (enemies != NULL) {
         free(enemies); 
-        printf("Memoria de enemigos liberada.\n");
+        // printf("Memoria de enemigos liberada.\n");
     }
 }
 
 void freeScenarioMap(Scenario* scenarios) {
     if (scenarios != NULL) {
         free(scenarios);
-        printf("Memoria de escenarios liberada.\n");
+        // printf("Memoria de escenarios liberada.\n");
     }
 }
 
 void freeItems(Item* items) {
     if (items != NULL) {
         free(items);
-        printf("Memoria de ítems liberada.\n");
+        // printf("Memoria de ítems liberada.\n");
     }
 }
 
@@ -64,13 +64,14 @@ bool parse_enemy(char** tokens, Enemy* enemy) {
     strncpy(enemy->name, tokens[1], sizeof(enemy->name) - 1);
     enemy->name[sizeof(enemy->name) - 1] = '\0';
     enemy->HP = atoi(tokens[2]);
+    enemy->currentHP = enemy->HP; // Inicializar currentHP igual a HP
     enemy->attack = atoi(tokens[3]);
     enemy->defense = atoi(tokens[4]);
     enemy->difficulty = atoi(tokens[5]);
     return true;
 }
 
-// El orden de las columnas de items:
+// El orden de las columnas de items para initial_items.csv:
 // ID, Nombre, Tipo, Rareza, Daño, Curación, Defensa, Costo, Dificultad
 bool parse_item(char** tokens, Item* item) {
     if (tokens == NULL || item == NULL) return false;
@@ -87,7 +88,34 @@ bool parse_item(char** tokens, Item* item) {
     item->price = atoi(tokens[7]);
     item->difficulty = atoi(tokens[8]);
     item->effectDuration = atoi(tokens[9]);
+    // Solo asignar class si existe la columna (para initial_items.csv)
+    if (tokens[10] != NULL) {
+        strncpy(item->class, tokens[10], sizeof(item->class) - 1);
+        item->class[sizeof(item->class) - 1] = '\0';
+    } else {
+        item->class[0] = '\0';
+    }
 
+    return true;
+}
+
+// El orden de las columnas de items para items.csv:
+// ID, Nombre, Tipo, Rareza, Daño, Defensa, Curación, Costo, Dificultad, EffectDuration
+bool parse_item_basic(char** tokens, Item* item) {
+    if (tokens == NULL || item == NULL) return false;
+    item->id = atoi(tokens[0]);
+    strncpy(item->name, tokens[1], sizeof(item->name) - 1);
+    item->name[sizeof(item->name) - 1] = '\0';
+    item->type = atoi(tokens[2]);
+    strncpy(item->rarity, tokens[3], sizeof(item->rarity) - 1);
+    item->rarity[sizeof(item->rarity) - 1] = '\0';
+    item->damage = atoi(tokens[4]);
+    item->defense = atoi(tokens[5]);
+    item->heal = atoi(tokens[6]);
+    item->price = atoi(tokens[7]);
+    item->difficulty = atoi(tokens[8]);
+    item->effectDuration = atoi(tokens[9]);
+    item->class[0] = '\0'; // No hay clase en items.csv
     return true;
 }
 
@@ -99,7 +127,7 @@ bool parse_scenario(char** tokens, Scenario* node) {
     // Verificar que tenemos todos los campos necesarios
     for (int i = 0; i < 4; i++) {
         if (!tokens[i]) {
-            fprintf(stderr, "Error: Faltan campos en el escenario\n");
+            // printf(stderr, "Error: Faltan campos en el escenario\n");
             return false;
         }
     }
@@ -108,7 +136,7 @@ bool parse_scenario(char** tokens, Scenario* node) {
     char* endptr;
     node->id = strtol(tokens[0], &endptr, 10);
     if (*endptr != '\0' || node->id <= 0) {
-        fprintf(stderr, "Error: ID de escenario inválido '%s'\n", tokens[0]);
+        // printf(stderr, "Error: ID de escenario inválido '%s'\n", tokens[0]);
         return false;
     }
 
@@ -123,7 +151,7 @@ bool parse_scenario(char** tokens, Scenario* node) {
     // Parsear Dificultad
     node->difficulty = strtol(tokens[3], &endptr, 10);
     if (*endptr != '\0' || node->difficulty < 1 || node->difficulty > 3) {
-        fprintf(stderr, "Error: Dificultad inválida '%s' (debe ser 1-3)\n", tokens[3]);
+        // printf(stderr, "Error: Dificultad inválida '%s' (debe ser 1-3)\n", tokens[3]);
         return false;
     }
 
@@ -138,7 +166,7 @@ Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
         *numEnemies = 0;
         return NULL;
     }
-    printf("Cargando enemigos desde %s...\n", ENEMIES_CSV_PATH);
+    // printf("Cargando enemigos desde %s...\n", ENEMIES_CSV_PATH);
     int capacity = 10;
     int count = 0;
     Enemy* enemies = malloc(sizeof(Enemy) * capacity);
@@ -148,13 +176,13 @@ Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
         *numEnemies = 0;
         return NULL;
     }
-    printf("Memoria asignada para %d enemigos.\n", capacity);
+    // printf("Memoria asignada para %d enemigos.\n", capacity);
     // Leer y descartar el encabezado
     char** tokens = read_csv_line(file, CSV_DELIMITER);
     free_tokens(tokens);
 
     // Leer enemigos del CSV
-    printf("Leyendo enemigos...\n");
+    // printf("Leyendo enemigos...\n");
     while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
         if (count >= capacity) {
             capacity *= 2;
@@ -179,10 +207,10 @@ Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
         free_tokens(tokens);
     }
 
-    printf("Total de enemigos leídos: %d\n", count);
+    // printf("Total de enemigos leídos: %d\n", count);
     fclose(file);
     *numEnemies = count;
-    printf("Cargados %d enemigos desde %s.\n", count, ENEMIES_CSV_PATH);
+    // printf("Cargados %d enemigos desde %s.\n", count, ENEMIES_CSV_PATH);
     return enemies;
 }
 
@@ -215,26 +243,24 @@ Item* load_items(const char* ITEMS_CSV_PATH, int* numItems) {
             Item* temp = realloc(items, sizeof(Item) * capacity);
             if (temp == NULL) {
                 perror("Error al redimensionar memoria para ítems");
-                freeItems(items); // <-- Asegurate de tener esta función
+                freeItems(items);
                 fclose(file);
                 *numItems = 0;
                 return NULL;
             }
             items = temp;
         }
-
-        if (parse_item(tokens, &items[count])) {
+        if (parse_item_basic(tokens, &items[count])) {
             count++;
         } else {
             printf("Advertencia: Error al parsear un ítem. Saltando línea.\n");
         }
-
         free_tokens(tokens);
     }
 
     fclose(file);
     *numItems = count;
-    printf("Cargados %d ítems desde %s.\n", count, ITEMS_CSV_PATH);
+    // printf("Cargados %d ítems desde %s.\n", count, ITEMS_CSV_PATH);
     return items;
 }
 
@@ -286,7 +312,7 @@ Item* load_initial_items(const char* INITIAL_ITEMS_CSV_PATH, int* numItems) {
 
     fclose(file);
     *numItems = count;
-    printf("Cargados %d ítems iniciales desde %s.\n", count, INITIAL_ITEMS_CSV_PATH);
+    // printf("Cargados %d ítems iniciales desde %s.\n", count, INITIAL_ITEMS_CSV_PATH);
     return items;
 }
 
@@ -338,7 +364,7 @@ Scenario* load_scenarios(const char* SCENARIOS_CSV_PATH, int* numScenarios) {
 
     fclose(file);
     *numScenarios = count;
-    printf("Cargados %d escenarios desde %s.\n", count, SCENARIOS_CSV_PATH);
+    // printf("Cargados %d escenarios desde %s.\n", count, SCENARIOS_CSV_PATH);
     return scenarios;
 }
 

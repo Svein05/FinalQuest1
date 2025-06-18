@@ -9,13 +9,11 @@
 
 // --- FUNCIONES AUXILIARES DEL MÓDULO COMBATE ---
 int calculate_damage(int attack, int defense) {
-    // Calcular el daño base.
-    int damage_dealt = attack - defense;
-
-    // Asegurar que el daño mínimo siempre sea 0, incluso si la defensa es muy alta.
-    if (damage_dealt < 1) {
-        damage_dealt = 0;
-    }
+    // Fórmula no lineal: la defensa reduce el daño con rendimientos decrecientes
+    // Daño = ataque * (100 / (100 + defensa))
+    float reduction = 100.0f / (100.0f + (float)defense);
+    int damage_dealt = (int)(attack * reduction + 0.5f); // Redondeo
+    if (damage_dealt < 1) damage_dealt = 1; // Daño mínimo siempre 1
     return damage_dealt;
 }
 
