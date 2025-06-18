@@ -172,32 +172,39 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         }
     } else { // Bonus
         printf("Has descubierto algo interesante!\n");
+        waitForKeyPress();
         int bonus_type = rand() % 10; // 0-3: oro (40%), 4-6: stats (30%), 7-9: item (30%)
         if (bonus_type < 4) { // Oro
             int gold_found = (rand() % 100) + 50;
             player->gold += gold_found;
             printf("Encontraste %d oro!\n", gold_found);
+            waitForKeyPress();
         } else if (bonus_type < 7) { // Stats
             int stat_choice = rand() % 2;
             if (stat_choice == 0) {
                 int atk_boost = (rand() % 5) + 1;
                 player->attack += atk_boost;
                 printf("Te sientes mas fuerte! Tu ataque aumento en %d.\n", atk_boost);
+                waitForKeyPress();
             } else {
                 int def_boost = (rand() % 3) + 1;
                 player->defense += def_boost;
                 printf("Tu piel se ha endurecido! Tu defensa aumento en %d.\n", def_boost);
+                waitForKeyPress();
             }
         } else { // Ítem (menos frecuente)
             if (numItems > 0) {
                 Item randomItem = allItems[rand() % numItems];
                 if (player_add_item_to_inventory(player, randomItem)) {
                     printf("Encontraste un %s!\n", randomItem.name);
+                    waitForKeyPress();
                 } else {
                     printf("Encontraste un %s, pero tu inventario esta lleno!\n", randomItem.name);
+                    waitForKeyPress();
                 }
             } else {
                 printf("No se encontraron ítems para dar como bonificación.\n");
+                waitForKeyPress();
             }
         }
     }

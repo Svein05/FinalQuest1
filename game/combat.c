@@ -6,6 +6,7 @@
 #include "combat.h"     // Declaraciones de las funciones de combate
 #include "data_types.h" // Definiciones de las estructuras Player, Enemy, Item
 #include "player.h"     // Funciones del jugador (initializePlayer, player_add_item_to_inventory, etc.)
+#include "ui.h" // Para waitForKeyPress y otros helpers visuales
 
 // --- FUNCIONES AUXILIARES DEL MÓDULO COMBATE ---
 int calculate_damage(int attack, int defense) {
@@ -21,20 +22,20 @@ void display_combat_status(Player* player, Enemy* enemy) {
     if (player == NULL || enemy == NULL) return;
 
     printf("\n--- ESTADO DE COMBATE ---\n");
-    printf("%s HP: %d/%d (Atk: %d, Def: %d)\n",
+    printf("%s HP: \x1b[32m%d\x1b[0m/\x1b[32m%d\x1b[0m (Atk: \x1b[31m%d\x1b[0m, Def: \x1b[34m%d\x1b[0m)\n",
            player->name, player->currentHP, player->maxHP,
            player->attack + player->tempAttackBoost, // Mostrar ataque efectivo
            player->defense + player->tempDefenseBoost); // Mostrar defensa efectiva
 
     // Mostrar boosts temporales si están activos
     if (player->tempAttackBoost > 0) {
-        printf("  - Boost Atk: +%d (%d turnos restantes)\n", player->tempAttackBoost, player->attackBoostTurns);
+        printf("  - Boost Atk: +\x1b[31m%d\x1b[0m (%d turnos restantes)\n", player->tempAttackBoost, player->attackBoostTurns);
     }
     if (player->tempDefenseBoost > 0) {
-        printf("  - Boost Def: +%d (%d turnos restantes)\n", player->tempDefenseBoost, player->defenseBoostTurns);
+        printf("  - Boost Def: +\x1b[34m%d\x1b[0m (%d turnos restantes)\n", player->tempDefenseBoost, player->defenseBoostTurns);
     }
 
-    printf("%s HP: %d\n", enemy->name, enemy->currentHP);
+    printf("%s HP: \x1b[32m%d\x1b[0m\n", enemy->name, enemy->currentHP);
     printf("------------------------\n");
 }
 
@@ -84,6 +85,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
     }
 
     printf("\n--- ¡COMBATE INICIADO! %s vs %s ---\n", player->name, enemy->name);
+    waitForKeyPress();
 
     while (player->currentHP > 0 && enemy->currentHP > 0) {
         display_combat_status(player, enemy);
@@ -99,6 +101,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             apply_damage(&enemy->currentHP, damage_to_enemy);
             printf("%s ataca a %s y le inflige %d de daño.\n",
                    player->name, enemy->name, damage_to_enemy);
+            waitForKeyPress();
 
         } else if (action_choice == 2) { 
             printf("--- Inventario de %s ---\n", player->name);
@@ -120,23 +123,27 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
                 int item_choice = atoi(item_input);
 
                 if (item_choice > 0 && item_choice <= player->inventoryCount) {
-                    printf("Usando item del inventario (Lógica player_use_consumable pendiente).\n"); 
+                    player_use_consumable(player, item_choice - 1);
+                    waitForKeyPress(); // Pausa para leer el resultado del ítem
                 } else {
                     printf("Cancelando uso de item.\n");
+                    waitForKeyPress();
                 }
             }
         } else {
             printf("Accion invalida. Pierdes tu turno.\n");
+            waitForKeyPress();
         }
 
         // --- Verificar si el enemigo fue derrotado después del turno del jugador ---
         if (enemy->currentHP <= 0) {
             printf("%s ha sido derrotado!\n", enemy->name);
+            waitForKeyPress();
             return true; // Jugador gana
         }
 
 
-        printf("Actualizando efectos temporales del jugador (Lógica player_update_temporary_boosts pendiente).\n"); 
+        player_update_temporary_boosts(player); 
 
         // --- TURNO DEL ENEMIGO ---
         printf("\nEs el turno de %s!\n", enemy->name);
@@ -144,10 +151,11 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
         apply_damage(&player->currentHP, enemy_damage_to_player);
         printf("%s ataca a %s y le inflige %d de daño.\n",
                enemy->name, player->name, enemy_damage_to_player);
-
+        waitForKeyPress();
 
         if (player->currentHP <= 0) {
             printf("%s ha sido derrotado por %s!\n", player->name, enemy->name);
+            waitForKeyPress();
             return false; // Jugador pierde
         }
     }

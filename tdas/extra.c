@@ -1,5 +1,7 @@
 #include "extra.h"
 #include <string.h> // Para strdup, strlen, strcpy, etc.
+#include <stdlib.h>
+#include <string.h>
 
 
 #define MAX_LINE_LENGTH 4096
@@ -124,7 +126,13 @@ List *split_string(const char *str, const char *delim) {
 
 // Función para limpiar la pantalla
 void clearScreen() {
-  printf("CLEARSCREEN\n");
+    char* shell = getenv("SHELL");
+    char* term = getenv("TERM");
+    if ((shell && strstr(shell, "bash")) || (term && strstr(term, "xterm"))) {
+        system("clear");
+    } else {
+        system("cls");
+    }
 }
 
 void waitForKeyPress() {

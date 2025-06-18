@@ -4,7 +4,8 @@
 #include <stdbool.h>
 
 #include "player.h"
-#include "data_types.h" // Para Player, Item, y las nuevas constantes
+#include "data_types.h"
+#include "ui.h"
 // Puedes necesitar includes adicionales para debug o IO si usas system("cls") etc.
 
 // --- FUNCIONES AUXILIARES INTERNAS ---
@@ -73,8 +74,7 @@ void initializePlayer(Player* player, const char* name, int hp, int atk, int def
         initializeEmptyItem(&player->inventory[i]); // Asegurarse de que todos los campos estén limpios
     }
 
-    printf("Jugador '%s' inicializado con HP: %d, Atk: %d, Def: %d, Oro: %d.\n",
-           player->name, player->currentHP, player->attack, player->defense, player->gold);
+    initializePlayer_menu(player);
 }
 
 /**

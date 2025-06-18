@@ -27,12 +27,8 @@
 int main() {
     SetConsoleOutputCP(CP_UTF8);
     clearScreen();
-    printf("--- ¡BIENVENIDO A TU AVENTURA! ---\n");
-    printf("Un juego de rol sencillo en C.\n");
-    printf("Elige tu clase:\n");
-    printf("1. Guerrero (Balanceado)\n");
-    printf("2. Tanque (Mucha defensa y vida, menos daño)\n");
-    printf("3. Asesino (Mucho daño, poca vida y defensa)\n");
+    welcome_program(); 
+    choice_class_menu();
     int clase = 0;
     while (clase < 1 || clase > 3) {
         printf("Ingresa el número de tu clase: ");
@@ -63,7 +59,7 @@ int main() {
 
     // --- 2. Cargar Datos del Juego ---
     printf("Cargando datos del juego\n");
-    //wait_three_points();
+    wait_three_points();
 
     enemy_array = load_enemies(ENEMIES_CSV_PATH, &numEnemies);
     if (enemy_array == NULL) {
@@ -125,11 +121,15 @@ int main() {
             waitForKeyPress();
             scenario_counter++;
         } else {
-            printf("\n--- ESCENARIO %d ---\n", scenario_counter);
-            printf("Estas en: %s\n", currentScenario->name);
-            printf("%s\n", currentScenario->description);
+            printf("\n========================================\n");
+            printf("      \x1b[33mESCENARIO %d\x1b[0m\n", scenario_counter);
+            printf("========================================\n");
+            printf("\x1b[36mUbicación:\x1b[0m %s\n", currentScenario->name);
+            printf("\x1b[32mDescripción:\x1b[0m %s\n", currentScenario->description);
+            printf("----------------------------------------\n");
             int steps = MAX_STEPS_PER_SCENARIO; // Simular pasos del jugador en el escenario actual
             
+            waitForKeyPress();
             while (steps) { 
                 scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario->difficulty); // Manejar el evento del escenario actual
                 printf("Pasos restantes: %d\n", steps);
