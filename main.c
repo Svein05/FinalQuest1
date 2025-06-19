@@ -23,31 +23,14 @@
 #define MAX_DIFFICULTY 3    
 #define MAX_STEPS_PER_SCENARIO 8
 
-// --- FUNCIÓN PRINCIPAL DEL JUEGO ---
 int main() {
     SetConsoleOutputCP(CP_UTF8);
     clearScreen();
-    welcome_program(); 
-    choice_class_menu();
-    int clase = 0;
-    while (clase < 1 || clase > 3) {
-        printf("Ingresa el número de tu clase: ");
-        char input[10];
-        fgets(input, sizeof(input), stdin);
-        clase = atoi(input);
-    }
-    char* nombreClase;
-    int hp, atk, def, oro;
-    switch (clase) {
-        case 1: nombreClase = "Guerrero"; hp = 100; atk = 10; def = 5; oro = 200; break;
-        case 2: nombreClase = "Tanque";   hp = 130; atk = 7;  def = 12; oro = 200; break;
-        case 3: nombreClase = "Asesino";  hp = 70;  atk = 18; def = 2; oro = 200; break;
-    }
-    Player player;
-    initializePlayer(&player, nombreClase, hp, atk, def, oro); 
-    // HP, Atk, Def, Oro inicial
 
-    // Añadir TDAS
+    // --- 1. Inicializamos al Jugador ---
+    Player player;
+    player_choose_and_assign_class(&player);
+
     Enemy* enemy_array = NULL;
     Item* item_array = NULL;
     Scenario* scenario_array = NULL;
@@ -58,95 +41,51 @@ int main() {
     int numScenarios = 0;
 
     // --- 2. Cargar Datos del Juego ---
-    printf("Cargando datos del juego\n");
-    wait_three_points();
-
     enemy_array = load_enemies(ENEMIES_CSV_PATH, &numEnemies);
-    if (enemy_array == NULL) {
-        fprintf(stderr, "Error: No se pudieron cargar los enemigos. Saliendo.\n");
-        return EXIT_FAILURE;
-    } printf("Enemigos cargados: %d\n", numEnemies);
+    if (enemy_array == NULL) return EXIT_FAILURE;
 
     item_array = load_items(ITEMS_CSV_PATH, &numItems);
-    if (item_array == NULL) {
-        fprintf(stderr, "Error: No se pudieron cargar los ítems. Saliendo.\n");
+    if (item_array == NULL) return EXIT_FAILURE;
 
-        freeEnemies(enemy_array);
-        return EXIT_FAILURE;
-    } printf("Ítems cargados: %d\n", numItems);
-    
     scenario_array = load_scenarios(SCENARIOS_CSV_PATH, &numScenarios);
-    if (game_map == NULL) {
-        fprintf(stderr, "Error: No se pudieron cargar los escenarios. Saliendo.\n");
-        
-        freeEnemies(enemy_array);
-        freeItems(item_array);
-        return EXIT_FAILURE;
-    }
+    if (scenario_array == NULL) return EXIT_FAILURE;
 
     // --- 3. Bucle Principal del Juego: Recorrer el Mapa ---
-    // GENERAR UN COMANDO PARA POBLAR STACK GAMEMAP EN BASE A LOS ESCENARIOS CARGADOS - SE TIENE QUE ELEGIR AL AZAR UNO ENTRE CADA DIFICULTAD DEL 1 AL 3
     poblarGameMap(game_map, scenario_array, numScenarios); // Crear el stack para el mapa del juego
     Scenario* currentScenario = stack_top(game_map); // Comenzar desde el primer escenario
     int scenario_counter = 0;
     
-    printf("Todo cargado correctamente. ¡Comencemos la aventura!\n");
+    // Quite el if de scenario uno, porque era innecesario ya que solo sucedia una vez
+    // asique solamente se carga una vez afuera el inicio del juego y ya 
+    // luego funciona el juego de manera normal.
+    pretty_loading_animation("Cargando datos del juego");
+    player_add_initial_class_items(&player, INITIAL_ITEMS_CSV_PATH);
     waitForKeyPress();
     while (currentScenario != NULL) {
         clearScreen();
-        if (scenario_counter == 0) {
-            welcome_zero(&player); // Mostrar bienvenida y primer escenario
-            
-            // Añadir ítems iniciales al inventario del jugador
-            int numInitialItems = 0;
-            Item* initialItems = load_initial_items(INITIAL_ITEMS_CSV_PATH, &numInitialItems);
-            if (initialItems == NULL) {
-                printf("No se encontraron ítems iniciales para añadir al inventario.\n");
-                exit(EXIT_FAILURE);
-            }
+        display_scenario(currentScenario);
+        display_player_summary(&player);
 
-            // Solo añadir los ítems de la clase elegida
-            for (int i = 0; i < numInitialItems; i++) {
-                if ((clase == 1 && strcmp(initialItems[i].class, "Guerrero") == 0) ||
-                    (clase == 2 && strcmp(initialItems[i].class, "Tanque") == 0) ||
-                    (clase == 3 && strcmp(initialItems[i].class, "Asesino") == 0)) {
-                    if (!player_add_item_to_inventory(&player, initialItems[i])) {
-                        printf("No se pudo añadir el ítem %s al inventario.\n", initialItems[i].name);
-                    } else Sleep(1000);
-                }
-            }
-            freeItems(initialItems); // Liberar memoria de los ítems iniciales
+        int steps = MAX_STEPS_PER_SCENARIO; // Simular pasos del jugador en el escenario actual
             
-            printf("Automaticamente te equiparás con tu mejor equipamiento.\n");
-            waitForKeyPress();
-            scenario_counter++;
-        } else {
-            printf("\n========================================\n");
-            printf("      \x1b[33mESCENARIO %d\x1b[0m\n", scenario_counter);
-            printf("========================================\n");
-            printf("\x1b[36mUbicación:\x1b[0m %s\n", currentScenario->name);
-            printf("\x1b[32mDescripción:\x1b[0m %s\n", currentScenario->description);
-            printf("----------------------------------------\n");
-            int steps = MAX_STEPS_PER_SCENARIO; // Simular pasos del jugador en el escenario actual
-            
-            waitForKeyPress();
-            while (steps) { 
-                scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario->difficulty); // Manejar el evento del escenario actual
-                printf("Pasos restantes: %d\n", steps);
-                steps--;
-                if (player.currentHP <= 0) { // Si el jugador ha muerto, termina el juego
-                    printf("Has sido derrotado. Fin del juego.\n");
-                    currentScenario = NULL; // Terminar el bucle
-                    break;
-                }
-            }
-            
-            if (currentScenario != NULL) {  // Si el juego no terminó, avanza al siguiente escenario
-                stack_pop(game_map);        // Sacar el escenario actual del stack
-                currentScenario = stack_top(game_map); // Obtener el siguiente escenario en el stack
-                scenario_counter++;
+        waitForKeyPress();
+        while (steps) { 
+            scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario); // Manejar el evento del escenario actual
+            printf("Pasos restantes: %d\n", steps);
+            steps--;
+            if (player.currentHP <= 0) { // Si el jugador ha muerto, termina el juego
+                printf("Has sido derrotado. Fin del juego.\n");
+                currentScenario = NULL; // Terminar el bucle
+                break;
             }
         }
+            
+        if (currentScenario != NULL) {  // Si el juego no terminó, avanza al siguiente escenario
+            stack_pop(game_map);        // Sacar el escenario actual del stack
+            currentScenario = stack_top(game_map); // Obtener el siguiente escenario en el stack
+            scenario_counter++;
+        }
+        
     }
     
 

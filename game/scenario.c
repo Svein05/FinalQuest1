@@ -4,11 +4,13 @@
 #include <stdbool.h>  // Para bool
 #include <time.h>     // Para srand(time(NULL))
 
+#include "ui.h"
 #include "scenario.h"   // Declaraciones de las funciones de escenario
 #include "data_types.h" // Definiciones de las estructuras Player, Enemy, Item, Scenario
 #include "combat.h"     // Funciones de combate (combat_manage_turn)
 #include "player.h"     // Funciones del jugador (player_add_item_to_inventory, etc.)
-#include "shop.h"       // Funciones de tienda (shop_initialize_random_merchant, shop_interact, shop_free)
+#include "shop.h"       // Funciones de tienda (shop_initialize_random_merchant, shop_interact)
+#include "../tdas/map.h" // Para Map*
 #include "../tdas/extra.h" // Función para leer líneas del CSV
 #include "../tdas/stack.h"
 
@@ -110,14 +112,18 @@ void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios) {
 static int merchant_count = 0;
 static int last_event_type = -1;
 
-void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, int currentScenarioDifficulty) {
+void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario) {
     if (player == NULL || allItems == NULL || numItems == 0 || allEnemies == NULL || numEnemies == 0) {
         printf("Error: Datos incompletos para gestionar evento.\n");
         return;
     }
 
+    clearScreen();
+    display_scenario(scenario);
+    display_player_summary(player);
     printf("\n--- EVENTO ALEATORIO ---\n");
 
+    int currentScenarioDifficulty = scenario->difficulty;
     int event_type = -1;
     int roll = rand() % 100;
     // 0-54: combate (55%), 55-69: mercader (15%), 70-99: bonus (30%)
@@ -159,14 +165,15 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         }
     } else if (event_type == 1) { // Mercader
         printf("Has encontrado a un mercader errante!\n");
-        Shop* randomMerchant = shop_initialize_random_merchant(
-            "items.csv",
-            1,
-            3
+        Map* itemMap = shop_initialize_random_merchant(
+            allItems,
+            numItems,
+            1, // O puedes usar currentScenarioDifficulty
+            3  // O puedes usar currentScenarioDifficulty
         );
-        if (randomMerchant != NULL) {
-            shop_interact(player, randomMerchant);
-            shop_free(randomMerchant);
+        if (itemMap != NULL) {
+            shop_interact(player, itemMap);
+            map_destroy(itemMap);
         } else {
             printf("El mercader no tenia nada que vender o hubo un error.\n");
         }

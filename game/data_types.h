@@ -1,7 +1,7 @@
 #ifndef DATA_TYPES_H
 #define DATA_TYPES_H
 
-#define MAX_NAME_LENGTH 16
+#define MAX_NAME_LENGTH 48
 #define MAX_RARITY_LENGTH 20
 #define MAX_DESCRIPTION_LENGTH 256
 #define INVENTORY_SLOTS 10
@@ -27,6 +27,7 @@ typedef struct {
 // Struct de Player
 typedef struct {
     char name[MAX_NAME_LENGTH];         
+    int classID;
     int maxHP;                         
     int currentHP;                      
     int attack;                         
@@ -43,6 +44,7 @@ typedef struct {
     int tempDefenseBoost;   // Cantidad de defensa temporal ACTIVA en el jugador
     int attackBoostTurns;   // Turnos restantes para el aumento de ataque
     int defenseBoostTurns;  // Turnos restantes para el aumento de defensa
+    int enemiesDefeated;    // NUEVO: cantidad de enemigos derrotados
 } Player;
 
 // Struct de Enemy

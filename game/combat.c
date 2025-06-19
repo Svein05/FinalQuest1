@@ -138,6 +138,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
         // --- Verificar si el enemigo fue derrotado después del turno del jugador ---
         if (enemy->currentHP <= 0) {
             printf("%s ha sido derrotado!\n", enemy->name);
+            player->enemiesDefeated++;
             waitForKeyPress();
             return true; // Jugador gana
         }

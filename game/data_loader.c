@@ -9,6 +9,8 @@
 #include "player.h"        // Funciones del jugador
 #include "shop.h"          // Funciones de tienda
 #include "../tdas/extra.h" 
+#include "../tdas/map.h"
+#include "../tdas/list.h"
 
 // --- CONSTANTES INTERNAS ---
 #define CSV_DELIMITER ',' 
@@ -366,5 +368,43 @@ Scenario* load_scenarios(const char* SCENARIOS_CSV_PATH, int* numScenarios) {
     *numScenarios = count;
     // printf("Cargados %d escenarios desde %s.\n", count, SCENARIOS_CSV_PATH);
     return scenarios;
+}
+
+// Comparador seguro para Map de strings
+int string_equals(void* a, void* b) {
+    return strcmp((const char*)a, (const char*)b) == 0;
+}
+
+// Carga los ítems iniciales en un Map: clave=clase, valor=List* de Item*
+Map* load_initial_items_map(const char* INITIAL_ITEMS_CSV_PATH) {
+    FILE* file = fopen(INITIAL_ITEMS_CSV_PATH, "r");
+    if (!file) {
+        perror("Error al abrir el archivo de ítems iniciales");
+        return NULL;
+    }
+    Map* clase_a_items = map_create(string_equals);
+    // Leer encabezado
+    char** tokens = read_csv_line(file, CSV_DELIMITER);
+    free_tokens(tokens);
+    // Leer ítems iniciales
+    while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
+        Item* item = malloc(sizeof(Item));
+        if (parse_item(tokens, item)) {
+            List* lista = NULL;
+            MapPair* pair = map_search(clase_a_items, item->class);
+            if (pair) {
+                lista = (List*)pair->value;
+            } else {
+                lista = list_create();
+                map_insert(clase_a_items, strdup(item->class), lista);
+            }
+            list_pushBack(lista, item);
+        } else {
+            free(item);
+        }
+        free_tokens(tokens);
+    }
+    fclose(file);
+    return clase_a_items;
 }
 

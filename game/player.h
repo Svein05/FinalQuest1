@@ -61,6 +61,26 @@ void displayPlayerMenu(Player* player);
  */
 bool player_remove_item_from_inventory(Player* player, int item_id);
 
+/**
+ * @brief Asigna los valores de clase al jugador según la opción elegida.
+ * @param player Puntero al jugador.
+ * @param clase Opción de clase (1=Guerrero, 2=Tanque, 3=Asesino).
+ */
+void player_assign_class(Player* player, int clase);
+
+/**
+ * @brief Pregunta al usuario por la clase y asigna los valores al jugador.
+ * @param player Puntero al jugador.
+ */
+void player_choose_and_assign_class(Player* player);
+
+/**
+ * @brief Añade ítems iniciales al inventario del jugador según su clase.
+ * @param player Puntero al jugador.
+ * @param initial_items_csv Cadena CSV con los ítems iniciales (id,cantidad) para añadir.
+ */
+void player_add_initial_class_items(Player* player, const char* initial_items_csv);
+
 // --- DECLARACIONES DE FUNCIONES ADICIONALES (que ya estaban en player.c) ---
 // Función para usar un consumible (ej. poción) desde el inventario del jugador
 void player_use_consumable(Player* player, int itemIndexInInventory);

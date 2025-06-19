@@ -9,177 +9,109 @@
 #include "player.h" // Incluido para las funciones de jugador
 #include "../tdas/extra.h" // Asegúrate de que esta ruta es correcta para tu extra.h y extra.c
 #include "data_loader.h"
+#include "../tdas/map.h"
 
-Shop* shop_initialize_random_merchant(const char* itemsCsvPath, int minDifficulty, int maxDifficulty) {
-    // Inicializar el generador de números aleatorios si no se ha hecho
+// Comparador para IDs de ítems (int)
+static int int_equals(void* a, void* b) {
+    return (*(int*)a) == (*(int*)b);
+}
+
+Map* shop_initialize_random_merchant(Item* item_array, int numItems, int minDifficulty, int maxDifficulty) {
     static bool seeded = false;
     if (!seeded) {
         srand((unsigned int)time(NULL));
         seeded = true;
     }
-
-    FILE* file = fopen(itemsCsvPath, "r");
-    if (file == NULL) {
-        perror("Error al abrir el archivo de items para el mercader aleatorio");
-        return NULL;
+    int* indices = malloc(sizeof(int) * numItems);
+    int validCount = 0;
+    for (int i = 0; i < numItems; i++) {
+        if (item_array[i].difficulty >= minDifficulty && item_array[i].difficulty <= maxDifficulty) {
+            indices[validCount++] = i;
+        }
     }
-
-    // suitableItems contendrá copias de los Item structs, incluyendo sus cadenas fijas.
-    Item* suitableItems = NULL;
-    int suitableItemCount = 0;
-    int capacity = 10;
-    suitableItems = (Item*) malloc(sizeof(Item) * capacity);
-    if (suitableItems == NULL) {
-        perror("Error al asignar memoria inicial para ítems adecuados");
-        fclose(file);
-        return NULL;
-    }
-
-    char** tokens = NULL;
-    char separator = ',';
-
-
-    // Ahora, seleccionar un número aleatorio de ítems de 'suitableItems' para el mercader
     int merchantItemCount = 0;
-    if (suitableItemCount > 0) {
-        merchantItemCount = (rand() % 3) + 1; // El mercader vende entre 1 y 3 ítems
-        if (merchantItemCount > suitableItemCount) {
-            merchantItemCount = suitableItemCount;
-        }
+    if (validCount > 0) {
+        merchantItemCount = (rand() % 3) + 1;
+        if (merchantItemCount > validCount) merchantItemCount = validCount;
     }
-
-    Shop* randomMerchant = (Shop*) malloc(sizeof(Shop));
-    if (randomMerchant == NULL) {
-        perror("Error al asignar memoria para el mercader");
-        free(suitableItems);
-        return NULL;
+    Map* tempMap = map_create(int_equals);
+    bool* selected = calloc(validCount, sizeof(bool));
+    for (int count = 0; count < merchantItemCount && validCount > 0;) {
+        int r;
+        do { r = rand() % validCount; } while (selected[r]);
+        selected[r] = true;
+        int idx = indices[r];
+        int* key = malloc(sizeof(int));
+        *key = item_array[idx].id;
+        map_insert(tempMap, key, &item_array[idx]);
+        count++;
     }
-    randomMerchant->itemCount = merchantItemCount;
-    randomMerchant->items = (Item*) malloc(sizeof(Item) * randomMerchant->itemCount);
-    if (randomMerchant->items == NULL) {
-        perror("Error al asignar memoria para los items del mercader");
-        free(randomMerchant);
-        free(suitableItems);
-        return NULL;
-    }
-
-    if (suitableItemCount > 0) {
-        bool* selectedIndices = (bool*) calloc(suitableItemCount, sizeof(bool));
-        if (selectedIndices == NULL) {
-             perror("Error al asignar memoria para selectedIndices");
-             free(suitableItems); // Libera el arreglo de Items (cadenas fijas incluidas)
-             shop_free(randomMerchant); // Libera la tienda y sus items
-             return NULL;
-        }
-
-        for (int i = 0; i < merchantItemCount; i++) {
-            int randomIndex;
-            do {
-                randomIndex = rand() % suitableItemCount;
-            } while (selectedIndices[randomIndex]);
-
-            randomMerchant->items[i] = suitableItems[randomIndex]; // Copiar el ítem COMPLETO
-            selectedIndices[randomIndex] = true;
-        }
-        free(selectedIndices);
-    }
-
-    free(suitableItems); // Liberar el arreglo temporal de ítems adecuados
-
+    free(selected);
+    free(indices);
     printf("Un mercader misterioso ha aparecido con %d items de dificultad %d-%d!\n",
-           randomMerchant->itemCount, minDifficulty, maxDifficulty);
-    return randomMerchant;
+           merchantItemCount, minDifficulty, maxDifficulty);
+    return tempMap;
 }
 
-Shop* shop_initialize_start_shop(const char* itemsCsvPath) {
-    int numItems = 0;
-    Item* items = load_items(itemsCsvPath, &numItems);
-    if (items == NULL || numItems == 0) {
-        fprintf(stderr, "Error: No se pudieron cargar los ítems para la tienda inicial.\n");
-        return NULL;
-    }
-    Shop* startShop = (Shop*) malloc(sizeof(Shop));
-    if (startShop == NULL) {
-        perror("Error al asignar memoria para la tienda inicial");
-        freeItems(items);
-        return NULL;
-    }
-    startShop->items = items;
-    startShop->itemCount = numItems;
-    printf("Tienda inicial creada con %d ítems.\n", numItems);
-    return startShop;
-}
-
-void shop_interact(Player* player, Shop* currentShop) {
-    if (player == NULL || currentShop == NULL) {
+void shop_interact(Player* player, Map* itemMap) {
+    if (player == NULL || itemMap == NULL) {
         printf("Error: Datos de jugador o tienda inválidos.\n");
         return;
     }
-
     int choice;
     char input[10];
-
     printf("\n--- Bienvenido a la tienda! ---\n");
     printf("Tienes %d oro.\n", player->gold);
-
     while (true) {
         printf("\nItems disponibles:\n");
-        if (currentShop->itemCount == 0) {
+        MapPair* pair = map_first(itemMap);
+        if (!pair) {
             printf("   (No hay ítems en venta en este momento.)\n");
         } else {
-            for (int i = 0; i < currentShop->itemCount; i++) {
-                printf("   %d. %s (%s) - Costo: %d oro. ",
-                       i + 1, currentShop->items[i].name, currentShop->items[i].rarity, currentShop->items[i].price);
-
-                if (currentShop->items[i].type == 1) { // Arma
-                    printf("Daño: %d.\n", currentShop->items[i].damage);
-                } else if (currentShop->items[i].type == 2) { // Armadura
-                    printf("Defensa: %d.\n", currentShop->items[i].defense);
-                } else if (currentShop->items[i].type == 3) { // Poción
-                    printf("Cura: %d HP. ", currentShop->items[i].heal);
-                    if (currentShop->items[i].damage > 0 || currentShop->items[i].defense > 0) {
+            while (pair) {
+                Item* item = (Item*)pair->value;
+                int id = *(int*)pair->key;
+                printf("   [%d] %s (%s) - Costo: %d oro. ",
+                       id, item->name, item->rarity, item->price);
+                if (item->type == 1) {
+                    printf("Daño: %d.\n", item->damage);
+                } else if (item->type == 2) {
+                    printf("Defensa: %d.\n", item->defense);
+                } else if (item->type == 3) {
+                    printf("Cura: %d HP. ", item->heal);
+                    if (item->damage > 0 || item->defense > 0) {
                         printf("Boost: ");
-                        if (currentShop->items[i].damage > 0) printf("+%d Atk ", currentShop->items[i].damage);
-                        if (currentShop->items[i].defense > 0) printf("+%d Def ", currentShop->items[i].defense);
-                        printf("por %d turnos.\n", currentShop->items[i].effectDuration);
+                        if (item->damage > 0) printf("+%d Atk ", item->damage);
+                        if (item->defense > 0) printf("+%d Def ", item->defense);
+                        printf("por %d turnos.\n", item->effectDuration);
                     } else {
-                        printf("\n"); // Solo cura
+                        printf("\n");
                     }
                 } else {
-                    printf(")\n"); // Tipo desconocido o sin propiedades específicas
+                    printf(")\n");
                 }
+                pair = map_next(itemMap);
             }
         }
         printf("\nQue deseas hacer?\n");
         printf("1. Comprar Item\n");
         printf("2. Salir de la tienda\n");
         printf("Tu eleccion: ");
-
         if (fgets(input, sizeof(input), stdin) == NULL) {
             printf("Error al leer la entrada. Saliendo de la tienda.\n");
             break;
         }
         choice = atoi(input);
-
         if (choice == 1) {
-            if (currentShop->itemCount == 0) {
-                printf("No hay nada que comprar aqui!\n");
-                continue;
-            }
-            printf("Ingresa el numero del item a comprar (1-%d): ", currentShop->itemCount);
+            printf("Ingresa el ID del item a comprar: ");
             if (fgets(input, sizeof(input), stdin) == NULL) {
                 printf("Error al leer la entrada. Regresando al menu.\n");
                 continue;
             }
-            int itemChoice = atoi(input);
-
-            if (itemChoice >= 1 && itemChoice <= currentShop->itemCount) {
-                bool purchased = shop_buy_item(player, currentShop, itemChoice - 1);
-                if (purchased) {
-                    printf("¡Compra exitosa! Tienes %d oro restante.\n", player->gold);
-                }
-            } else {
-                printf("Numero de item invalido.\n");
+            int itemId = atoi(input);
+            bool purchased = shop_buy_item(player, itemMap, itemId);
+            if (purchased) {
+                printf("¡Compra exitosa! Tienes %d oro restante.\n", player->gold);
             }
         } else if (choice == 2) {
             printf("Gracias por tu visita! Vuelve pronto.\n");
@@ -190,64 +122,30 @@ void shop_interact(Player* player, Shop* currentShop) {
     }
 }
 
-bool shop_buy_item(Player* player, Shop* currentShop, int itemIndex) {
-    if (player == NULL || currentShop == NULL || itemIndex < 0 || itemIndex >= currentShop->itemCount) {
+bool shop_buy_item(Player* player, Map* itemMap, int itemId) {
+    if (player == NULL || itemMap == NULL) {
         printf("Error interno de compra. Por favor, reporta este bug.\n");
         return false;
     }
-
-    Item itemToBuy = currentShop->items[itemIndex];
-
-    if (player->gold < itemToBuy.price) {
-        printf("No tienes suficiente oro para comprar %s (necesitas %d, tienes %d).\n",
-               itemToBuy.name, itemToBuy.price, player->gold);
+    MapPair* pair = map_search(itemMap, &itemId);
+    if (!pair || !pair->value) {
+        printf("Error: El ítem seleccionado no existe en la tienda.\n");
         return false;
     }
-
-    // player_add_item_to_inventory ahora maneja el equipamiento automático si es mejor
-    // Si player_add_item_to_inventory devuelve true, el ítem fue añadido o equipado con éxito.
-    if (player_add_item_to_inventory(player, itemToBuy)) {
-        player->gold -= itemToBuy.price;
-
-        // **AQUÍ ESTÁ LA CORRECCIÓN**
-        // Si el ítem es un arma o armadura y no fue equipado automáticamente (es decir,
-        // no era "mejor"), entonces simplemente se añadió al inventario.
-        // Si SÍ fue equipado automáticamente, la función player_add_item_to_inventory
-        // ya llamó a player_equip_weapon/armor con el parámetro 'false'.
-        // Por lo tanto, estas llamadas directas aquí son redundantes y problemáticas.
-        // Las he comentado ya que la lógica de equipamiento ahora está en player_add_item_to_inventory.
-
-        // if (itemToBuy.type == 1) { // Arma
-        //     player_equip_weapon(player, itemToBuy, false); // false porque es un ítem nuevo de la tienda
-        //     printf("Has equipado %s (+%d Atk).\n", itemToBuy.name, itemToBuy.damage);
-        // } else if (itemToBuy.type == 2) { // Armadura
-        //     player_equip_armor(player, itemToBuy, false); // false porque es un ítem nuevo de la tienda
-        //     printf("Has equipado %s (+%d Def).\n", itemToBuy.name, itemToBuy.defense);
-        // } else if (itemToBuy.type == 3) { // Poción
-        //     printf("Has comprado %s y se ha añadido a tu inventario.\n", itemToBuy.name);
-        // }
-        // La confirmación de equipamiento o adición ya se maneja en player_add_item_to_inventory.
-
-        // Imprimimos un mensaje general de compra exitosa
-        printf("Has comprado %s y se ha gestionado tu inventario.\n", itemToBuy.name);
+    Item* itemToBuy = (Item*)pair->value;
+    if (player->gold < itemToBuy->price) {
+        printf("No tienes suficiente oro para comprar %s (necesitas %d, tienes %d).\n",
+               itemToBuy->name, itemToBuy->price, player->gold);
+        return false;
+    }
+    if (player_add_item_to_inventory(player, *itemToBuy)) {
+        player->gold -= itemToBuy->price;
+        // Eliminar el ítem del Map tras la compra
+        map_remove(itemMap, &itemId);
+        printf("Has comprado %s y se ha gestionado tu inventario.\n", itemToBuy->name);
         return true;
     } else {
-        printf("No se pudo comprar %s. (Inventario lleno o no fue mejor equipo)\n", itemToBuy.name);
+        printf("No se pudo comprar %s. (Inventario lleno o no fue mejor equipo)\n", itemToBuy->name);
         return false;
     }
-}
-
-void shop_free(Shop* shopToFree) {
-    if (shopToFree == NULL) {
-        return;
-    }
-    if (shopToFree->items != NULL) {
-        // Con name y rarity como char[], no necesitamos liberar cada cadena individualmente.
-        // La memoria para esas cadenas es parte del bloque de memoria de cada Item.
-        // Al liberar shopToFree->items, se libera todo el bloque.
-        free(shopToFree->items);
-        shopToFree->items = NULL;
-    }
-    free(shopToFree);
-    printf("Memoria de la tienda liberada.\n");
 }

@@ -46,4 +46,7 @@ void clearScreen();
 
 void waitForKeyPress();
 
+// Animación de carga bonita para consola (barra de progreso)
+void pretty_loading_animation(const char* mensaje);
+
 #endif

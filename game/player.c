@@ -2,10 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <windows.h> // Para Sleep()
 
 #include "player.h"
 #include "data_types.h"
 #include "ui.h"
+#include "data_loader.h"
+#include "../tdas/map.h"
+#include "../tdas/list.h"
 // Puedes necesitar includes adicionales para debug o IO si usas system("cls") etc.
 
 // --- FUNCIONES AUXILIARES INTERNAS ---
@@ -67,6 +71,7 @@ void initializePlayer(Player* player, const char* name, int hp, int atk, int def
     player->tempDefenseBoost = 0;
     player->attackBoostTurns = 0;
     player->defenseBoostTurns = 0;
+    player->enemiesDefeated = 0; // Inicializar enemigos derrotados en 0
 
     // Inicializar los slots del inventario como vacíos
     for (int i = 0; i < INVENTORY_SLOTS; i++) {
@@ -365,4 +370,90 @@ void player_update_temporary_boosts(Player* player) {
             printf("El efecto de aumento de defensa ha terminado.\n");
         }
     }
+}
+
+/**
+ * @brief Asigna los valores de clase al jugador según la opción elegida.
+ * @param player Puntero al jugador.
+ * @param clase Opción de clase (1=Guerrero, 2=Tanque, 3=Asesino).
+ */
+void player_assign_class(Player* player, int clase) {
+    switch (clase) {
+        case 1: // Guerrero
+            initializePlayer(player, "Guerrero", 100, 10, 5, 200);
+            break;
+        case 2: // Tanque
+            initializePlayer(player, "Tanque", 130, 7, 12, 200);
+            break;
+        case 3: // Asesino
+            initializePlayer(player, "Asesino", 70, 18, 2, 200);
+            break;
+        default:
+            initializePlayer(player, "Aventurero", 100, 10, 5, 200);
+            break;
+    }
+}
+
+/**
+ * @brief Pregunta al usuario por la clase y asigna los valores al jugador.
+ * @param player Puntero al jugador.
+ */
+void player_choose_and_assign_class(Player* player) {
+    welcome_program();
+    int clase = 0;
+    while (clase < 1 || clase > 3) {
+        printf("Ingresa el número de tu clase: ");
+        char input[10];
+        fgets(input, sizeof(input), stdin);
+        clase = atoi(input);
+    }
+    player->classID = clase;
+    player_assign_class(player, clase);
+}
+
+// Comparador seguro para Map de strings
+static int string_equals(void* a, void* b) {
+    return strcmp((const char*)a, (const char*)b) == 0;
+}
+
+// Añade ítems al jugador de forma silenciosa (sin mensajes) y guarda resumen
+void player_add_initial_class_items(Player* player, const char* initial_items_csv) {
+    Map* clase_a_items = load_initial_items_map(initial_items_csv);
+    if (!clase_a_items) return;
+    char* clase = NULL;
+    if (player->classID == 1) clase = "Guerrero";
+    else if (player->classID == 2) clase = "Tanque";
+    else if (player->classID == 3) clase = "Asesino";
+    MapPair* pair = map_search(clase_a_items, clase);
+    List* lista = (List*)pair->value;
+    printf("¡Has recibido tu equipo inicial, para la clase %s!\n", player->name);
+    for (Item* item = list_first(lista); item; item = list_next(lista)) {
+        if (item->type == 1) { // Arma
+            player->equippedWeapon = *item;
+            player->attack += item->damage;
+            printf("- %s (+%d Atk, equipada)\n", item->name, item->damage);
+        } else if (item->type == 2) { // Armadura
+            player->equippedArmor = *item;
+            player->defense += item->defense;
+            printf("- %s (+%d Def, equipada)\n", item->name, item->defense);
+        } else {
+            player->inventory[player->inventoryCount++] = *item;
+            printf("- %s (añadido al inventario)\n", item->name);
+        }
+        Sleep(500);
+    }
+    // Liberar memoria del Map y listas
+    map_first(clase_a_items);
+    MapPair* p;
+    while ((p = map_next(clase_a_items))) {
+        List* l = (List*)p->value;
+        for (Item* item = list_first(l); item; item = list_next(l)) {
+            free(item);
+        }
+        list_clean(l);
+        free(p->key);
+    }
+    map_destroy(clase_a_items);
+
+    printf("Automaticamente te equiparás con tu mejor equipamiento.\n");
 }

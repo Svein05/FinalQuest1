@@ -16,5 +16,10 @@ void mostrarVictoria();
 void wait_three_points();
 void choice_class_menu();
 void initializePlayer_menu(Player *player);
+// Imprime un escenario con bordes y formato uniforme
+void display_scenario(const Scenario* scenario);
+// Formatea y muestra la descripción del escenario dentro de los bordes
+void print_scenario_description(const char* description, int width);
+void display_player_summary(const Player* player);
 
 #endif // UI_H
