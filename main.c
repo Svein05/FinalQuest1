@@ -53,7 +53,6 @@ int main() {
     // --- 3. Bucle Principal del Juego: Recorrer el Mapa ---
     poblarGameMap(game_map, scenario_array, numScenarios); // Crear el stack para el mapa del juego
     Scenario* currentScenario = stack_top(game_map); // Comenzar desde el primer escenario
-    int scenario_counter = 0;
     
     // Quite el if de scenario uno, porque era innecesario ya que solo sucedia una vez
     // asique solamente se carga una vez afuera el inicio del juego y ya 
@@ -83,7 +82,6 @@ int main() {
         if (currentScenario != NULL) {  // Si el juego no terminó, avanza al siguiente escenario
             stack_pop(game_map);        // Sacar el escenario actual del stack
             currentScenario = stack_top(game_map); // Obtener el siguiente escenario en el stack
-            scenario_counter++;
         }
         
     }
