@@ -15,7 +15,7 @@
 #include "../tdas/stack.h"
 
 // --- FUNCIONES DE LIBERACIÓN DE MEMORIA ---
-#define NUM_EVENT_TYPES 3
+#define NUM_EVENT_TYPES 4 // Ahora hay 4 tipos de eventos
 #define MAX_DIFFICULTY 3    
 
 Enemy* spawnRandomEnemy(int currentScenarioDifficulty, Enemy* enemy_array, int numEnemies) {
@@ -111,6 +111,7 @@ void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios) {
 // --- Variables de control para eventos aleatorios ---
 static int merchant_count = 0;
 static int last_event_type = -1;
+static int forced_merchant = 0; // Para forzar aparición de mercader
 
 void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario) {
     if (player == NULL || allItems == NULL || numItems == 0 || allEnemies == NULL || numEnemies == 0) {
@@ -118,27 +119,35 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         return;
     }
 
-    clearScreen();
-    display_scenario(scenario);
-    display_player_summary(player);
-    printf("\n--- EVENTO ALEATORIO ---\n");
+    clearScreen();  
 
     int currentScenarioDifficulty = scenario->difficulty;
     int event_type = -1;
     int roll = rand() % 100;
-    // 0-54: combate (55%), 55-69: mercader (15%), 70-99: bonus (30%)
-    if (roll < 55) {
-        event_type = 0; // Combate
-    } else if (roll < 70) {
-        event_type = 1; // Mercader
-    } else {
-        event_type = 2; // Bonus
+    // 0-44: combate (45%), 45-54: mercader (10%), 55-74: bonus (20%), 75-99: historia/lore (25%)
+    if (merchant_count < 2 && last_event_type != 1 && forced_merchant < 2) {
+        // Forzar aparición de mercader si aún no ha salido 2 veces
+        if ((rand() % (3 - merchant_count)) == 0) { // Probabilidad de forzar
+            event_type = 1;
+            forced_merchant++;
+        }
+    }
+    if (event_type == -1) {
+        if (roll < 45) {
+            event_type = 0; // Combate
+        } else if (roll < 55) {
+            event_type = 1; // Mercader
+        } else if (roll < 75) {
+            event_type = 2; // Bonus
+        } else {
+            event_type = 3; // Historia/Lore
+        }
     }
 
     // Limitar mercader a 2 por escenario y nunca seguidos
     if (event_type == 1) {
         if (merchant_count >= 2 || last_event_type == 1) {
-            event_type = (roll < 85) ? 0 : 2; // Si no puede ser mercader, prioriza combate
+            event_type = (roll < 60) ? 0 : ((roll < 80) ? 2 : 3); // Prioriza combate, luego bonus, luego historia
         } else {
             merchant_count++;
         }
@@ -148,72 +157,82 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
     last_event_type = event_type;
 
     if (event_type == 0) { // Combate
-        printf("Has encontrado un enemigo inesperado!\n");
         Enemy* randomEnemy = spawnRandomEnemy(currentScenarioDifficulty, allEnemies, numEnemies);
-        printf("¡Un %s aparece!\n", randomEnemy->name);
+        display_combat_text();
         Enemy combatEnemy = *randomEnemy;
         bool combatWon = combat_manage_turn(player, &combatEnemy);
         if (combatWon) {
             int base = rand() % 51 + 50;
             int multiplier = 133 + (rand() % 3) * 33;
             int won_gold = combatEnemy.difficulty * base * multiplier / 100;
-            printf("Has derrotado a %s! Ganas %d de oro.\n", combatEnemy.name, won_gold);
+            printf("\x1b[33m═══════════════════════════════════════════════════════════════\x1b[0m\n");
+            printf("\x1b[33m🏅  %s ha caído en combate. ¡Recompensa: %d oro!\x1b[0m\n", combatEnemy.name, won_gold);
+            printf("\x1b[33m═══════════════════════════════════════════════════════════════\x1b[0m\n");
             player->gold += won_gold; 
         } else {
-            printf("Has sido derrotado por %s!.\n", combatEnemy.name);
+            printf("\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
+            printf("\x1b[41m  ☠️  %s te ha vencido. ¡Fin del combate!\x1b[0m\n", combatEnemy.name);
+            printf("\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
             player->currentHP = 0;
         }
     } else if (event_type == 1) { // Mercader
         printf("Has encontrado a un mercader errante!\n");
-        Map* itemMap = shop_initialize_random_merchant(
-            allItems,
-            numItems,
-            1, // O puedes usar currentScenarioDifficulty
-            3  // O puedes usar currentScenarioDifficulty
-        );
+        Map* itemMap = shop_initialize_random_merchant(allItems, numItems, currentScenarioDifficulty, player);
         if (itemMap != NULL) {
             shop_interact(player, itemMap);
             map_destroy(itemMap);
         } else {
             printf("El mercader no tenia nada que vender o hubo un error.\n");
         }
-    } else { // Bonus
-        printf("Has descubierto algo interesante!\n");
-        waitForKeyPress();
+    } else if (event_type == 2) { // Bonus
+        printf("\x1b[33m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+        printf("\x1b[33m            ¡Has descubierto algo interesante!\x1b[0m\n");
+        printf("\x1b[33m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+
+        printf("\x1b[33m   _________\n");
+        printf("  /        /\\\n");
+        printf(" /        /  \\\n");
+        printf("/________/____\\\n");
+        printf("|        |    |\n");
+        printf("|        | 💰 |\n");
+        printf("|________|____|\x1b[0m\n\n");
+        printf("Buscando");
+        wait_three_points();
         int bonus_type = rand() % 10; // 0-3: oro (40%), 4-6: stats (30%), 7-9: item (30%)
         if (bonus_type < 4) { // Oro
             int gold_found = (rand() % 100) + 50;
             player->gold += gold_found;
-            printf("Encontraste %d oro!\n", gold_found);
-            waitForKeyPress();
+            printf("Encontraste \x1b[33m%d oro\x1b[0m!\n", gold_found);
         } else if (bonus_type < 7) { // Stats
             int stat_choice = rand() % 2;
             if (stat_choice == 0) {
                 int atk_boost = (rand() % 5) + 1;
                 player->attack += atk_boost;
-                printf("Te sientes mas fuerte! Tu ataque aumento en %d.\n", atk_boost);
-                waitForKeyPress();
+                printf("Te sientes mas fuerte! \x1b[31mTu ataque aumento en %d\x1b[0m.\n", atk_boost);
             } else {
                 int def_boost = (rand() % 3) + 1;
                 player->defense += def_boost;
-                printf("Tu piel se ha endurecido! Tu defensa aumento en %d.\n", def_boost);
-                waitForKeyPress();
+                printf("Tu piel se ha endurecido! \x1b[34mTu defensa aumento en %d\x1b[0m.\n", def_boost);
             }
         } else { // Ítem (menos frecuente)
             if (numItems > 0) {
                 Item randomItem = allItems[rand() % numItems];
                 if (player_add_item_to_inventory(player, randomItem)) {
                     printf("Encontraste un %s!\n", randomItem.name);
-                    waitForKeyPress();
                 } else {
                     printf("Encontraste un %s, pero tu inventario esta lleno!\n", randomItem.name);
-                    waitForKeyPress();
                 }
             } else {
                 printf("No se encontraron ítems para dar como bonificación.\n");
-                waitForKeyPress();
             }
         }
+        waitForKeyPress();
+    } else if (event_type == 3) { // Historia/Lore
+        printf("\x1b[36m═══════════════════════════════════════════════════════════════\x1b[0m\n");
+        printf("\x1b[36m  📜  Encuentras un antiguo mural con inscripciones misteriosas...\x1b[0m\n");
+        printf("\x1b[36m  (Aquí habrá historia o lore en el futuro)\x1b[0m\n");
+        printf("\x1b[36m═══════════════════════════════════════════════════════════════\x1b[0m\n");
+        waitForKeyPress();
     }
     printf("--- FIN DE EVENTO ---\n");
 }

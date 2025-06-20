@@ -25,7 +25,7 @@ int calculate_damage(int attack, int defense);
 void display_combat_status(Player* player, Enemy* enemy);
 
 // Permite al jugador elegir una acción durante su turno (atacar, usar ítem, etc.).
-int player_choose_action(Player* player);
+int player_choose_action();
 
 // Aplica el daño a una entidad (jugador o enemigo).
 void apply_damage(int* target_hp, int damage_dealt);

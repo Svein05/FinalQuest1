@@ -21,22 +21,15 @@ int calculate_damage(int attack, int defense) {
 void display_combat_status(Player* player, Enemy* enemy) {
     if (player == NULL || enemy == NULL) return;
 
-    printf("\n--- ESTADO DE COMBATE ---\n");
-    printf("%s HP: \x1b[32m%d\x1b[0m/\x1b[32m%d\x1b[0m (Atk: \x1b[31m%d\x1b[0m, Def: \x1b[34m%d\x1b[0m)\n",
-           player->name, player->currentHP, player->maxHP,
-           player->attack + player->tempAttackBoost, // Mostrar ataque efectivo
-           player->defense + player->tempDefenseBoost); // Mostrar defensa efectiva
-
-    // Mostrar boosts temporales si están activos
-    if (player->tempAttackBoost > 0) {
-        printf("  - Boost Atk: +\x1b[31m%d\x1b[0m (%d turnos restantes)\n", player->tempAttackBoost, player->attackBoostTurns);
-    }
-    if (player->tempDefenseBoost > 0) {
-        printf("  - Boost Def: +\x1b[34m%d\x1b[0m (%d turnos restantes)\n", player->tempDefenseBoost, player->defenseBoostTurns);
-    }
-
-    printf("%s HP: \x1b[32m%d\x1b[0m\n", enemy->name, enemy->currentHP);
-    printf("------------------------\n");
+    printf("\x1b[36m╔═══════════════════════════════════════════════╗\x1b[0m\n");
+    printf("\x1b[36m║           \x1b[1m--- ESTADO DE COMBATE ---\x1b[0m           \x1b[36m║\x1b[0m\n");
+    printf("\x1b[36m╠═══════════════════════════════════════════════╣\x1b[0m\n");
+    printf("  %s HP: \x1b[32m%d\x1b[0m/\x1b[32m%d\x1b[0m  (Atk: \x1b[31m%d\x1b[0m, Def: \x1b[34m%d\x1b[0m)\n",
+        player->name, player->currentHP, player->maxHP,
+        player->attack + player->tempAttackBoost,
+        player->defense + player->tempDefenseBoost);
+    printf("  %s HP: \x1b[32m%d\x1b[0m\n", enemy->name, enemy->currentHP);
+    printf("\x1b[36m╚═══════════════════════════════════════════════╝\x1b[0m\n");
 }
 
 /**
@@ -45,14 +38,17 @@ void display_combat_status(Player* player, Enemy* enemy) {
  * @param player Puntero a la estructura del Jugador.
  * @return Un entero que representa la acción elegida (1 para Atacar, 2 para Usar Ítem, etc.).
  */
-int player_choose_action(Player* player) {
+int player_choose_action() {
     int choice;
     char input[10];
 
-    printf("\nEs tu turno, %s!\n", player->name);
-    printf("1. Atacar\n");
-    printf("2. Usar Ítem (Inventario)\n"); // Añadida opción para usar ítem
-    printf("Tu eleccion: ");
+    printf("\x1b[36m⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨\x1b[0m\n");
+    printf("\x1b[36m⇨  ¡Tu turno!\x1b[0m\n");
+    printf("\x1b[36m⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨\x1b[0m\n");
+    printf("  \x1b[32m[1] Atacar\x1b[0m\n");
+    printf("  \x1b[34m[2] Usar Ítem (Inventario)\x1b[0m\n");
+    printf("\x1b[36m──────────────────────────────────────────────────────────────\x1b[0m\n");
+    printf("Tu elección: ");
 
     if (fgets(input, sizeof(input), stdin) == NULL) {
         return -1; // Error de lectura
@@ -61,7 +57,6 @@ int player_choose_action(Player* player) {
 
     // Validación básica de la elección
     if (choice < 1 || choice > 2) {
-        printf("Opcion invalida. Por favor, elige una opcion valida.\n");
         return -1; // Indicar elección inválida
     }
     return choice;
@@ -84,14 +79,14 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
         return false; // Error en la batalla
     }
 
-    printf("\n--- ¡COMBATE INICIADO! %s vs %s ---\n", player->name, enemy->name);
-    waitForKeyPress();
+    display_combat_banner(player->name, enemy->name);
+    Sleep(1000);
 
     while (player->currentHP > 0 && enemy->currentHP > 0) {
         display_combat_status(player, enemy);
 
         // --- TURNO DEL JUGADOR ---
-        int action_choice = player_choose_action(player);
+        int action_choice = player_choose_action();
 
         if (action_choice == 1) { // Atacar
             // Calcular el daño que el jugador inflige
@@ -99,9 +94,9 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             int damage_to_enemy = calculate_damage(player_effective_attack, enemy->defense);
 
             apply_damage(&enemy->currentHP, damage_to_enemy);
-            printf("%s ataca a %s y le inflige %d de daño.\n",
-                   player->name, enemy->name, damage_to_enemy);
-            waitForKeyPress();
+            printf("\x1b[36m» %s ataca a %s y le inflige %d de daño. «\x1b[0m\n", player->name, enemy->name, damage_to_enemy);
+            printf("\x1b[90m──────────────────────────────────────────────────────────────\x1b[0m\n");
+            Sleep(500);
 
         } else if (action_choice == 2) { 
             printf("--- Inventario de %s ---\n", player->name);
@@ -110,8 +105,8 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             } else {
                 for (int i = 0; i < player->inventoryCount; i++) {
                     Item currentItem = player->inventory[i];
-                    printf("%d. %s (Tipo: %d, Cura: %d, Daño Boost: %d, Def Boost: %d, Duracion: %d)\n",
-                           i + 1, currentItem.name, currentItem.type, currentItem.heal,
+                    printf("%d. %s (Curacion: %d, Daño Boost: %d, Def Boost: %d, Duracion: %d)\n",
+                           i + 1, currentItem.name, currentItem.heal,
                            currentItem.damage, currentItem.defense, currentItem.effectDuration);
                 }
                 printf("Elige un item a usar (0 para cancelar): ");
@@ -132,14 +127,13 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             }
         } else {
             printf("Accion invalida. Pierdes tu turno.\n");
-            waitForKeyPress();
+            Sleep(500);
         }
 
         // --- Verificar si el enemigo fue derrotado después del turno del jugador ---
         if (enemy->currentHP <= 0) {
-            printf("%s ha sido derrotado!\n", enemy->name);
             player->enemiesDefeated++;
-            waitForKeyPress();
+            Sleep(500);
             return true; // Jugador gana
         }
 
@@ -147,17 +141,19 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
         player_update_temporary_boosts(player); 
 
         // --- TURNO DEL ENEMIGO ---
-        printf("\nEs el turno de %s!\n", enemy->name);
+        printf("\x1b[31m⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
+        printf("\x1b[31m⇦  Es el turno de %s!\x1b[0m\n", enemy->name);
+        printf("\x1b[31m⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
         int enemy_damage_to_player = calculate_damage(enemy->attack, player->defense + player->tempDefenseBoost); // Usar defensa efectiva
         apply_damage(&player->currentHP, enemy_damage_to_player);
-        printf("%s ataca a %s y le inflige %d de daño.\n",
-               enemy->name, player->name, enemy_damage_to_player);
-        waitForKeyPress();
+        printf("\x1b[31m« %s ataca a %s y le inflige %d de daño. »\x1b[0m\n", enemy->name, player->name, enemy_damage_to_player);
+        printf("\x1b[90m──────────────────────────────────────────────────────────────\x1b[0m\n");
 
         if (player->currentHP <= 0) {
-            printf("%s ha sido derrotado por %s!\n", player->name, enemy->name);
-            waitForKeyPress();
+            Sleep(500);
             return false; // Jugador pierde
+        } else {
+            waitForKeyPress();
         }
     }
 

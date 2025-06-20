@@ -85,19 +85,17 @@ bool parse_item(char** tokens, Item* item) {
     strncpy(item->rarity, tokens[3], sizeof(item->rarity) - 1);
     item->rarity[sizeof(item->rarity) - 1] = '\0';
     item->damage = atoi(tokens[4]);
-    item->defense = atoi(tokens[5]);
-    item->heal = atoi(tokens[6]);
+    item->heal = atoi(tokens[5]);
+    item->defense = atoi(tokens[6]);
     item->price = atoi(tokens[7]);
     item->difficulty = atoi(tokens[8]);
-    item->effectDuration = atoi(tokens[9]);
-    // Solo asignar class si existe la columna (para initial_items.csv)
+    item->effectDuration = (tokens[9] != NULL) ? atoi(tokens[9]) : 0;
     if (tokens[10] != NULL) {
         strncpy(item->class, tokens[10], sizeof(item->class) - 1);
         item->class[sizeof(item->class) - 1] = '\0';
     } else {
         item->class[0] = '\0';
     }
-
     return true;
 }
 
@@ -112,8 +110,8 @@ bool parse_item_basic(char** tokens, Item* item) {
     strncpy(item->rarity, tokens[3], sizeof(item->rarity) - 1);
     item->rarity[sizeof(item->rarity) - 1] = '\0';
     item->damage = atoi(tokens[4]);
-    item->defense = atoi(tokens[5]);
-    item->heal = atoi(tokens[6]);
+    item->heal = atoi(tokens[5]);
+    item->defense = atoi(tokens[6]);
     item->price = atoi(tokens[7]);
     item->difficulty = atoi(tokens[8]);
     item->effectDuration = atoi(tokens[9]);

@@ -132,13 +132,7 @@ void player_equip_weapon(Player* player, Item weapon, bool from_inventory) {
     if (old_weapon.id != ITEM_ID_EMPTY) {
         player->attack -= old_weapon.damage; // Quita el bono de ataque del arma vieja
         printf("Se ha desequipado %s. (-%d Atk)\n", old_weapon.name, old_weapon.damage);
-
-        // Intenta devolver el arma vieja al inventario
-        if (player_add_item_to_inventory(player, old_weapon)) {
-            printf("%s ha vuelto a tu inventario.\n", old_weapon.name);
-        } else {
-            printf("Tu inventario esta lleno, %s se ha perdido!\n", old_weapon.name);
-        }
+        // NO devolver el arma vieja al inventario, simplemente desaparece
     }
 
     // Equipa la nueva arma
@@ -171,13 +165,7 @@ void player_equip_armor(Player* player, Item armor, bool from_inventory) {
     if (old_armor.id != ITEM_ID_EMPTY) {
         player->defense -= old_armor.defense; // Quita el bono de defensa de la armadura vieja
         printf("Se ha desequipado %s. (-%d Def)\n", old_armor.name, old_armor.defense);
-
-        // Intenta devolver la armadura vieja al inventario
-        if (player_add_item_to_inventory(player, old_armor)) {
-            printf("%s ha vuelto a tu inventario.\n", old_armor.name);
-        } else {
-            printf("Tu inventario esta lleno, %s se ha perdido!\n", old_armor.name);
-        }
+        // NO devolver la armadura vieja al inventario, simplemente desaparece
     }
 
     // Equipa la nueva armadura
@@ -205,34 +193,36 @@ bool player_add_item_to_inventory(Player* player, Item item) {
         return false;
     }
 
-    // --- Lógica de reemplazo automático de equipo si es mejor ---
-    if (item.type == 1) { // Es un arma
+    // Solo consumibles pueden ir al inventario
+    if (item.type == 1) { // Arma
         if (item.damage > player->equippedWeapon.damage) {
             printf("¡Has encontrado un arma mejor! Equipada automaticamente.\n");
-            player_equip_weapon(player, item, false); // false porque es un ítem nuevo, no del inventario
+            player_equip_weapon(player, item, false);
             return true;
+        } else {
+            printf("El arma encontrada no es mejor que la equipada. No se añade al inventario.\n");
+            return false;
         }
-    } else if (item.type == 2) { // Es una armadura
+    } else if (item.type == 2) { // Armadura
         if (item.defense > player->equippedArmor.defense) {
             printf("¡Has encontrado una armadura mejor! Equipada automaticamente.\n");
-            player_equip_armor(player, item, false); // false porque es un ítem nuevo
+            player_equip_armor(player, item, false);
             return true;
+        } else {
+            printf("La armadura encontrada no es mejor que la equipada. No se añade al inventario.\n");
+            return false;
         }
+    } else if (item.type == 3) { // Consumible
+        if (player->inventoryCount >= INVENTORY_SLOTS) {
+            printf("Inventario lleno. No se puede añadir %s.\n", item.name);
+            return false;
+        }
+        player->inventory[player->inventoryCount] = item;
+        player->inventoryCount++;
+        printf("%s ha sido añadido al inventario.\n", item.name);
+        return true;
     }
-
-    // Si no es un equipo mejor (o si es consumible), intenta añadirlo al inventario
-    if (player->inventoryCount >= INVENTORY_SLOTS) {
-        printf("Inventario lleno. No se puede añadir %s.\n", item.name);
-        return false;
-    }
-
-    // Copiar el ítem completo al siguiente slot disponible del inventario.
-    // Como name y rarity son char[], la copia por valor de la struct Item
-    // también copia estas cadenas, lo cual es seguro y no requiere strdup aquí.
-    player->inventory[player->inventoryCount] = item;
-    player->inventoryCount++;
-    printf("%s ha sido añadido al inventario.\n", item.name);
-    return true;
+    return false;
 }
 
 /**

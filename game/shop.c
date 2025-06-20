@@ -16,7 +16,8 @@ static int int_equals(void* a, void* b) {
     return (*(int*)a) == (*(int*)b);
 }
 
-Map* shop_initialize_random_merchant(Item* item_array, int numItems, int minDifficulty, int maxDifficulty) {
+// Cambia la firma para recibir Player* y filtrar armas/armaduras ya equipadas
+Map* shop_initialize_random_merchant(Item* item_array, int numItems, int maxDifficulty, Player* player) {
     static bool seeded = false;
     if (!seeded) {
         srand((unsigned int)time(NULL));
@@ -25,7 +26,9 @@ Map* shop_initialize_random_merchant(Item* item_array, int numItems, int minDiff
     int* indices = malloc(sizeof(int) * numItems);
     int validCount = 0;
     for (int i = 0; i < numItems; i++) {
-        if (item_array[i].difficulty >= minDifficulty && item_array[i].difficulty <= maxDifficulty) {
+        if (item_array[i].difficulty <= maxDifficulty) {
+            if (item_array[i].type == 1 && player && player->equippedWeapon.id == item_array[i].id) continue;
+            if (item_array[i].type == 2 && player && player->equippedArmor.id == item_array[i].id) continue;
             indices[validCount++] = i;
         }
     }
@@ -48,8 +51,8 @@ Map* shop_initialize_random_merchant(Item* item_array, int numItems, int minDiff
     }
     free(selected);
     free(indices);
-    printf("Un mercader misterioso ha aparecido con %d items de dificultad %d-%d!\n",
-           merchantItemCount, minDifficulty, maxDifficulty);
+    printf("Un mercader misterioso ha aparecido con %d items de dificultad hasta %d!\n",
+           merchantItemCount, maxDifficulty);
     return tempMap;
 }
 
@@ -78,15 +81,12 @@ void shop_interact(Player* player, Map* itemMap) {
                 } else if (item->type == 2) {
                     printf("Defensa: %d.\n", item->defense);
                 } else if (item->type == 3) {
-                    printf("Cura: %d HP. ", item->heal);
-                    if (item->damage > 0 || item->defense > 0) {
-                        printf("Boost: ");
-                        if (item->damage > 0) printf("+%d Atk ", item->damage);
-                        if (item->defense > 0) printf("+%d Def ", item->defense);
-                        printf("por %d turnos.\n", item->effectDuration);
-                    } else {
-                        printf("\n");
-                    }
+                    // Consumible: mostrar curación y boosts
+                    if (item->heal > 0) printf("Cura: %d HP. ", item->heal);
+                    if (item->damage > 0) printf("Daño Boost: +%d Atk ", item->damage);
+                    if (item->defense > 0) printf("Defensa Boost: +%d Def ", item->defense);
+                    if (item->damage > 0 || item->defense > 0) printf("por %d turnos. ", item->effectDuration);
+                    printf("\n");
                 } else {
                     printf(")\n");
                 }

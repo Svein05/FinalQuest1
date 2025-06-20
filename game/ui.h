@@ -20,6 +20,9 @@ void initializePlayer_menu(Player *player);
 void display_scenario(const Scenario* scenario);
 // Formatea y muestra la descripción del escenario dentro de los bordes
 void print_scenario_description(const char* description, int width);
+void display_title();
 void display_player_summary(const Player* player);
+void display_combat_text();
+void display_combat_banner(const char* player_name, const char* enemy_name);
 
 #endif // UI_H

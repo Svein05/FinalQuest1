@@ -68,9 +68,11 @@ int main() {
         int steps = MAX_STEPS_PER_SCENARIO; // Simular pasos del jugador en el escenario actual
             
         waitForKeyPress();
+        
         while (steps) { 
             scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario); // Manejar el evento del escenario actual
             printf("Pasos restantes: %d\n", steps);
+            waitForKeyPress();
             steps--;
             if (player.currentHP <= 0) { // Si el jugador ha muerto, termina el juego
                 printf("Has sido derrotado. Fin del juego.\n");

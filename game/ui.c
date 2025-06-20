@@ -38,7 +38,6 @@ void welcome_zero(Player* player) {
     waitForKeyPress();
 }
 
-// Esta función espera medio segundo y muestra tres puntos de carga, para darle mas color a la carga del juego. xdd
 void wait_three_points() {
     for (int i = 0; i < 3; i++) {
         Sleep(1000); // Esperar medio segundo
@@ -152,9 +151,79 @@ void display_player_summary(const Player* player) {
     printf("\x1b[36m╟──────────────────────────────────────────────────────────────╢\x1b[0m\n");
     printf("\x1b[36m║\x1b[0m Clase: %-20s Enemigos derrotados: %-4d        \x1b[36m║\x1b[0m\n", player->name, player->enemiesDefeated);
     printf("\x1b[36m║\x1b[0m Vida: \x1b[32m%3d/%-3d\x1b[0m  Atk: \x1b[31m%-3d\x1b[0m  Def: \x1b[34m%-3d\x1b[0m  Oro: \x1b[33m%-5d\x1b[0m                \x1b[36m║\x1b[0m\n", player->currentHP, player->maxHP, player->attack, player->defense, player->gold);
-    printf("\x1b[36m║\x1b[0m Arma equipada: %-20s (+%-2d Atk)                \x1b[36m║\x1b[0m\n", player->equippedWeapon.name, player->equippedWeapon.damage);
-    printf("\x1b[36m║\x1b[0m Armadura equipada: %-17s (+%-2d Def)              \x1b[36m║\x1b[0m\n", player->equippedArmor.name, player->equippedArmor.defense);
+    printf("\x1b[36m║\x1b[0m Arma equipada: %-24s (+%-2d Atk)%12s\x1b[36m║\x1b[0m\n", player->equippedWeapon.name, player->equippedWeapon.damage, "");
+    printf("\x1b[36m║\x1b[0m Armadura equipada: %-20s (+%2d Def)%12s\x1b[36m║\x1b[0m\n", player->equippedArmor.name, player->equippedArmor.defense, "");
     printf("\x1b[36m╟──────────────────────────────────────────────────────────────╢\x1b[0m\n");
     printf("\x1b[36m║\x1b[0m Slots disponibles de inventario: %-2d %25s\x1b[36m║\x1b[0m\n", INVENTORY_SLOTS - player->inventoryCount, "");
     printf("\x1b[36m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+}
+
+void display_combat_text() {
+    int combate_disenio = rand() % 3;
+    
+    for (int i = 0 ; i < 2 ; i++){
+        clearScreen();
+        if (combate_disenio == 0) {
+            // Diseño 1: Clásico de peligro
+            printf("\x1b[31m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+            printf("\x1b[31m║                  ¡ENEMIGO INESPERADO APARECE!                ║\x1b[0m\n");
+            printf("\x1b[31m╠══════════════════════════════════════════════════════════════╣\x1b[0m\n");
+            printf("\x1b[31m║        ¡Prepárate para la batalla, valiente aventurero!      ║\x1b[0m\n");
+            printf("\x1b[31m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+        } else if (combate_disenio == 1) {
+            // Diseño 4: Alerta máxima
+            printf("\x1b[31m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+            printf("\x1b[31m║                    ¡PELIGRO! ¡PELIGRO!                       ║\x1b[0m\n");
+            printf("\x1b[31m╠══════════════════════════════════════════════════════════════╣\x1b[0m\n");
+            printf("\x1b[31m║               ¡Un enemigo bloquea tu avance!                 ║\x1b[0m\n");
+            printf("\x1b[31m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+        } else {
+            // Diseño 5: Estilo épico
+            printf("\x1b[31m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+            printf("\x1b[31m║              ¡UNA BATALLA COMENZARA, PREPARATE!              ║\x1b[0m\n");
+            printf("\x1b[31m╠══════════════════════════════════════════════════════════════╣\x1b[0m\n");
+            printf("\x1b[31m║            ¡Demuestra tu valor contra el enemigo!            ║\x1b[0m\n");
+            printf("\x1b[31m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+        }
+        fflush(stdout);
+        Sleep(500);
+        clearScreen();
+        Sleep(500); 
+    }
+    if (combate_disenio == 0) {
+        // Diseño 1: Clásico de peligro
+        printf("\x1b[31m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+        printf("\x1b[31m║                  ¡ENEMIGO INESPERADO APARECE!                ║\x1b[0m\n");
+        printf("\x1b[31m╠══════════════════════════════════════════════════════════════╣\x1b[0m\n");
+        printf("\x1b[31m║        ¡Prepárate para la batalla, valiente aventurero!      ║\x1b[0m\n");
+        printf("\x1b[31m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+    } else if (combate_disenio == 1) {
+        // Diseño 4: Alerta máxima
+        printf("\x1b[31m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+        printf("\x1b[31m║                    ¡PELIGRO! ¡PELIGRO!                       ║\x1b[0m\n");
+        printf("\x1b[31m╠══════════════════════════════════════════════════════════════╣\x1b[0m\n");
+        printf("\x1b[31m║               ¡Un enemigo bloquea tu avance!                 ║\x1b[0m\n");
+        printf("\x1b[31m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+    } else {
+        // Diseño 5: Estilo épico
+        printf("\x1b[31m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+        printf("\x1b[31m║              ¡UNA BATALLA COMENZARA, PREPARATE!              ║\x1b[0m\n");
+        printf("\x1b[31m╠══════════════════════════════════════════════════════════════╣\x1b[0m\n");
+        printf("\x1b[31m║            ¡Demuestra tu valor contra el enemigo!            ║\x1b[0m\n");
+        printf("\x1b[31m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+    }
+}
+
+void display_mercader_text(){
+
+}
+
+void display_bonus_text(){
+    
+}
+
+void display_combat_banner(const char* player_name, const char* enemy_name) {
+    printf("\x1b[35m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+    printf("\x1b[35m║ ¡COMBATE INICIADO! %10s vs %-27s ║\x1b[0m\n", player_name, enemy_name);
+    printf("\x1b[35m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
 }

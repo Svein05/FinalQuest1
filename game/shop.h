@@ -16,7 +16,7 @@
  * @param maxDifficulty Dificultad máxima de los ítems a vender.
  * @return Un Map* temporal (clave: ID del ítem, valor: puntero a Item) con los ítems seleccionados.
  */
-Map* shop_initialize_random_merchant(Item* item_array, int numItems, int minDifficulty, int maxDifficulty);
+Map* shop_initialize_random_merchant(Item* item_array, int numItems, int maxDifficulty, Player* player);
 
 /**
  * @brief Gestiona la interacción principal del jugador con una tienda.
