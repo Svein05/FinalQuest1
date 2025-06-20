@@ -13,6 +13,7 @@
 #include "../tdas/map.h" // Para Map*
 #include "../tdas/extra.h" // Función para leer líneas del CSV
 #include "../tdas/stack.h"
+#include "../tdas/queue.h"
 
 // --- FUNCIONES DE LIBERACIÓN DE MEMORIA ---
 #define NUM_EVENT_TYPES 4 // Ahora hay 4 tipos de eventos
@@ -53,7 +54,7 @@ Enemy* spawnRandomEnemy(int currentScenarioDifficulty, Enemy* enemy_array, int n
     return spawnedEnemy; 
 }
 
-void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios) {
+void poblarGameMap(Queue* game_map, Scenario* escenarios, int numScenarios) {
     // Validación de parámetros
     if (!game_map || !escenarios || numScenarios <= 0) {
         fprintf(stderr, "Error: Parámetros inválidos para poblarGameMap\n");
@@ -85,21 +86,21 @@ void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios) {
         }
     }
 
-    // Empujar escenarios en orden inverso: 3 → 2 → 1
+    // Insertar escenarios en orden: 1 → 2 → 3
     int pushed = 0;
-    if (count3 > 0) {
-        Scenario* s = dificultad3[rand() % count3];
-        stack_push(game_map, s);
+    if (count1 > 0) {
+        Scenario* s = dificultad1[rand() % count1];
+        queue_insert(game_map, s);
         pushed++;
     }
     if (count2 > 0) {
         Scenario* s = dificultad2[rand() % count2];
-        stack_push(game_map, s);
+        queue_insert(game_map, s);
         pushed++;
     }
-    if (count1 > 0) {
-        Scenario* s = dificultad1[rand() % count1];
-        stack_push(game_map, s);
+    if (count3 > 0) {
+        Scenario* s = dificultad3[rand() % count3];
+        queue_insert(game_map, s);
         pushed++;
     }
 

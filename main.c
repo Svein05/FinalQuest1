@@ -14,6 +14,7 @@
 #include "tdas/extra.h"      
 #include "tdas/stack.h"
 #include "tdas/list.h"
+#include "tdas/queue.h"
 
 // Rutas a archivos CSV
 #define SCENARIOS_CSV_PATH "data/scenarios.csv"
@@ -34,7 +35,7 @@ int main() {
     Enemy* enemy_array = NULL;
     Item* item_array = NULL;
     Scenario* scenario_array = NULL;
-    Stack* game_map = stack_create(NULL);
+    Queue* game_map = queue_create(NULL);
 
     int numEnemies = 0;
     int numItems = 0;  
@@ -51,12 +52,9 @@ int main() {
     if (scenario_array == NULL) return EXIT_FAILURE;
 
     // --- 3. Bucle Principal del Juego: Recorrer el Mapa ---
-    poblarGameMap(game_map, scenario_array, numScenarios); // Crear el stack para el mapa del juego
-    Scenario* currentScenario = stack_top(game_map); // Comenzar desde el primer escenario
-    
-    // Quite el if de scenario uno, porque era innecesario ya que solo sucedia una vez
-    // asique solamente se carga una vez afuera el inicio del juego y ya 
-    // luego funciona el juego de manera normal.
+    poblarGameMap(game_map, scenario_array, numScenarios); // Crear una cola para el mapa del juego
+    Scenario* currentScenario = queue_front(game_map); // Comenzar desde el primer escenario
+
     pretty_loading_animation("Cargando datos del juego");
     player_add_initial_class_items(&player, INITIAL_ITEMS_CSV_PATH);
     waitForKeyPress();
@@ -70,28 +68,35 @@ int main() {
         waitForKeyPress();
         
         while (steps) { 
-            scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario); // Manejar el evento del escenario actual
+            // Generar el evento para el paso actual
+            scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario); 
             printf("Pasos restantes: %d\n", steps);
             waitForKeyPress();
             steps--;
-            if (player.currentHP <= 0) { // Si el jugador ha muerto, termina el juego
+
+            // Si el jugador ha muerto, termina el juego
+            if (player.currentHP <= 0) {
                 printf("Has sido derrotado. Fin del juego.\n");
-                currentScenario = NULL; // Terminar el bucle
+                currentScenario = NULL; 
                 break;
             }
+            clearScreen();
         }
-            
-        if (currentScenario != NULL) {  // Si el juego no terminó, avanza al siguiente escenario
-            stack_pop(game_map);        // Sacar el escenario actual del stack
-            currentScenario = stack_top(game_map); // Obtener el siguiente escenario en el stack
+        
+        // Si el juego no terminó, avanza al siguiente escenario
+        if (currentScenario != NULL) {  
+            queue_remove(game_map);       
+            currentScenario = queue_front(game_map); 
         }
         
     }
     
-
-    if (player.currentHP > 0 && currentScenario == NULL) { // Si el bucle terminó por el final del mapa
-        if (FINALBOSS(&player, enemy_array, numEnemies)) { // Luchar contra el jefe final
+    // Si el jugador ha llegado al final del juego y no ha muerto, se enfrenta al jefe final
+    if (player.currentHP > 0 && currentScenario == NULL) { 
+        if (FINALBOSS(&player, enemy_array, numEnemies)) { 
             printf("\n¡Felicidades! Has derrotado al jefe final y completado el juego.\n");
+        } else {
+            printf("\nNo has logrado derrotar al jefe final. Fin del juego.\n");
         }
         printf("\n--- FIN DEL JUEGO ---\n");
         printf("¡Gracias por jugar, %s! Has llegado al final de tu aventura.\n", player.name);
@@ -100,8 +105,8 @@ int main() {
     }
 
     // --- 4. Liberar Memoria ---
-    freeGameData(scenario_array, enemy_array, item_array); // Llama a la función de limpieza
-    stack_clean(game_map); // Liberar el stack del mapa del juego
+    freeGameData(scenario_array, enemy_array, item_array);
+    queue_clean(game_map);
 
-    return EXIT_SUCCESS; // El programa terminó exitosamente
+    return EXIT_SUCCESS; 
 }

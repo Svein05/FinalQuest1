@@ -4,6 +4,7 @@
 #include <stdbool.h>    // Para usar el tipo de dato 'bool'
 #include "data_types.h" // Incluimos data_types.h para las definiciones de Player, Enemy, Item, Scenario
 #include "../tdas/stack.h"
+#include "../tdas/queue.h"
 
 // --- DEFINICIONES DE TIPOS DE ESCENARIO ---
 // Estos valores corresponden a los tipos de escenario en la estructura Scenario.
