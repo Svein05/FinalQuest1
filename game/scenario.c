@@ -113,8 +113,31 @@ void poblarGameMap(Queue* game_map, Scenario* escenarios, int numScenarios) {
 static int merchant_count = 0;
 static int last_event_type = -1;
 static int forced_merchant = 0; // Para forzar aparición de mercader
+static int scenario_event_count = 0; // Cuenta eventos en el escenario
 
-// Añadir Map* lore_map y LoreTracker* para mostrar lore en todos los eventos sin repetir
+static int elegir_evento(int *merchant_count, int last_event_type, int forced_merchant, int scenario_event_count) {
+    // Si el mercader no ha salido 2 veces, forzamos su aparición (pero nunca dos veces seguidas)
+    if (*merchant_count < 2 && last_event_type != 1) {
+        // Forzar mercader cada 3 eventos si no ha salido suficiente
+        if ((scenario_event_count % 3 == 2) || (forced_merchant < 2 && rand() % 4 == 0)) {
+            return 1; // Mercader
+        }
+    }
+    // Probabilidades: 0-69 combate, 70-84 bonus, 85-99 lore
+    int roll = rand() % 100;
+    int event_type = -1;
+    if (roll < 70) event_type = 0; // Combate
+    else if (roll < 85) event_type = 2; // Bonus
+    else event_type = 3; // Lore
+    // Si el evento es igual al anterior y NO es combate, elegir otro (excepto si solo queda mercader)
+    if (event_type == last_event_type && event_type != 0) {
+        if (*merchant_count < 2 && last_event_type != 1) return 1; // Mercader
+        // Alternar entre bonus y lore si bonus/lore fue el anterior
+        event_type = (event_type == 2) ? 3 : 2;
+    }
+    return event_type;
+}
+
 void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario, Map* lore_map, LoreTracker* tracker_ambiental, LoreTracker* tracker_profundo) {
     if (player == NULL || allItems == NULL || numItems == 0 || allEnemies == NULL || numEnemies == 0) {
         printf("Error: Datos incompletos para gestionar evento.\n");
@@ -125,37 +148,27 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
 
     int currentScenarioDifficulty = scenario->difficulty;
     int event_type = -1;
-    int roll = rand() % 100;
-    // 0-44: combate (45%), 45-54: mercader (10%), 55-74: bonus (20%), 75-99: historia/lore (25%)
-    if (merchant_count < 2 && last_event_type != 1 && forced_merchant < 2) {
-        // Forzar aparición de mercader si aún no ha salido 2 veces
-        if ((rand() % (3 - merchant_count)) == 0) { // Probabilidad de forzar
-            event_type = 1;
-            forced_merchant++;
-        }
-    }
-    if (event_type == -1) {
-        if (roll < 45) {
-            event_type = 0; // Combate
-        } else if (roll < 55) {
-            event_type = 1; // Mercader
-        } else if (roll < 75) {
-            event_type = 2; // Bonus
-        } else {
-            event_type = 3; // Historia/Lore
-        }
-    }
+    scenario_event_count++;
+    event_type = elegir_evento(&merchant_count, last_event_type, forced_merchant, scenario_event_count);
 
     // Limitar mercader a 2 por escenario y nunca seguidos
     if (event_type == 1) {
         if (merchant_count >= 2 || last_event_type == 1) {
-            event_type = (roll < 60) ? 0 : ((roll < 80) ? 2 : 3); // Prioriza combate, luego bonus, luego historia
+            // Si ya salió 2 veces o fue el último, elige otro evento
+            event_type = (rand() % 2) ? 0 : ((rand() % 2) ? 2 : 3); // Prioriza combate, luego bonus/lore
         } else {
             merchant_count++;
+            forced_merchant++;
         }
     }
-    if (event_type != 1) merchant_count = 0; // Reset si no es mercader
+    if (event_type != 1) forced_merchant = 0; // Reset si no es mercader
+    if (event_type != 1) merchant_count = (merchant_count > 2) ? 2 : merchant_count; // No resetear merchant_count si ya salió 2 veces
 
+    // Evitar dos eventos iguales seguidos
+    if (event_type == last_event_type) {
+        if (event_type == 0) event_type = (rand() % 2) ? 2 : 3;
+        else event_type = 0;
+    }
     last_event_type = event_type;
 
     if (event_type == 0) { // Combate
