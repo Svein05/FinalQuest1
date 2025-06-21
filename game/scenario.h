@@ -5,6 +5,8 @@
 #include "data_types.h" // Incluimos data_types.h para las definiciones de Player, Enemy, Item, Scenario
 #include "../tdas/stack.h"
 #include "../tdas/queue.h"
+#include "../tdas/map.h"
+#include "ui.h"
 
 // --- DEFINICIONES DE TIPOS DE ESCENARIO ---
 // Estos valores corresponden a los tipos de escenario en la estructura Scenario.
@@ -40,9 +42,11 @@ Enemy* getEnemyForScenario(Scenario* Scenario, Enemy* allEnemies, int numEnemies
  * @param allEnemies Arreglo de todos los enemigos disponibles en el juego.
  * @param numEnemies Número total de enemigos en allEnemies.
  */
-void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario);
+void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario, Map* lore_map, LoreTracker* tracker_ambiental, LoreTracker* tracker_profundo);
 
 void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios);
 bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies);
+void show_random_lore(Map* lore_map, int tipo);
+void show_random_lore_no_repeat(Map* lore_map, LoreTracker* tracker, int tipo);
 
 #endif // SCENARIO_H

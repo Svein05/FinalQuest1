@@ -114,7 +114,8 @@ static int merchant_count = 0;
 static int last_event_type = -1;
 static int forced_merchant = 0; // Para forzar aparición de mercader
 
-void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario) {
+// Añadir Map* lore_map y LoreTracker* para mostrar lore en todos los eventos sin repetir
+void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario, Map* lore_map, LoreTracker* tracker_ambiental, LoreTracker* tracker_profundo) {
     if (player == NULL || allItems == NULL || numItems == 0 || allEnemies == NULL || numEnemies == 0) {
         printf("Error: Datos incompletos para gestionar evento.\n");
         return;
@@ -176,6 +177,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
             printf("\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
             player->currentHP = 0;
         }
+        show_random_lore_no_repeat(lore_map, tracker_ambiental, 0);
     } else if (event_type == 1) { // Mercader
         printf("Has encontrado a un mercader errante!\n");
         Map* itemMap = shop_initialize_random_merchant(allItems, numItems, currentScenarioDifficulty, player);
@@ -185,6 +187,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         } else {
             printf("El mercader no tenia nada que vender o hubo un error.\n");
         }
+        show_random_lore_no_repeat(lore_map, tracker_ambiental, 0); // Mostrar lore ambiental
     } else if (event_type == 2) { // Bonus
         printf("\x1b[33m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
         printf("\x1b[33m            ¡Has descubierto algo interesante!\x1b[0m\n");
@@ -227,12 +230,13 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
                 printf("No se encontraron ítems para dar como bonificación.\n");
             }
         }
+        show_random_lore_no_repeat(lore_map, tracker_ambiental, 0); // Mostrar lore ambiental
         waitForKeyPress();
     } else if (event_type == 3) { // Historia/Lore
-        printf("\x1b[36m═══════════════════════════════════════════════════════════════\x1b[0m\n");
-        printf("\x1b[36m  📜  Encuentras un antiguo mural con inscripciones misteriosas...\x1b[0m\n");
-        printf("\x1b[36m  (Aquí habrá historia o lore en el futuro)\x1b[0m\n");
-        printf("\x1b[36m═══════════════════════════════════════════════════════════════\x1b[0m\n");
+        printf("Recuerdos vienen hacia ti");
+        wait_three_points();
+        clearScreen();
+        show_random_lore_no_repeat(lore_map, tracker_profundo, 1); // Mostrar lore profundo
         waitForKeyPress();
     }
     printf("--- FIN DE EVENTO ---\n");
@@ -245,4 +249,41 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
     // Simulación de combate con el jefe final
     // Aquí podrías llamar a combat_manage_turn() con un enemigo especial.
     return true; // Simulamos que el jugador gana
+}
+
+// Recibe el Map* de lore y el tipo de evento, y muestra un fragmento aleatorio con animación
+void show_random_lore(Map* lore_map, int tipo) {
+    int key = tipo;
+    MapPair* pair = map_search(lore_map, &key);
+    if (!pair || !pair->value) return;
+    List* lista = (List*)pair->value;
+    int n = list_size(lista);
+    if (n == 0) return;
+    int idx = rand() % n;
+    void* node = list_first(lista);
+    for (int i = 0; i < idx; i++) node = list_next(lista);
+    char* lore = (char*)node;
+    display_lore_event(lore);
+}
+
+// Recibe el Map* de lore, el tracker y el tipo de evento, y muestra un fragmento aleatorio no repetido
+void show_random_lore_no_repeat(Map* lore_map, LoreTracker* tracker, int tipo) {
+    int key = tipo;
+    MapPair* pair = map_search(lore_map, &key);
+    if (!pair || !pair->value) return;
+    List* lista = (List*)pair->value;
+    int n = list_size(lista);
+    if (n == 0) return;
+    int idx = get_random_unused_lore(tracker);
+    if (idx == -1) {
+        // Si ya se mostraron todos, reiniciar tracker y volver a elegir
+        free_lore_tracker(tracker);
+        init_lore_tracker(tracker, tipo, n);
+        idx = get_random_unused_lore(tracker);
+    }
+    void* node = list_first(lista);
+    for (int i = 0; i < idx; i++) node = list_next(lista);
+    char* lore = (char*)node;
+    mark_lore_used(tracker, idx);
+    display_lore_event(lore);
 }

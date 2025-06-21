@@ -17,6 +17,8 @@ Item* load_items(const char* ITEMS_CSV_PATH, int* numItems);
 Item* load_initial_items(const char* INITIAL_ITEMS_CSV_PATH, int* numItems);
 Map* load_initial_items_map(const char* INITIAL_ITEMS_CSV_PATH);
 Scenario* load_scenarios(const char* SCENARIOS_CSV_PATH, int* numScenarios);
+int int_key_equal(void* a, void* b);
+Map* load_lore_map(const char* lore_csv_path);
 
 
 #endif // DATALOADER_H

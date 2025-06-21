@@ -406,3 +406,47 @@ Map* load_initial_items_map(const char* INITIAL_ITEMS_CSV_PATH) {
     return clase_a_items;
 }
 
+/**
+ * Carga todos los fragmentos de lore desde el CSV y los agrupa en un Map,
+ * donde la key es el tipo (int*) y el value es una List* de strings (char*).
+ * El Map debe ser liberado por el llamador.
+ */
+// Comparador para claves int en Map
+int int_key_equal(void* a, void* b) {
+    return *((int*)a) == *((int*)b);
+}
+
+Map* load_lore_map(const char* lore_csv_path) {
+    Map* lore_map = map_create(int_key_equal);
+    FILE* file = fopen(lore_csv_path, "r");
+    if (!file) return NULL;
+    char** tokens;
+    // Leer encabezado
+    tokens = read_csv_line(file, CSV_DELIMITER);
+    free_tokens(tokens);
+    while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
+        if (!tokens[0] || !tokens[1] || !tokens[3]) {
+            free_tokens(tokens);
+            continue;
+        }
+        int tipo = atoi(tokens[1]);
+        char* historia = tokens[3];
+        // Buscar lista para este tipo
+        int* key = malloc(sizeof(int));
+        *key = tipo;
+        MapPair* pair = map_search(lore_map, key);
+        List* lista;
+        if (pair) {
+            lista = (List*)pair->value;
+            free(key); // Ya existe la key
+        } else {
+            lista = list_create();
+            map_insert(lore_map, key, lista);
+        }
+        list_pushBack(lista, strdup(historia));
+        free_tokens(tokens);
+    }
+    fclose(file);
+    return lore_map;
+}
+

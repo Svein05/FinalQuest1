@@ -408,6 +408,7 @@ static int string_equals(void* a, void* b) {
 
 // Añade ítems al jugador de forma silenciosa (sin mensajes) y guarda resumen
 void player_add_initial_class_items(Player* player, const char* initial_items_csv) {
+    pretty_loading_animation("Cargando datos del juego");
     Map* clase_a_items = load_initial_items_map(initial_items_csv);
     if (!clase_a_items) return;
     char* clase = NULL;
@@ -446,4 +447,5 @@ void player_add_initial_class_items(Player* player, const char* initial_items_cs
     map_destroy(clase_a_items);
 
     printf("Automaticamente te equiparás con tu mejor equipamiento.\n");
+    waitForKeyPress();
 }

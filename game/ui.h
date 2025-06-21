@@ -24,5 +24,19 @@ void display_title();
 void display_player_summary(const Player* player);
 void display_combat_text();
 void display_combat_banner(const char* player_name, const char* enemy_name);
+void display_intro_lore_and_ascii(const char* lore_inicial);
+void print_lore_text_animated(const char* texto, int delay_ms);
+void print_lore_text_animated_wrapped(const char* texto, int line_width, int delay_ms);
+void display_lore_event(const char* lore);
+
+typedef struct {
+    int tipo;
+    int* usados;
+    int cantidad;
+} LoreTracker;
+void init_lore_tracker(LoreTracker* tracker, int tipo, int cantidad);
+void free_lore_tracker(LoreTracker* tracker);
+int get_random_unused_lore(LoreTracker* tracker);
+void mark_lore_used(LoreTracker* tracker, int idx);
 
 #endif // UI_H

@@ -2,6 +2,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <windows.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 #include "data_types.h"
 #include "ui.h"
@@ -226,4 +228,79 @@ void display_combat_banner(const char* player_name, const char* enemy_name) {
     printf("\x1b[35m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
     printf("\x1b[35m║ ¡COMBATE INICIADO! %10s vs %-27s ║\x1b[0m\n", player_name, enemy_name);
     printf("\x1b[35m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+}
+
+void display_intro_lore_and_ascii(const char* lore_inicial) {
+    clearScreen();
+    printf("\n\x1b[36m▒█▀▀▀ ░▀░ █▀▀▄ █▀▀█ █░░ ▒█▀▀█ █░░█ █▀▀ █▀▀ ▀▀█▀▀   ▄█░\x1b[0m\n");
+    printf("\x1b[36m▒█▀▀▀ ▀█▀ █░░█ █▄▄█ █░░ ▒█░▒█ █░░█ █▀▀ ▀▀█ ░░█░░   ░█░ \x1b[0m\n");
+    printf("\x1b[36m▒█░░░ ▀▀▀ ▀░░▀ ▀░░▀ ▀▀▀ ░▀▀█▄ ░▀▀▀ ▀▀▀ ▀▀▀ ░░▀░░   ▄█▄\x1b[0m\n\n");
+    puts("           __...--~~~~~-._   _.-~~~~~--...__");
+    puts("         //      Aqui     `V'      Tu       \\\\");
+    puts("        //     Empieza     |     Aventura    \\\\");
+    puts("       //__...--~~~~~~-._  |  _.-~~~~~~--...__\\\\");
+    puts("      //__.....----~~~~._\\ | /_.~~~~----.....__\\\\");
+    puts("     ====================\\\\|//====================");
+    puts("                         `---`");
+    printf("\x1b[36m╔─────────────────────────────────────────────────────╗\x1b[0m\n");
+    printf("  ");
+    print_lore_text_animated_wrapped(lore_inicial, 45, 18);
+    printf("\x1b[36m╚─────────────────────────────────────────────────────╝\x1b[0m\n");
+    waitForKeyPress();
+}
+
+// Imprime texto animado tipo videojuego antiguo, con salto de línea automático cada 'line_width' caracteres
+void print_lore_text_animated_wrapped(const char* texto, int line_width, int delay_ms) {
+    int len = strlen(texto);
+    int col = 0;
+    for (int i = 0; i < len; i++) {
+        putchar(texto[i]);
+        fflush(stdout);
+        Sleep(delay_ms);
+        col++;
+        if (col >= line_width && texto[i] == ' ') {
+            putchar('\n');
+            printf("  ");
+            col = 0;
+        }
+    }
+    putchar('\n');
+}
+
+void display_lore_event(const char* lore) {
+    Sleep(1000);
+    printf("\x1b[35m╔──────────────────────────────────────────────────────────────╗\x1b[0m\n");
+    printf("  ");
+    print_lore_text_animated_wrapped(lore, 54, 18); // 18 ms por caracter
+    printf("\x1b[35m╚──────────────────────────────────────────────────────────────╝\x1b[0m\n");
+}
+
+// --- Lógica de LoreTracker (implementación) ---
+
+void init_lore_tracker(LoreTracker* tracker, int tipo, int cantidad) {
+    tracker->tipo = tipo;
+    tracker->cantidad = cantidad;
+    tracker->usados = calloc(cantidad, sizeof(int));
+}
+
+void free_lore_tracker(LoreTracker* tracker) {
+    free(tracker->usados);
+}
+
+int get_random_unused_lore(LoreTracker* tracker) {
+    int disponibles = 0;
+    for (int i = 0; i < tracker->cantidad; i++) if (!tracker->usados[i]) disponibles++;
+    if (disponibles == 0) return -1;
+    int elegido = rand() % disponibles;
+    for (int i = 0, c = 0; i < tracker->cantidad; i++) {
+        if (!tracker->usados[i]) {
+            if (c == elegido) return i;
+            c++;
+        }
+    }
+    return -1;
+}
+
+void mark_lore_used(LoreTracker* tracker, int idx) {
+    tracker->usados[idx] = 1;
 }

@@ -55,9 +55,36 @@ int main() {
     poblarGameMap(game_map, scenario_array, numScenarios); // Crear una cola para el mapa del juego
     Scenario* currentScenario = queue_front(game_map); // Comenzar desde el primer escenario
 
-    pretty_loading_animation("Cargando datos del juego");
     player_add_initial_class_items(&player, INITIAL_ITEMS_CSV_PATH);
-    waitForKeyPress();
+
+    // Cargar todos los fragmentos de lore agrupados por tipo
+    Map* lore_map = load_lore_map("data/lore.csv");
+    LoreTracker tracker_ambiental, tracker_profundo;
+    int cantidad_ambiental = 0, cantidad_profundo = 0;
+    if (lore_map) {
+        int tipo_inicial = -1;
+        MapPair* pair = map_search(lore_map, &tipo_inicial);
+        if (pair && pair->value) {
+            List* lista = (List*)pair->value;
+            char* lore_inicial = (char*)list_first(lista); // Solo hay uno para tipo -1
+            display_intro_lore_and_ascii(lore_inicial);
+        } else {
+            printf("No se encontro el lore inicial en el mapa.\n");
+            waitForKeyPress();
+        }
+        // Inicializar trackers para lore ambiental (tipo 0) y profundo (tipo 1)
+        int tipo_ambiental = 0, tipo_profundo = 1;
+        MapPair* pair_ambiental = map_search(lore_map, &tipo_ambiental);
+        MapPair* pair_profundo = map_search(lore_map, &tipo_profundo);
+        if (pair_ambiental && pair_ambiental->value) cantidad_ambiental = list_size((List*)pair_ambiental->value);
+        if (pair_profundo && pair_profundo->value) cantidad_profundo = list_size((List*)pair_profundo->value);
+        init_lore_tracker(&tracker_ambiental, tipo_ambiental, cantidad_ambiental);
+        init_lore_tracker(&tracker_profundo, tipo_profundo, cantidad_profundo);
+    } else {
+        printf("No se pudo cargar el mapa de lore.\n");
+        waitForKeyPress();
+    }
+
     while (currentScenario != NULL) {
         clearScreen();
         display_scenario(currentScenario);
@@ -69,7 +96,7 @@ int main() {
         
         while (steps) { 
             // Generar el evento para el paso actual
-            scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario); 
+            scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario, lore_map, &tracker_ambiental, &tracker_profundo); 
             printf("Pasos restantes: %d\n", steps);
             waitForKeyPress();
             steps--;
@@ -107,6 +134,12 @@ int main() {
     // --- 4. Liberar Memoria ---
     freeGameData(scenario_array, enemy_array, item_array);
     queue_clean(game_map);
+    free(lore_map); // Liberar memoria del mapa de lore
+    // Liberar memoria de trackers de lore
+    if (lore_map) {
+        free_lore_tracker(&tracker_ambiental);
+        free_lore_tracker(&tracker_profundo);
+    }
 
     return EXIT_SUCCESS; 
 }
