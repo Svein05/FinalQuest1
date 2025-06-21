@@ -10,6 +10,7 @@
 #include "../tdas/extra.h"
 #include "player.h"
 #include "../tdas/extra.h"
+#include "../tdas/map.h"
 
 void display_title()
 {
@@ -303,4 +304,102 @@ int get_random_unused_lore(LoreTracker* tracker) {
 
 void mark_lore_used(LoreTracker* tracker, int idx) {
     tracker->usados[idx] = 1;
+}
+
+// --- Funciones de impresión de tienda ---
+void display_merchant_appearance(int merchantItemCount, int maxDifficulty) {
+    printf("\033[1;33m"); // Amarillo brillante
+    printf("╔═════════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║\033[1;36m  ¡Un mercader misterioso ha aparecido con \033[1;32m%d\033[1;36m ítem%s de dificultad hasta \033[1;31m%d\033[1;36m!  \033[1;33m  ║\n",
+           merchantItemCount, merchantItemCount == 1 ? "" : "s", maxDifficulty);
+    printf("╚═════════════════════════════════════════════════════════════════════════════╝\n");
+    printf("\033[0m"); // Resetear colores
+}
+
+void display_shop_welcome(int gold) {
+    printf("\033[1;35m╔════════════════════════════════════════════════════════════╗\n");
+    printf("║                  Bienvenido a la tienda!                   ║\n");
+    printf("╠════════════════════════════════════════════════════════════╣\n");
+    printf("║                  Tienes \033[1;33m%d\033[1;35m oro.                           ║\n", gold);
+    printf("╚════════════════════════════════════════════════════════════╝\n\033[0m");
+}
+
+void display_shop_items(Map* itemMap) {
+    const int ancho = 82;
+    printf("\033[1;36m╔");
+    for (int i = 0; i < ancho - 2; i++) printf("═");
+    printf("╗\033[0m\n");
+    printf("   \033[1;36m%-*s\033[0m\n", ancho - 3, "Items disponibles:");
+    MapPair* pair = map_first(itemMap);
+    if (!pair) {
+        printf("   \033[1;31m(No hay ítems en venta en este momento.)\033[0m\n");
+    } else {
+        while (pair) {
+            Item* item = (Item*)pair->value;
+            int id = *(int*)pair->key;
+            printf("   [\033[1;33m%d\033[0m] \033[1;37m%-20s\033[0m (\033[1;34m%-6s\033[0m) - Costo: \033[1;33m%-4d oro\033[0m. ",
+                   id, item->name, item->rarity, item->price);
+            if (item->type == 1) {
+                printf("\033[1;31mDaño: %-3d.\033[0m", item->damage);
+            } else if (item->type == 2) {
+                printf("\033[1;32mDefensa: %-3d.\033[0m", item->defense);
+            } else if (item->type == 3) {
+                if (item->heal > 0) printf("\033[1;32mCura: %d HP. \033[0m", item->heal);
+                if (item->damage > 0) printf("\033[1;31mDaño Boost: +%d Atk \033[0m", item->damage);
+                if (item->defense > 0) printf("\033[1;32mDefensa Boost: +%d Def \033[0m", item->defense);
+                if (item->damage > 0 || item->defense > 0) printf("por %d turnos. ", item->effectDuration);
+            }
+            printf("\n");
+            pair = map_next(itemMap);
+        }
+    }
+    printf("\033[1;36m╚");
+    for (int i = 0; i < ancho - 2; i++) printf("═");
+    printf("╝\033[0m\n");
+}
+
+void display_shop_item_detail(Item* item, int id) {
+    printf("║   [\033[1;33m%d\033[0m] \033[1;37m%-20s\033[0m (\033[1;34m%-6s\033[0m) - Costo: \033[1;33m%-4d oro\033[0m. ",
+           id, item->name, item->rarity, item->price);
+    if (item->type == 1) {
+        printf("\033[1;31mDaño: %-3d.\033[0m", item->damage);
+    } else if (item->type == 2) {
+        printf("\033[1;32mDefensa: %-3d.\033[0m", item->defense);
+    } else if (item->type == 3) {
+        if (item->heal > 0) printf("\033[1;32mCura: %d HP. \033[0m", item->heal);
+        if (item->damage > 0) printf("\033[1;31mDaño Boost: +%d Atk \033[0m", item->damage);
+        if (item->defense > 0) printf("\033[1;32mDefensa Boost: +%d Def \033[0m", item->defense);
+        if (item->damage > 0 || item->defense > 0) printf("por %d turnos. ", item->effectDuration);
+    }
+    printf("%*s║\n", 60 - (int)strlen(item->name) - 35, ""); // Ajusta el padding
+}
+
+void display_shop_menu() {
+    printf("\033[1;36m╔════════════════════════════════════════════════════════════╗\n");
+    printf("║                  ¿Qué deseas hacer?                        ║\n");
+    printf("╠════════════════════════════════════════════════════════════╣\n");
+    printf("║ \033[1;32m1. Comprar Item\033[1;36m                                            ║\n");
+    printf("║ \033[1;31m2. Salir de la tienda\033[1;36m                                      ║\n");
+    printf("╚════════════════════════════════════════════════════════════╝\n");
+    printf("\033[0mTu eleccion: ");
+}
+
+void display_shop_buy_success(int gold) {
+    printf("\033[1;32m¡Compra exitosa! Tienes %d oro restante.\033[0m\n", gold);
+}
+
+void display_shop_exit() {
+    printf("\033[1;35mGracias por tu visita! Vuelve pronto.\033[0m\n");
+}
+
+void display_shop_invalid_option() {
+    printf("\033[1;31mOpcion invalida. Por favor, elige 1 o 2.\033[0m\n");
+}
+
+void display_shop_error(const char* msg) {
+    printf("\033[1;31m%s\033[0m\n", msg);
+}
+
+void display_shop_input(const char* msg) {
+    printf("\033[1;36m%s\033[0m", msg);
 }

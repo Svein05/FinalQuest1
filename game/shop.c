@@ -10,6 +10,7 @@
 #include "../tdas/extra.h" // Asegúrate de que esta ruta es correcta para tu extra.h y extra.c
 #include "data_loader.h"
 #include "../tdas/map.h"
+#include "ui.h" // Incluido para las funciones de interfaz de usuario
 
 // Comparador para IDs de ítems (int)
 static int int_equals(void* a, void* b) {
@@ -51,101 +52,69 @@ Map* shop_initialize_random_merchant(Item* item_array, int numItems, int maxDiff
     }
     free(selected);
     free(indices);
-    printf("Un mercader misterioso ha aparecido con %d items de dificultad hasta %d!\n",
-           merchantItemCount, maxDifficulty);
+    display_merchant_appearance(merchantItemCount, maxDifficulty);
     return tempMap;
 }
 
 void shop_interact(Player* player, Map* itemMap) {
     if (player == NULL || itemMap == NULL) {
-        printf("Error: Datos de jugador o tienda inválidos.\n");
+        display_shop_error("Error: Datos de jugador o tienda inválidos.");
         return;
     }
     int choice;
     char input[10];
-    printf("\n--- Bienvenido a la tienda! ---\n");
-    printf("Tienes %d oro.\n", player->gold);
+    display_shop_welcome(player->gold);
     while (true) {
-        printf("\nItems disponibles:\n");
-        MapPair* pair = map_first(itemMap);
-        if (!pair) {
-            printf("   (No hay ítems en venta en este momento.)\n");
-        } else {
-            while (pair) {
-                Item* item = (Item*)pair->value;
-                int id = *(int*)pair->key;
-                printf("   [%d] %s (%s) - Costo: %d oro. ",
-                       id, item->name, item->rarity, item->price);
-                if (item->type == 1) {
-                    printf("Daño: %d.\n", item->damage);
-                } else if (item->type == 2) {
-                    printf("Defensa: %d.\n", item->defense);
-                } else if (item->type == 3) {
-                    // Consumible: mostrar curación y boosts
-                    if (item->heal > 0) printf("Cura: %d HP. ", item->heal);
-                    if (item->damage > 0) printf("Daño Boost: +%d Atk ", item->damage);
-                    if (item->defense > 0) printf("Defensa Boost: +%d Def ", item->defense);
-                    if (item->damage > 0 || item->defense > 0) printf("por %d turnos. ", item->effectDuration);
-                    printf("\n");
-                } else {
-                    printf(")\n");
-                }
-                pair = map_next(itemMap);
-            }
-        }
-        printf("\nQue deseas hacer?\n");
-        printf("1. Comprar Item\n");
-        printf("2. Salir de la tienda\n");
-        printf("Tu eleccion: ");
+        display_shop_items(itemMap);
+        display_shop_menu();
         if (fgets(input, sizeof(input), stdin) == NULL) {
-            printf("Error al leer la entrada. Saliendo de la tienda.\n");
+            display_shop_error("Error al leer la entrada. Saliendo de la tienda.");
             break;
         }
         choice = atoi(input);
         if (choice == 1) {
-            printf("Ingresa el ID del item a comprar: ");
+            display_shop_input("Ingresa el ID del item a comprar: ");
             if (fgets(input, sizeof(input), stdin) == NULL) {
-                printf("Error al leer la entrada. Regresando al menu.\n");
+                display_shop_error("Error al leer la entrada. Regresando al menu.");
                 continue;
             }
             int itemId = atoi(input);
             bool purchased = shop_buy_item(player, itemMap, itemId);
             if (purchased) {
-                printf("¡Compra exitosa! Tienes %d oro restante.\n", player->gold);
+                display_shop_buy_success(player->gold);
             }
         } else if (choice == 2) {
-            printf("Gracias por tu visita! Vuelve pronto.\n");
+            display_shop_exit();
             break;
         } else {
-            printf("Opcion invalida. Por favor, elige 1 o 2.\n");
+            display_shop_invalid_option();
         }
     }
 }
 
 bool shop_buy_item(Player* player, Map* itemMap, int itemId) {
     if (player == NULL || itemMap == NULL) {
-        printf("Error interno de compra. Por favor, reporta este bug.\n");
+        display_shop_error("Error interno de compra. Por favor, reporta este bug.");
         return false;
     }
     MapPair* pair = map_search(itemMap, &itemId);
     if (!pair || !pair->value) {
-        printf("Error: El ítem seleccionado no existe en la tienda.\n");
+        display_shop_error("Error: El ítem seleccionado no existe en la tienda.");
         return false;
     }
     Item* itemToBuy = (Item*)pair->value;
     if (player->gold < itemToBuy->price) {
-        printf("No tienes suficiente oro para comprar %s (necesitas %d, tienes %d).\n",
+        printf("\033[1;31mNo tienes suficiente oro para comprar %s (necesitas %d, tienes %d).\033[0m\n",
                itemToBuy->name, itemToBuy->price, player->gold);
         return false;
     }
     if (player_add_item_to_inventory(player, *itemToBuy)) {
         player->gold -= itemToBuy->price;
-        // Eliminar el ítem del Map tras la compra
         map_remove(itemMap, &itemId);
-        printf("Has comprado %s y se ha gestionado tu inventario.\n", itemToBuy->name);
+        printf("\033[1;32mHas comprado %s y se ha gestionado tu inventario.\033[0m\n", itemToBuy->name);
         return true;
     } else {
-        printf("No se pudo comprar %s. (Inventario lleno o no fue mejor equipo)\n", itemToBuy->name);
+        printf("\033[1;31mNo se pudo comprar %s. (Inventario lleno o no fue mejor equipo)\033[0m\n", itemToBuy->name);
         return false;
     }
 }
