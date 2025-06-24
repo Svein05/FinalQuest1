@@ -18,6 +18,9 @@
  */
 bool combat_manage_turn(Player* player, Enemy* enemy);
 
+// Combate especial para el boss final
+bool combat_final_boss(Player* player, Enemy* boss);
+
 // Calcula el daño real después de aplicar la defensa.
 int calculate_damage(int attack, int defense);
 

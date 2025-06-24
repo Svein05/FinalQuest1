@@ -50,6 +50,14 @@ Enemy* spawnRandomEnemy(int currentScenarioDifficulty, Enemy* enemy_array, int n
         return NULL;
     }
     *spawnedEnemy = filteredEnemies[randomIndex]; // Copiar el enemigo seleccionado
+    
+    // Para el boss final (dificultad 4), asegurar que tenga HP completo
+    if (currentScenarioDifficulty == 4) {
+        spawnedEnemy->currentHP = spawnedEnemy->HP;
+    } else {
+        spawnedEnemy->currentHP = spawnedEnemy->HP; // HP completo para todos
+    }
+    
     free(filteredEnemies); // Liberar memoria de la lista filtrada
     return spawnedEnemy; 
 }
@@ -114,6 +122,9 @@ static int merchant_count = 0;
 static int last_event_type = -1;
 static int forced_merchant = 0; // Para forzar aparición de mercader
 static int scenario_event_count = 0; // Cuenta eventos en el escenario
+
+// --- Variable global para reinicio tras derrota ---
+int gameover_retry_flag = 0;
 
 static int elegir_evento(int *merchant_count, int last_event_type, int forced_merchant, int scenario_event_count) {
     // Si el mercader no ha salido 2 veces, forzamos su aparición (pero nunca dos veces seguidas)
@@ -185,10 +196,10 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
             printf("\x1b[33m═══════════════════════════════════════════════════════════════\x1b[0m\n");
             player->gold += won_gold; 
         } else {
-            printf("\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
-            printf("\x1b[41m  ☠️  %s te ha vencido. ¡Fin del combate!\x1b[0m\n", combatEnemy.name);
-            printf("\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
             player->currentHP = 0;
+            // Menú para reiniciar o salir
+            if (menu_gameover_retry()) gameover_retry_flag = 1;
+            if (!gameover_retry_flag) return; // Si elige salir, cortar la función inmediatamente
         }
         show_random_lore_no_repeat(lore_map, tracker_ambiental, 0);
     } else if (event_type == 1) { // Mercader
@@ -256,12 +267,108 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
 }
 
 bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
-    // Aquí podrías implementar la lógica del jefe final.
-    // Por ahora, simplemente retornamos true para simular que el jugador lo derrotó.
-    printf("¡Has llegado al jefe final! Preparándote para la batalla...\n");
-    // Simulación de combate con el jefe final
-    // Aquí podrías llamar a combat_manage_turn() con un enemigo especial.
-    return true; // Simulamos que el jugador gana
+    if (!player || !allEnemies || numEnemies <= 0) {
+        printf("Error: Parámetros inválidos para el boss final.\n");
+        return false;
+    }
+
+    // Buscar el boss final (dificultad 4)
+    Enemy* finalBoss = spawnRandomEnemy(4, allEnemies, numEnemies);
+    if (!finalBoss) {
+        printf("Error: No se pudo encontrar el boss final.\n");
+        return false;
+    }
+
+    // Mostrar la entrada épica del boss final
+    display_final_boss_entrance(finalBoss->name);
+
+    // Dar una última oportunidad al jugador para prepararse
+    printf("\x1b[93m╔═══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+    printf("\x1b[93m║              ÚLTIMA OPORTUNIDAD DE PREPARACIÓN                ║\x1b[0m\n");
+    printf("\x1b[93m╠═══════════════════════════════════════════════════════════════╣\x1b[0m\n");
+    printf("\x1b[93m║  ¿Quieres usar algún ítem de tu inventario antes del combate? ║\x1b[0m\n");
+    printf("\x1b[93m║                    [1] Sí  [2] No, estoy listo                ║\x1b[0m\n");
+    printf("\x1b[93m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+    
+    char input[10];
+    printf("Tu elección: ");
+    if (fgets(input, sizeof(input), stdin) != NULL) {
+        int choice = atoi(input);
+        if (choice == 1) {
+            printf("\x1b[96m¡Úsalo sabiamente, puede ser tu última oportunidad!\x1b[0m\n\n");
+            // --- Inventario de uso de ítem (igual que combate normal) ---
+            printf("--- Inventario de %s ---\n", player->name);
+            if (player->inventoryCount == 0) {
+                printf("Tu inventario esta vacio.\n");
+            } else {
+                for (int i = 0; i < player->inventoryCount; i++) {
+                    Item currentItem = player->inventory[i];
+                    printf("%d. %s (Curacion: %d, Daño Boost: %d, Def Boost: %d, Duracion: %d)\n",
+                           i + 1, currentItem.name, currentItem.heal,
+                           currentItem.damage, currentItem.defense, currentItem.effectDuration);
+                }
+                printf("Elige un item a usar (0 para cancelar): ");
+                char item_input[10];
+                if (fgets(item_input, sizeof(item_input), stdin) != NULL) {
+                    int item_choice = atoi(item_input);
+                    if (item_choice > 0 && item_choice <= player->inventoryCount) {
+                        player_use_consumable(player, item_choice - 1);
+                        waitForKeyPress();
+                    } else {
+                        printf("Cancelando uso de item.\n");
+                        waitForKeyPress();
+                    }
+                }
+            }
+        }
+    }
+
+    // Mostrar estadísticas finales antes del combate
+    printf("\x1b[95m╔═══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+    printf("\x1b[95m║                     ESTADÍSTICAS FINALES                      ║\x1b[0m\n");
+    printf("\x1b[95m╠═══════════════════════════════════════════════════════════════╣\x1b[0m\n");
+    printf("\x1b[95m║  Héroe: %-20s  Enemigos Derrotados: %-8d   ║\x1b[0m\n", 
+           player->name, player->enemiesDefeated);
+    printf("\x1b[95m║  HP: %3d/%-3d  ATK: %-3d  DEF: %-3d  Oro: %-5d                ║\x1b[0m\n", 
+           player->currentHP, player->maxHP, 
+           player->attack + player->tempAttackBoost,
+           player->defense + player->tempDefenseBoost, 
+           player->gold);
+    printf("\x1b[95m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n\n");
+    
+    printf("¡Que el destino esté de tu lado!");
+    wait_three_points();
+
+    // ¡COMBATE FINAL!
+    bool victory = combat_final_boss(player, finalBoss);
+
+    if (victory) {
+        // ¡VICTORIA ÉPICA!
+        display_final_boss_victory();
+        
+        // Recompensas épicas por derrotar al boss final
+        int epic_gold = 5000;
+        player->gold += epic_gold;
+        player->enemiesDefeated++;
+        
+        printf("\x1b[93m╔═══════════════════════════════════════════════════════════════╗\x1b[0m\n");
+        printf("\x1b[93m║                      RECOMPENSAS ÉPICAS                       ║\x1b[0m\n");
+        printf("\x1b[93m╠═══════════════════════════════════════════════════════════════╣\x1b[0m\n");
+        printf("\x1b[93m║  • Oro del Tesoro Final: %d                                 ║\x1b[0m\n", epic_gold);
+        printf("\x1b[93m║  • Título: 'Devorador de Devouradores'                        ║\x1b[0m\n");
+        printf("\x1b[93m║  • Leyenda Eterna: Tu nombre será recordado por siempre       ║\x1b[0m\n");
+        printf("\x1b[93m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n");
+        
+        free(finalBoss);
+        return true;
+    } else {
+        // Derrota final
+        display_final_boss_defeat(finalBoss->name);
+        // Menú para reiniciar o salir
+        if (menu_gameover_retry()) gameover_retry_flag = 1;
+        free(finalBoss);
+        return false;
+    }
 }
 
 // Recibe el Map* de lore y el tipo de evento, y muestra un fragmento aleatorio con animación

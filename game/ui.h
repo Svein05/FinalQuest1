@@ -52,4 +52,12 @@ void display_shop_invalid_option();
 void display_shop_error(const char* msg);
 void display_shop_input(const char* msg);
 
+// Menú para salir o volver a jugar tras derrota
+int menu_gameover_retry();
+
+// === FUNCIONES DEL BOSS FINAL ===
+void display_final_boss_entrance(const char* boss_name);
+void display_final_boss_victory();
+void display_final_boss_defeat(const char* boss_name);
+
 #endif // UI_H

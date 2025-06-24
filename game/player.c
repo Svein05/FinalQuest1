@@ -376,7 +376,7 @@ void player_assign_class(Player* player, int clase) {
             initializePlayer(player, "Tanque", 130, 7, 12, 200);
             break;
         case 3: // Asesino
-            initializePlayer(player, "Asesino", 70, 18, 2, 200);
+            initializePlayer(player, "Asesino", 999, 999, 999, 999);
             break;
         default:
             initializePlayer(player, "Aventurero", 100, 10, 5, 200);
