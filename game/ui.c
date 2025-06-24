@@ -386,6 +386,7 @@ void display_shop_menu() {
 
 void display_shop_buy_success(int gold) {
     printf("\033[1;32m¡Compra exitosa! Tienes %d oro restante.\033[0m\n", gold);
+    printf("\x1b[90m──────────────────────────────────────────────────────────────\x1b[0m\n");
 }
 
 void display_shop_exit() {

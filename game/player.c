@@ -107,7 +107,6 @@ bool player_remove_item_from_inventory(Player* player, int item_id) {
         player->inventoryCount--;
         // Opcional: limpiar el último slot si es necesario, aunque inventoryCount ya lo manejará
         // initializeEmptyItem(&player->inventory[player->inventoryCount]);
-        printf("'%s' ha sido removido del inventario.\n", player->inventory[found_index].name); // Nombre del item que se movió
         return true;
     }
     return false; // Ítem no encontrado
@@ -131,14 +130,13 @@ void player_equip_weapon(Player* player, Item weapon, bool from_inventory) {
     // Primero, desequipa el arma anterior si existe y no es un ítem vacío
     if (old_weapon.id != ITEM_ID_EMPTY) {
         player->attack -= old_weapon.damage; // Quita el bono de ataque del arma vieja
-        printf("Se ha desequipado %s. (-%d Atk)\n", old_weapon.name, old_weapon.damage);
         // NO devolver el arma vieja al inventario, simplemente desaparece
     }
 
     // Equipa la nueva arma
     player->equippedWeapon = weapon; // Copia la nueva arma al slot de equipado
     player->attack += player->equippedWeapon.damage; // Añade el bono de ataque de la nueva arma
-    printf("Has equipado %s. (+%d Atk)\n", player->equippedWeapon.name, player->equippedWeapon.damage);
+    printf("\033[1;33mHas equipado %s. (+%d Atk)\033[0m\n", player->equippedWeapon.name, player->equippedWeapon.damage);
 
     // Si el arma fue equipada desde el inventario, la removemos de ahí
     if (from_inventory) {
@@ -164,14 +162,13 @@ void player_equip_armor(Player* player, Item armor, bool from_inventory) {
     // Primero, desequipa la armadura anterior si existe y no es un ítem vacío
     if (old_armor.id != ITEM_ID_EMPTY) {
         player->defense -= old_armor.defense; // Quita el bono de defensa de la armadura vieja
-        printf("Se ha desequipado %s. (-%d Def)\n", old_armor.name, old_armor.defense);
         // NO devolver la armadura vieja al inventario, simplemente desaparece
     }
 
     // Equipa la nueva armadura
     player->equippedArmor = armor; // Copia la nueva armadura al slot de equipado
     player->defense += player->equippedArmor.defense; // Añade el bono de defensa de la nueva armadura
-    printf("Has equipado %s. (+%d Def)\n", player->equippedArmor.name, player->equippedArmor.defense);
+    printf("\033[1;34mHas equipado %s. (+%d Def)\033[0m\n", player->equippedArmor.name, player->equippedArmor.defense);
 
     // Si la armadura fue equipada desde el inventario, la removemos de ahí
     if (from_inventory) {
@@ -196,21 +193,21 @@ bool player_add_item_to_inventory(Player* player, Item item) {
     // Solo consumibles pueden ir al inventario
     if (item.type == 1) { // Arma
         if (item.damage > player->equippedWeapon.damage) {
-            printf("¡Has encontrado un arma mejor! Equipada automaticamente.\n");
+            printf("\033[1;32m¡Has cambiado a un arma mejor!\033[0m\n");
             player_equip_weapon(player, item, false);
             return true;
         } else {
-            printf("El arma encontrada no es mejor que la equipada. No se añade al inventario.\n");
+            printf("Tu arma equipada es mejor que este item.\n");
             return false;
         }
     } else if (item.type == 2) { // Armadura
         if (item.defense > player->equippedArmor.defense) {
-            printf("¡Has encontrado una armadura mejor! Equipada automaticamente.\n");
+            printf("\033[1;32m¡Has cambiado a una armadura mejor!\033[0m\n");
             player_equip_armor(player, item, false);
             return true;
         } else {
-            printf("La armadura encontrada no es mejor que la equipada. No se añade al inventario.\n");
-            return false;
+            printf("Tu armadura equipada es mejor que este item.\n");
+            return false; 
         }
     } else if (item.type == 3) { // Consumible
         if (player->inventoryCount >= INVENTORY_SLOTS) {
@@ -219,71 +216,11 @@ bool player_add_item_to_inventory(Player* player, Item item) {
         }
         player->inventory[player->inventoryCount] = item;
         player->inventoryCount++;
-        printf("%s ha sido añadido al inventario.\n", item.name);
+        printf("\033[1;36m%s ha sido añadido al inventario.\033[0m\n", item.name);
         return true;
     }
     return false;
 }
-
-/**
- * @brief Muestra un menú detallado del jugador con sus estadísticas, oro y equipo actual.
- * @param player Puntero a la estructura del Jugador.
- */
-void displayPlayerMenu(Player* player) {
-    if (player == NULL) return;
-
-    printf("\n--- ESTADO DEL JUGADOR: %s ---\n", player->name);
-    printf("Vida: %d/%d\n", player->currentHP, player->maxHP);
-    printf("Ataque: %d (Base: %d", player->attack + player->tempAttackBoost, player->attack);
-    if (player->tempAttackBoost > 0) {
-        printf(", Boost: +%d por %d turnos", player->tempAttackBoost, player->attackBoostTurns);
-    }
-    printf(")\n");
-
-    printf("Defensa: %d (Base: %d", player->defense + player->tempDefenseBoost, player->defense);
-    if (player->tempDefenseBoost > 0) {
-        printf(", Boost: +%d por %d turnos", player->tempDefenseBoost, player->defenseBoostTurns);
-    }
-    printf(")\n");
-
-    printf("Oro: %d\n", player->gold);
-
-    printf("--- EQUIPO ---\n");
-    printf("Arma Equipada: %s (Daño: %d)\n",
-           (player->equippedWeapon.id != ITEM_ID_EMPTY) ? player->equippedWeapon.name : "Nada",
-           player->equippedWeapon.damage);
-    printf("Armadura Equipada: %s (Defensa: %d)\n",
-           (player->equippedArmor.id != ITEM_ID_EMPTY) ? player->equippedArmor.name : "Nada",
-           player->equippedArmor.defense);
-
-    printf("--- INVENTARIO ---\n");
-    if (player->inventoryCount == 0) {
-        printf("Inventario vacio.\n");
-    } else {
-        for (int i = 0; i < player->inventoryCount; i++) {
-            Item currentItem = player->inventory[i];
-            // Solo mostrar ítems que NO son el arma o armadura equipada, y que no están vacíos
-            if (currentItem.id != ITEM_ID_EMPTY &&
-                currentItem.id != player->equippedWeapon.id && // Asume que un ítem equipado no tiene un duplicado en inventario por ID
-                currentItem.id != player->equippedArmor.id) {
-                printf("%d. %s (Tipo: %d, Rareza: %s, Costo: %d",
-                       i + 1, currentItem.name, currentItem.type, currentItem.rarity, currentItem.price);
-                if (currentItem.type == 1) printf(", Daño: %d)\n", currentItem.damage);
-                else if (currentItem.type == 2) printf(", Defensa: %d)\n", currentItem.defense);
-                else if (currentItem.type == 3) {
-                    printf(", Cura: %d", currentItem.heal);
-                    if (currentItem.damage > 0 || currentItem.defense > 0) {
-                        printf(", Boost: +%d Atk, +%d Def por %d turnos",
-                               currentItem.damage, currentItem.defense, currentItem.effectDuration);
-                    }
-                    printf(")\n");
-                } else printf(")\n"); // Tipo desconocido
-            }
-        }
-    }
-    printf("---------------------------\n");
-}
-
 
 // --- Funciones adicionales (ya estaban en player.c) ---
 
@@ -305,6 +242,11 @@ void player_use_consumable(Player* player, int itemIndexInInventory) {
         return;
     }
 
+    // Guardar el nombre antes de remover el ítem
+    char nombreConsumido[64];
+    strncpy(nombreConsumido, itemToUse->name, sizeof(nombreConsumido) - 1);
+    nombreConsumido[sizeof(nombreConsumido) - 1] = '\0';
+
     printf("Usando %s...\n", itemToUse->name);
 
     // Aplicar curación (si tiene)
@@ -313,27 +255,24 @@ void player_use_consumable(Player* player, int itemIndexInInventory) {
         if (player->currentHP > player->maxHP) {
             player->currentHP = player->maxHP;
         }
-        printf("Has recuperado %d HP. HP actual: %d/%d.\n", itemToUse->heal, player->currentHP, player->maxHP);
+        printf("\033[1;32mHas recuperado %d HP. HP actual: %d/%d.\033[0m\n", itemToUse->heal, player->currentHP, player->maxHP);
     }
 
     // Aplicar boosts temporales (si tiene)
     if (itemToUse->damage > 0) {
         player->tempAttackBoost += itemToUse->damage;
-        // Establecer la duración. Si ya hay un boost activo, puedes decidir si se "stackean" los turnos
-        // o si simplemente se reinicia la duración. Aquí, la reinicia.
         player->attackBoostTurns = itemToUse->effectDuration;
-        printf("Tu ataque ha aumentado en %d por %d turnos.\n", itemToUse->damage, itemToUse->effectDuration);
+        printf("\033[1;33mTu ataque ha aumentado en %d por %d turnos.\033[0m\n", itemToUse->damage, itemToUse->effectDuration);
     }
     if (itemToUse->defense > 0) {
         player->tempDefenseBoost += itemToUse->defense;
         player->defenseBoostTurns = itemToUse->effectDuration;
-        printf("Tu defensa ha aumentado en %d por %d turnos.\n", itemToUse->defense, itemToUse->effectDuration);
+        printf("\033[1;34mTu defensa ha aumentado en %d por %d turnos.\033[0m\n", itemToUse->defense, itemToUse->effectDuration);
     }
 
     // Remover el ítem consumido del inventario
-    // Mover los items subsiguientes para llenar el espacio
     player_remove_item_from_inventory(player, itemToUse->id);
-    printf("%s ha sido consumido y eliminado del inventario.\n", itemToUse->name);
+    printf("\033[1;34m%s ha sido consumido\033[0m\n", nombreConsumido);
 }
 
 /**
@@ -417,22 +356,25 @@ void player_add_initial_class_items(Player* player, const char* initial_items_cs
     else if (player->classID == 3) clase = "Asesino";
     MapPair* pair = map_search(clase_a_items, clase);
     List* lista = (List*)pair->value;
-    printf("¡Has recibido tu equipo inicial, para la clase %s!\n", player->name);
+    printf("\033[1;36m==============================================\033[0m\n");
+    printf("\033[1;32m¡Has recibido tu equipo inicial!\033[0m\n");
+    printf("\033[1;36m──────────────────────────────────────────────\033[0m\n");
     for (Item* item = list_first(lista); item; item = list_next(lista)) {
         if (item->type == 1) { // Arma
             player->equippedWeapon = *item;
             player->attack += item->damage;
-            printf("- %s (+%d Atk, equipada)\n", item->name, item->damage);
+            printf("\033[1;33m- %s (+%d Atk, equipada)\033[0m\n", item->name, item->damage);
         } else if (item->type == 2) { // Armadura
             player->equippedArmor = *item;
             player->defense += item->defense;
-            printf("- %s (+%d Def, equipada)\n", item->name, item->defense);
+            printf("\033[1;34m- %s (+%d Def, equipada)\033[0m\n", item->name, item->defense);
         } else {
             player->inventory[player->inventoryCount++] = *item;
-            printf("- %s (añadido al inventario)\n", item->name);
+            printf("\033[1;36m- %s (añadido al inventario)\033[0m\n", item->name);
         }
         Sleep(500);
     }
+    printf("\033[1;36m==============================================\033[0m\n");
     // Liberar memoria del Map y listas
     map_first(clase_a_items);
     MapPair* p;
@@ -446,6 +388,56 @@ void player_add_initial_class_items(Player* player, const char* initial_items_cs
     }
     map_destroy(clase_a_items);
 
-    printf("Automaticamente te equiparás con tu mejor equipamiento.\n");
+    printf("Los items se equiparan automaticamente.\n");
     waitForKeyPress();
+}
+
+/**
+ * @brief Muestra el inventario del jugador con formato visual, ocultando stats en 0.
+ * @param player Puntero al jugador.
+ * @param show_index Si es true, muestra el índice para selección.
+ * @param show_use_option Si es true, muestra la opción de usar/cancelar.
+ */
+void display_inventory(Player* player, bool show_index, bool show_use_option) {
+    printf("\x1b[36m╔═══════════════════════════════════════════════╗\x1b[0m\n");
+    printf("\x1b[36m║              \x1b[1m--- INVENTARIO ---\x1b[0m               \x1b[36m║\x1b[0m\n");
+    printf("\x1b[36m╠═══════════════════════════════════════════════╣\x1b[0m\n");
+    if (player->inventoryCount == 0) {
+        printf("\x1b[31mTu inventario está vacío.\x1b[0m\n");
+        printf("\x1b[36m╚═══════════════════════════════════════════════╝\x1b[0m\n");
+        return;
+    }
+    for (int i = 0; i < player->inventoryCount; i++) {
+        Item currentItem = player->inventory[i];
+        if (show_index)
+            printf("\x1b[33m%2d.\x1b[0m ", i + 1);
+        else
+            printf("   ");
+        printf("\x1b[1m%s\x1b[0m", currentItem.name);
+        bool first = true;
+        printf(" (");
+        if (currentItem.heal > 0) {
+            printf("\x1b[32mCura: %d\x1b[0m", currentItem.heal);
+            first = false;
+        }
+        if (currentItem.damage > 0) {
+            if (!first) printf(", ");
+            printf("\x1b[33mAtk+: %d\x1b[0m", currentItem.damage);
+            first = false;
+        }
+        if (currentItem.defense > 0) {
+            if (!first) printf(", ");
+            printf("\x1b[34mDef+: %d\x1b[0m", currentItem.defense);
+            first = false;
+        }
+        if (currentItem.effectDuration > 0 && (currentItem.damage > 0 || currentItem.defense > 0)) {
+            if (!first) printf(", ");
+            printf("Duración: %d", currentItem.effectDuration);
+        }
+        printf(")\n");
+    }
+    printf("\x1b[36m╚═══════════════════════════════════════════════╝\x1b[0m\n");
+    if (show_use_option) {
+        printf("Elige un item a usar (0 para cancelar): ");
+    }
 }

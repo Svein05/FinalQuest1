@@ -99,18 +99,10 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             Sleep(500);
 
         } else if (action_choice == 2) { 
-            // --- Inventario de uso de ítem (igual que combate normal) ---
-            printf("--- Inventario de %s ---\n", player->name);
+            display_inventory(player, true, true);
             if (player->inventoryCount == 0) {
-                printf("Tu inventario esta vacio.\n");
+                waitForKeyPress();
             } else {
-                for (int i = 0; i < player->inventoryCount; i++) {
-                    Item currentItem = player->inventory[i];
-                    printf("%d. %s (Curacion: %d, Daño Boost: %d, Def Boost: %d, Duracion: %d)\n",
-                           i + 1, currentItem.name, currentItem.heal,
-                           currentItem.damage, currentItem.defense, currentItem.effectDuration);
-                }
-                printf("Elige un item a usar (0 para cancelar): ");
                 char item_input[10];
                 if (fgets(item_input, sizeof(item_input), stdin) == NULL) {
                     printf("Error de lectura de item.\n");
@@ -143,7 +135,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
         // --- TURNO DEL ENEMIGO ---
         printf("\x1b[31m⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
         printf("\x1b[31m⇦  Es el turno de %s!\x1b[0m\n", enemy->name);
-        printf("\x1b[31m⇦⇦⇦⇦⇦⇦⇦⇦⇨⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
+        printf("\x1b[31m⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
         int enemy_damage_to_player = calculate_damage(enemy->attack, player->defense + player->tempDefenseBoost); // Usar defensa efectiva
         apply_damage(&player->currentHP, enemy_damage_to_player);
         printf("\x1b[31m« %s ataca a %s y le inflige %d de daño. »\x1b[0m\n", enemy->name, player->name, enemy_damage_to_player);

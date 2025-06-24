@@ -66,28 +66,51 @@ void shop_interact(Player* player, Map* itemMap) {
     display_shop_welcome(player->gold);
     while (true) {
         display_shop_items(itemMap);
-        display_shop_menu();
+        // Verificar si hay items disponibles
+        MapPair* pair = map_first(itemMap);
+        bool hay_items = (pair != NULL);
+        if (hay_items) {
+            display_shop_menu();
+        } else {
+            // Solo mostrar opción de salir
+            printf("\033[1;36m╔════════════════════════════════════════════════════════════╗\n");
+            printf("║                  No hay ítems disponibles.                 ║\n");
+            printf("╠════════════════════════════════════════════════════════════╣\n");
+            printf("║ \033[1;31m1. Salir de la tienda\033[1;36m                                      ║\n");
+            printf("╚════════════════════════════════════════════════════════════╝\n");
+            printf("\033[0mTu eleccion: ");
+        }
         if (fgets(input, sizeof(input), stdin) == NULL) {
             display_shop_error("Error al leer la entrada. Saliendo de la tienda.");
             break;
         }
         choice = atoi(input);
-        if (choice == 1) {
-            display_shop_input("Ingresa el ID del item a comprar: ");
-            if (fgets(input, sizeof(input), stdin) == NULL) {
-                display_shop_error("Error al leer la entrada. Regresando al menu.");
-                continue;
+        if (hay_items) {
+            if (choice == 1) {
+                display_shop_input("Ingresa el ID del item a comprar: ");
+                if (fgets(input, sizeof(input), stdin) == NULL) {
+                    display_shop_error("Error al leer la entrada. Regresando al menu.");
+                    continue;
+                }
+                int itemId = atoi(input);
+                bool purchased = shop_buy_item(player, itemMap, itemId);
+                if (purchased) {
+                    display_shop_buy_success(player->gold);
+                }
+            } else if (choice == 2) {
+                display_shop_exit();
+                break;
+            } else {
+                display_shop_invalid_option();
             }
-            int itemId = atoi(input);
-            bool purchased = shop_buy_item(player, itemMap, itemId);
-            if (purchased) {
-                display_shop_buy_success(player->gold);
-            }
-        } else if (choice == 2) {
-            display_shop_exit();
-            break;
         } else {
-            display_shop_invalid_option();
+            // Solo permitir salir
+            if (choice == 1) {
+                display_shop_exit();
+                break;
+            } else {
+                display_shop_invalid_option();
+            }
         }
     }
 }

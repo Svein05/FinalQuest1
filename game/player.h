@@ -46,12 +46,6 @@ void player_equip_weapon(Player* player, Item weapon, bool from_inventory);
 void player_equip_armor(Player* player, Item armor, bool from_inventory);
 
 /**
- * @brief Muestra un menú detallado del jugador con sus estadísticas, oro y equipo actual.
- * @param player Puntero a la estructura del Jugador.
- */
-void displayPlayerMenu(Player* player);
-
-/**
  * @brief Remueve un ítem específico del inventario del jugador por su ID.
  * Útil cuando un ítem es equipado (y se mueve del inventario al slot de equipo)
  * o cuando un consumible es usado.
@@ -80,6 +74,14 @@ void player_choose_and_assign_class(Player* player);
  * @param initial_items_csv Cadena CSV con los ítems iniciales (id,cantidad) para añadir.
  */
 void player_add_initial_class_items(Player* player, const char* initial_items_csv);
+
+/**
+ * @brief Muestra el inventario del jugador con formato visual, ocultando stats en 0.
+ * @param player Puntero al jugador.
+ * @param show_index Si es true, muestra el índice para selección.
+ * @param show_use_option Si es true, muestra la opción de usar/cancelar.
+ */
+void display_inventory(Player* player, bool show_index, bool show_use_option);
 
 // --- DECLARACIONES DE FUNCIONES ADICIONALES (que ya estaban en player.c) ---
 // Función para usar un consumible (ej. poción) desde el inventario del jugador
