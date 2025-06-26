@@ -4,7 +4,6 @@
 #include <stdbool.h>  // Para bool
 #include <time.h>     // Para srand(time(NULL))
 
-#include "ui.h"
 #include "scenario.h"   // Declaraciones de las funciones de escenario
 #include "data_types.h" // Definiciones de las estructuras Player, Enemy, Item, Scenario
 #include "combat.h"     // Funciones de combate (combat_manage_turn)
@@ -12,8 +11,8 @@
 #include "shop.h"       // Funciones de tienda (shop_initialize_random_merchant, shop_interact)
 #include "../tdas/map.h" // Para Map*
 #include "../tdas/extra.h" // Función para leer líneas del CSV
-#include "../tdas/stack.h"
 #include "../tdas/queue.h"
+#include "lore.h" // Incluir lore.h para lógica de trackers
 
 // --- FUNCIONES DE LIBERACIÓN DE MEMORIA ---
 #define NUM_EVENT_TYPES 4 // Ahora hay 4 tipos de eventos
@@ -184,7 +183,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
 
     if (event_type == 0) { // Combate
         Enemy* randomEnemy = spawnRandomEnemy(currentScenarioDifficulty, allEnemies, numEnemies);
-        display_combat_text();
+        ui_combat_text();
         Enemy combatEnemy = *randomEnemy;
         bool combatWon = combat_manage_turn(player, &combatEnemy);
         if (combatWon) {
@@ -198,13 +197,13 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         } else {
             player->currentHP = 0;
             // Menú para reiniciar o salir
-            if (menu_gameover_retry()) gameover_retry_flag = 1;
+            if (ui_gameover_retry()) gameover_retry_flag = 1;
             if (!gameover_retry_flag) return; // Si elige salir, cortar la función inmediatamente
         }
         show_random_lore_no_repeat(lore_map, tracker_ambiental, 0);
     } else if (event_type == 1) { // Mercader
         printf("Un mercader aparece en tu camino");
-        wait_three_points();
+        ui_wait_dots();
         Map* itemMap = shop_initialize_random_merchant(allItems, numItems, currentScenarioDifficulty, player);
         if (itemMap != NULL) {
             shop_interact(player, itemMap);
@@ -226,7 +225,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         printf("|        | 💰 |\n");
         printf("|________|____|\x1b[0m\n\n");
         printf("Buscando");
-        wait_three_points();
+        ui_wait_dots();
         int bonus_type = rand() % 10; // 0-3: oro (40%), 4-6: stats (30%), 7-9: item (30%)
         if (bonus_type < 4) { // Oro
             int gold_found = (rand() % 100) + 50;
@@ -259,7 +258,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         waitForKeyPress();
     } else if (event_type == 3) { // Historia/Lore
         printf("Recuerdos vienen hacia ti");
-        wait_three_points();
+        ui_wait_dots();
         clearScreen();
         show_random_lore_no_repeat(lore_map, tracker_profundo, 1); // Mostrar lore profundo
         waitForKeyPress();
@@ -281,7 +280,7 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
     }
 
     // Mostrar la entrada épica del boss final
-    display_final_boss_entrance(finalBoss->name);
+    ui_entrance_boss(finalBoss->name);
 
     // Dar una última oportunidad al jugador para prepararse
     printf("\x1b[93m╔═══════════════════════════════════════════════════════════════╗\x1b[0m\n");
@@ -338,14 +337,14 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
     printf("\x1b[95m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n\n");
     
     printf("¡Que el destino esté de tu lado!");
-    wait_three_points();
+    ui_wait_dots();
 
     // ¡COMBATE FINAL!
     bool victory = combat_final_boss(player, finalBoss);
 
     if (victory) {
         // ¡VICTORIA ÉPICA!
-        display_final_boss_victory();
+        ui_boss_victory();
         
         // Recompensas épicas por derrotar al boss final
         int epic_gold = 5000;
@@ -364,9 +363,9 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
         return true;
     } else {
         // Derrota final
-        display_final_boss_defeat(finalBoss->name);
+        ui_boss_defeat(finalBoss->name);
         // Menú para reiniciar o salir
-        if (menu_gameover_retry()) gameover_retry_flag = 1;
+        if (ui_gameover_retry()) gameover_retry_flag = 1;
         free(finalBoss);
         return false;
     }
@@ -384,7 +383,7 @@ void show_random_lore(Map* lore_map, int tipo) {
     void* node = list_first(lista);
     for (int i = 0; i < idx; i++) node = list_next(lista);
     char* lore = (char*)node;
-    display_lore_event(lore);
+    ui_lore_event(lore);
 }
 
 // Recibe el Map* de lore, el tracker y el tipo de evento, y muestra un fragmento aleatorio no repetido
@@ -406,5 +405,5 @@ void show_random_lore_no_repeat(Map* lore_map, LoreTracker* tracker, int tipo) {
     for (int i = 0; i < idx; i++) node = list_next(lista);
     char* lore = (char*)node;
     mark_lore_used(tracker, idx);
-    display_lore_event(lore);
+    ui_lore_event(lore);
 }

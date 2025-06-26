@@ -144,19 +144,3 @@ void waitForKeyPress() {
 }
 
 // Animación de carga bonita para consola (barra de progreso)
-void pretty_loading_animation(const char* mensaje) {
-    int steps = 5;
-    int percent[] = {20, 40, 60, 80, 100};
-    for (int i = 1; i <= steps; i++) {
-        printf("%s [", mensaje);
-        for (int j = 1; j <= steps; j++) {
-            if (j <= i) printf("■");
-            else printf("□");
-        }
-        printf("] %d%%\r", percent[i-1]);
-        fflush(stdout);
-        Sleep(350); // velocidad de la animación
-    }
-    printf("%s [■■■■■] 100%%\n", mensaje);
-    fflush(stdout);
-}

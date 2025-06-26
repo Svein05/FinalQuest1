@@ -7,41 +7,27 @@
 
 #include "data_types.h"
 #include "ui.h"
-#include "../tdas/extra.h"
 #include "player.h"
+#include "../tdas/extra.h"
 #include "../tdas/extra.h"
 #include "../tdas/map.h"
 
-void display_title()
-{
+
+void ui_menu_title() {
     printf("\x1b[36m╔════════════════════════════════════════════╗\x1b[0m\n");
     puts("\x1b[36m║\x1b[0m              FinalQuest 1                  \x1b[36m║\x1b[0m");
     printf("\x1b[36m╚════════════════════════════════════════════╝\x1b[0m\n\n");
 }
 
-void welcome_program(){
+void ui_menu_welcome() {
     printf("\x1b[36m╔══════════════════════════════════════╗\x1b[0m\n");
     printf("\x1b[36m║\x1b[0m            FinalQuest 1              \x1b[36m║\x1b[0m\n");
     printf("\x1b[36m╚══════════════════════════════════════╝\x1b[0m\n\n");
 
-    choice_class_menu();
+    ui_choice_class();
 }
 
-void welcome_zero(Player* player) {
-    display_title();
-    printf("\x1b[36m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
-    printf("\x1b[36m║\x1b[0m                      \x1b[33mINICIO DEL JUEGO\x1b[0m                        \x1b[36m║\x1b[0m\n");
-    printf("\x1b[36m╟──────────────────────────────────────────────────────────────╢\x1b[0m\n");
-    printf("\x1b[36m║\x1b[0m ¡Bienvenido, \x1b[32m%-48s\x1b[0m\x1b[36m║\x1b[0m\n", player->name);
-    printf("\x1b[36m║\x1b[0m - Explora los escenarios y enfrentate a enemigos aleatorios. \x1b[36m║\x1b[0m\n");
-    printf("\x1b[36m║\x1b[0m - Cada partida es diferente: Tu suerte sera vital.           \x1b[36m║\x1b[0m\n");
-    printf("\x1b[36m║\x1b[0m - ¡Tus decisiones influyen en tu destino!                    \x1b[36m║\x1b[0m\n");   
-    printf("\x1b[36m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
-    printf("\n\x1b[33m¡Prepárate para la aventura!\x1b[0m\n\n");
-    waitForKeyPress();
-}
-
-void wait_three_points() {
+void ui_wait_dots() {
     for (int i = 0; i < 3; i++) {
         Sleep(1000); // Esperar medio segundo
         printf(".");
@@ -50,24 +36,56 @@ void wait_three_points() {
     printf("\n");
 }
 
-void mostrarInstrucciones() {
-    printf("Instrucciones:\n");
-    printf("1. Mueve con comandos W/A/S/D\n");
-    printf("2. Agarra ítems y sobrevive\n");
-    printf("3. No mueras... idealmente.\n\n");
+void ui_load_animation(const char* mensaje) {
+    int steps = 5;
+    int percent[] = {20, 40, 60, 80, 100};
+    for (int i = 1; i <= steps; i++) {
+        printf("%s [", mensaje);
+        for (int j = 1; j <= steps; j++) {
+            if (j <= i) printf("■");
+            else printf("□");
+        }
+        printf("] %d%%\r", percent[i-1]);
+        fflush(stdout);
+        Sleep(350); // velocidad de la animación
+    }
+    printf("%s [■■■■■] 100%%\n", mensaje);
+    fflush(stdout);
 }
 
-void mostrarGameOver() {
-    printf("\nGAME OVER\n");
-    printf("Mejor suerte para la próxima :(\n");
+void print_lore_text_animated_wrapped(const char* texto, int line_width, int delay_ms) {
+    int len = strlen(texto);
+    int col = 0;
+    for (int i = 0; i < len; i++) {
+        putchar(texto[i]);
+        fflush(stdout);
+        Sleep(delay_ms);
+        col++;
+        if (col >= line_width && texto[i] == ' ') {
+            putchar('\n');
+            printf("  ");
+            col = 0;
+        }
+    }
+    putchar('\n');
 }
 
-void mostrarVictoria() {
-    printf("\n¡Ganaste!\n");
-    printf("Eres el rey!!\n");
+int ui_gameover_retry() {
+    printf("\n\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
+    printf("\x1b[41m  ☠️  Has sido derrotado. ¿Qué deseas hacer?                \x1b[0m\n");
+    printf("\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
+    printf("  [1] Volver a jugar desde el inicio\n");
+    printf("  [2] Salir del juego\n");
+    printf("Tu elección: ");
+    char input[10];
+    if (fgets(input, sizeof(input), stdin) != NULL) {
+        int choice = atoi(input);
+        if (choice == 1) return 1;
+    }
+    return 0;
 }
 
-void choice_class_menu() {
+void ui_choice_class() {
     printf("\x1b[36m╔══════════════════════════════════════╗\x1b[0m\n");
     printf("\x1b[36m║\x1b[0m \x1b[33m     BIENVENIDO A TU AVENTURA        \x1b[36m║\x1b[0m\n");
     printf("\x1b[36m╟──────────────────────────────────────╢\x1b[0m\n");
@@ -78,27 +96,15 @@ void choice_class_menu() {
     printf("\x1b[36m╚══════════════════════════════════════╝\x1b[0m\n");
 }
 
-void initializePlayer_menu(Player* player) {
+void ui_player_init(Player* player) {
     clearScreen();
-    display_title();
+    ui_menu_title();
     printf("\x1b[36m╔════════════════════════════════════════════╗\x1b[0m\n");
     printf("\x1b[36m║\x1b[0m        \x1b[33m¡Héroe creado exitosamente!\x1b[0m         \x1b[36m║\x1b[0m\n");
     printf("\x1b[36m╠════════════════════════════════════════════╣\x1b[0m\n");
     printf("\x1b[36m║\x1b[0m Clase: %-36s\x1b[36m║\x1b[0m\n", player->name);
     printf("\x1b[36m║\x1b[0m Vida: \x1b[32m%-3d\x1b[0m   Ataque: \x1b[31m%-3d\x1b[0m   Defensa: \x1b[34m%-3d\x1b[0m     \x1b[36m║\x1b[0m\n", player->maxHP, player->attack, player->defense);
     printf("\x1b[36m║\x1b[0m Oro inicial: \x1b[33m%-30d\x1b[0m\x1b[36m║\x1b[0m\n", player->gold);
-    printf("\x1b[36m╚════════════════════════════════════════════╝\x1b[0m\n");
-}
-
-// Imprime un escenario con bordes y formato uniforme
-void display_scenario(const Scenario* scenario) {
-    display_title();
-
-    int width = 42; // igual que display_title
-    printf("\x1b[36m╔════════════════════════════════════════════╗\x1b[0m\n");
-    printf("\x1b[36m║\x1b[0m \x1b[33mESCENARIO: %-32s\x1b[36m║\x1b[0m\n", scenario->name);
-    printf("\x1b[36m╟────────────────────────────────────────────╢\x1b[0m\n");
-    print_scenario_description(scenario->description, width);
     printf("\x1b[36m╚════════════════════════════════════════════╝\x1b[0m\n");
 }
 
@@ -148,7 +154,19 @@ void print_scenario_description(const char *texto, int line_width)
     }
 }
 
-void display_player_summary(const Player* player) {
+// Imprime un escenario con bordes y formato uniforme
+void ui_scenario(const Scenario* scenario) {
+    ui_menu_title();
+
+    int width = 42;
+    printf("\x1b[36m╔════════════════════════════════════════════╗\x1b[0m\n");
+    printf("\x1b[36m║\x1b[0m \x1b[33mESCENARIO: %-32s\x1b[36m║\x1b[0m\n", scenario->name);
+    printf("\x1b[36m╟────────────────────────────────────────────╢\x1b[0m\n");
+    print_scenario_description(scenario->description, width);
+    printf("\x1b[36m╚════════════════════════════════════════════╝\x1b[0m\n");
+}
+
+void ui_player_summary(const Player* player) {
     printf("\n\x1b[36m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
     printf("\x1b[36m║\x1b[0m \x1b[33mRESUMEN DEL JUGADOR\x1b[0m%42s\x1b[36m║\x1b[0m\n", "");
     printf("\x1b[36m╟──────────────────────────────────────────────────────────────╢\x1b[0m\n");
@@ -161,7 +179,7 @@ void display_player_summary(const Player* player) {
     printf("\x1b[36m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
 }
 
-void display_combat_text() {
+void ui_combat_text() {
     int combate_disenio = rand() % 3;
     
     for (int i = 0 ; i < 2 ; i++){
@@ -217,21 +235,13 @@ void display_combat_text() {
     }
 }
 
-void display_mercader_text(){
-
-}
-
-void display_bonus_text(){
-    
-}
-
-void display_combat_banner(const char* player_name, const char* enemy_name) {
+void ui_combat_banner(const char* player_name, const char* enemy_name) {
     printf("\x1b[35m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
     printf("\x1b[35m║ ¡COMBATE INICIADO! %10s vs %-27s ║\x1b[0m\n", player_name, enemy_name);
     printf("\x1b[35m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
 }
 
-void display_intro_lore_and_ascii(const char* lore_inicial) {
+void ui_lore_zero(Map* lore_map, int tipo) {
     clearScreen();
     printf("\n\x1b[36m▒█▀▀▀ ░▀░ █▀▀▄ █▀▀█ █░░ ▒█▀▀█ █░░█ █▀▀ █▀▀ ▀▀█▀▀   ▄█░\x1b[0m\n");
     printf("\x1b[36m▒█▀▀▀ ▀█▀ █░░█ █▄▄█ █░░ ▒█░▒█ █░░█ █▀▀ ▀▀█ ░░█░░   ░█░ \x1b[0m\n");
@@ -245,30 +255,19 @@ void display_intro_lore_and_ascii(const char* lore_inicial) {
     puts("                         `---`");
     printf("\x1b[36m╔─────────────────────────────────────────────────────╗\x1b[0m\n");
     printf("  ");
-    print_lore_text_animated_wrapped(lore_inicial, 45, 18);
+    // Obtener el texto de lore correspondiente al tipo (ej: tipo -1 para portada)
+    MapPair* pair = map_search(lore_map, &tipo);
+    const char* lore_inicial = NULL;
+    if (pair && pair->value) {
+        List* lista = (List*)pair->value;
+        lore_inicial = list_first(lista);
+    }
+    print_lore_text_animated_wrapped(lore_inicial ? lore_inicial : "¡Bienvenido a la aventura RPG!", 45, 18);
     printf("\x1b[36m╚─────────────────────────────────────────────────────╝\x1b[0m\n");
     waitForKeyPress();
 }
 
-// Imprime texto animado tipo videojuego antiguo, con salto de línea automático cada 'line_width' caracteres
-void print_lore_text_animated_wrapped(const char* texto, int line_width, int delay_ms) {
-    int len = strlen(texto);
-    int col = 0;
-    for (int i = 0; i < len; i++) {
-        putchar(texto[i]);
-        fflush(stdout);
-        Sleep(delay_ms);
-        col++;
-        if (col >= line_width && texto[i] == ' ') {
-            putchar('\n');
-            printf("  ");
-            col = 0;
-        }
-    }
-    putchar('\n');
-}
-
-void display_lore_event(const char* lore) {
+void ui_lore_event(const char* lore) {
     Sleep(1000);
     printf("\x1b[35m╔──────────────────────────────────────────────────────────────╗\x1b[0m\n");
     printf("  ");
@@ -276,43 +275,13 @@ void display_lore_event(const char* lore) {
     printf("\x1b[35m╚──────────────────────────────────────────────────────────────╝\x1b[0m\n");
 }
 
-// --- Lógica de LoreTracker (implementación) ---
-
-void init_lore_tracker(LoreTracker* tracker, int tipo, int cantidad) {
-    tracker->tipo = tipo;
-    tracker->cantidad = cantidad;
-    tracker->usados = calloc(cantidad, sizeof(int));
-}
-
-void free_lore_tracker(LoreTracker* tracker) {
-    free(tracker->usados);
-}
-
-int get_random_unused_lore(LoreTracker* tracker) {
-    int disponibles = 0;
-    for (int i = 0; i < tracker->cantidad; i++) if (!tracker->usados[i]) disponibles++;
-    if (disponibles == 0) return -1;
-    int elegido = rand() % disponibles;
-    for (int i = 0, c = 0; i < tracker->cantidad; i++) {
-        if (!tracker->usados[i]) {
-            if (c == elegido) return i;
-            c++;
-        }
-    }
-    return -1;
-}
-
-void mark_lore_used(LoreTracker* tracker, int idx) {
-    tracker->usados[idx] = 1;
-}
-
-void display_shop_welcome(int gold) {
+void ui_shop_welcome(int gold) {
     printf("\033[1;35m╔════════════════════════════════════════════════════════════╗\n");
     printf("║ Bienvenido a la tienda! Tienes \033[1;33m%-5d de oro\033[1;35m                ║\n", gold);
     printf("╚════════════════════════════════════════════════════════════╝\n\033[0m");
 }
 
-void display_shop_items(Map* itemMap) {
+void ui_shop_items(Map* itemMap) {
     const int ancho = 82;
     printf("\033[1;36m╔");
     for (int i = 0; i < ancho - 2; i++) printf("═");
@@ -346,17 +315,27 @@ void display_shop_items(Map* itemMap) {
     printf("╝\033[0m\n");
 }
 
-void display_shop_menu() {
-    printf("\033[1;36m╔════════════════════════════════════════════════════════════╗\n");
-    printf("║                  ¿Qué deseas hacer?                        ║\n");
-    printf("╟────────────────────────────────────────────────────────────╢\n");
-    printf("║ \033[1;32m1. Comprar Item\033[1;36m                                            ║\n");
-    printf("║ \033[1;31m2. Salir de la tienda\033[1;36m                                      ║\n");
-    printf("╚════════════════════════════════════════════════════════════╝\n");
-    printf("\033[0mTu eleccion: ");
+void ui_shop_menu(bool hay_items) {
+    if (hay_items) {
+        printf("\033[1;36m╔════════════════════════════════════════════════════════════╗\n");
+        printf("║                  ¿Qué deseas hacer?                        ║\n");
+        printf("╟────────────────────────────────────────────────────────────╢\n");
+        printf("║ \033[1;32m1. Comprar Item\033[1;36m                                            ║\n");
+        printf("║ \033[1;31m2. Salir de la tienda\033[1;36m                                      ║\n");
+        printf("╚════════════════════════════════════════════════════════════╝\n");
+        printf("\033[0mTu eleccion: ");
+    }
+    else {
+        printf("\033[1;36m╔════════════════════════════════════════════════════════════╗\n");
+        printf("║                  No hay ítems disponibles.                 ║\n");
+        printf("╠════════════════════════════════════════════════════════════╣\n");
+        printf("║ \033[1;31m1. Salir de la tienda\033[1;36m                                      ║\n");
+        printf("╚════════════════════════════════════════════════════════════╝\n");
+        printf("\033[0mTu eleccion: ");
+    }
 }
 
-void display_shop_buy_success(int gold) {
+void ui_shop_buy(int gold) {
     printf("\033[1;32m¡Compra exitosa!\033[0m\n");
     waitForKeyPress();
     clearScreen();
@@ -364,25 +343,13 @@ void display_shop_buy_success(int gold) {
     printf("\x1b[90m──────────────────────────────────────────────────────────────\x1b[0m\n");
 }
 
-void display_shop_exit() {
-    printf("\033[1;35mGracias por tu visita! Vuelve pronto.\033[0m\n");
-}
-
-void display_shop_invalid_option() {
-    printf("\033[1;31mOpcion invalida. Por favor, elige 1 o 2.\033[0m\n");
-}
-
-void display_shop_error(const char* msg) {
+void ui_msg_error(const char* msg) {
     printf("\033[1;31m%s\033[0m\n", msg);
-}
-
-void display_shop_input(const char* msg) {
-    printf("\033[1;36m%s\033[0m", msg);
 }
 
 // === FUNCIONES DEL BOSS FINAL ===
 
-void display_final_boss_entrance(const char* boss_name) {
+void ui_entrance_boss(const char* boss_name) {
     clearScreen();
     printf("\x1b[31m");
     printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
@@ -421,12 +388,12 @@ void display_final_boss_entrance(const char* boss_name) {
     printf("\x1b[0m\n");
     
     printf("La oscuridad se intensifica");
-    wait_three_points();
+    ui_wait_dots();
     printf("\x1b[31m¡EL COMBATE FINAL COMIENZA!\x1b[0m\n\n");
     waitForKeyPress();
 }
 
-void display_final_boss_victory() {
+void ui_boss_victory() {
     clearScreen();
     printf("\x1b[93m");
     printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
@@ -465,12 +432,12 @@ void display_final_boss_victory() {
     printf("\x1b[0m\n");
     
     printf("Tu leyenda será recordada por siempre");
-    wait_three_points();
+    ui_wait_dots();
     printf("\n\x1b[93m¡JUEGO COMPLETADO!\x1b[0m\n\n");
     waitForKeyPress();
 }
 
-void display_final_boss_defeat(const char* boss_name) {
+void ui_boss_defeat(const char* boss_name) {
     clearScreen();
     printf("\x1b[31m");
     printf("╔═══════════════════════════════════════════════════════════════════════════╗\n");
@@ -487,19 +454,4 @@ void display_final_boss_defeat(const char* boss_name) {
     
     printf("\x1b[90m¿Tendrás lo necesario para intentarlo de nuevo?\x1b[0m\n\n");
     waitForKeyPress();
-}
-
-int menu_gameover_retry() {
-    printf("\n\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
-    printf("\x1b[41m  ☠️  Has sido derrotado. ¿Qué deseas hacer?                \x1b[0m\n");
-    printf("\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
-    printf("  [1] Volver a jugar desde el inicio\n");
-    printf("  [2] Salir del juego\n");
-    printf("Tu elección: ");
-    char input[10];
-    if (fgets(input, sizeof(input), stdin) != NULL) {
-        int choice = atoi(input);
-        if (choice == 1) return 1;
-    }
-    return 0;
 }

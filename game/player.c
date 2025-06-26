@@ -79,7 +79,7 @@ void initializePlayer(Player* player, const char* name, int hp, int atk, int def
         initializeEmptyItem(&player->inventory[i]); // Asegurarse de que todos los campos estén limpios
     }
 
-    initializePlayer_menu(player);
+    ui_player_init(player);
 }
 
 /**
@@ -328,7 +328,7 @@ void player_assign_class(Player* player, int clase) {
  * @param player Puntero al jugador.
  */
 void player_choose_and_assign_class(Player* player) {
-    welcome_program();
+    ui_menu_welcome();
     int clase = 0;
     while (clase < 1 || clase > 3) {
         printf("Ingresa el número de tu clase: ");
@@ -347,7 +347,7 @@ static int string_equals(void* a, void* b) {
 
 // Añade ítems al jugador de forma silenciosa (sin mensajes) y guarda resumen
 void player_add_initial_class_items(Player* player, const char* initial_items_csv) {
-    pretty_loading_animation("Cargando datos del juego");
+    ui_load_animation("Cargando datos del juego");
     Map* clase_a_items = load_initial_items_map(initial_items_csv);
     if (!clase_a_items) return;
     char* clase = NULL;

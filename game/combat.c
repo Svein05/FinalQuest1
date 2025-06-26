@@ -79,7 +79,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
         return false; // Error en la batalla
     }
 
-    display_combat_banner(player->name, enemy->name);
+    ui_combat_banner(player->name, enemy->name);
     Sleep(1000);
 
     while (player->currentHP > 0 && enemy->currentHP > 0) {
@@ -187,7 +187,7 @@ bool combat_final_boss(Player* player, Enemy* boss) {
             if (!boss_enraged) {
                 boss_enraged = true;
                 printf("\x1b[91m Algo dentro del %s esta cambiando", boss->name);
-                wait_three_points();
+                ui_wait_dots();
                 printf("\x1b[91m╔═══════════════════════════════════════════════════════════════╗\x1b[0m\n");
                 printf("\x1b[91m║  ¡%-22s ENTRA EN MODO FURIA FINAL!           ║\x1b[0m\n", boss->name);
                 printf("\x1b[91m║              ¡Sus ataques son más devastadores!               ║\x1b[0m\n");

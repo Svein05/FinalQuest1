@@ -3,10 +3,10 @@
 
 #include <stdbool.h>    // Para usar el tipo de dato 'bool'
 #include "data_types.h" // Incluimos data_types.h para las definiciones de Player, Enemy, Item, Scenario
-#include "../tdas/stack.h"
 #include "../tdas/queue.h"
 #include "../tdas/map.h"
 #include "ui.h"
+#include "lore.h"
 
 // --- DEFINICIONES DE TIPOS DE ESCENARIO ---
 // Estos valores corresponden a los tipos de escenario en la estructura Scenario.
@@ -44,9 +44,16 @@ Enemy* getEnemyForScenario(Scenario* Scenario, Enemy* allEnemies, int numEnemies
  */
 void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario, Map* lore_map, LoreTracker* tracker_ambiental, LoreTracker* tracker_profundo);
 
-void poblarGameMap(Stack* game_map, Scenario* escenarios, int numScenarios);
+void poblarGameMap(Queue* game_map, Scenario* escenarios, int numScenarios);
 bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies);
 void show_random_lore(Map* lore_map, int tipo);
 void show_random_lore_no_repeat(Map* lore_map, LoreTracker* tracker, int tipo);
+
+// Ya NO se deben usar helpers antiguos de UI para trackers:
+// get_random_unused_lore → get_random_unused_lore
+// free_lore_tracker → free_lore_tracker
+// init_lore_tracker → init_lore_tracker
+// mark_lore_used → mark_lore_used
+// Si ves referencias a los antiguos helpers en otros archivos, reemplázalos por los equivalentes de lore.c
 
 #endif // SCENARIO_H
