@@ -99,22 +99,30 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             Sleep(500);
 
         } else if (action_choice == 2) { 
-            display_inventory(player, true, true);
+            printf("--- Inventario de %s ---\n", player->name);
             if (player->inventoryCount == 0) {
-                waitForKeyPress();
+                printf("Tu inventario esta vacio.\n");
             } else {
+                for (int i = 0; i < player->inventoryCount; i++) {
+                    Item currentItem = player->inventory[i];
+                    printf("%d. %s (Curacion: %d, Daño Boost: %d, Def Boost: %d, Duracion: %d)\n",
+                           i + 1, currentItem.name, currentItem.heal,
+                           currentItem.damage, currentItem.defense, currentItem.effectDuration);
+                }
+                printf("Elige un item a usar (0 para cancelar): ");
                 char item_input[10];
                 if (fgets(item_input, sizeof(item_input), stdin) == NULL) {
                     printf("Error de lectura de item.\n");
+                    continue;
+                }
+                int item_choice = atoi(item_input);
+
+                if (item_choice > 0 && item_choice <= player->inventoryCount) {
+                    player_use_consumable(player, item_choice - 1);
+                    waitForKeyPress(); // Pausa para leer el resultado del ítem
                 } else {
-                    int item_choice = atoi(item_input);
-                    if (item_choice > 0 && item_choice <= player->inventoryCount) {
-                        player_use_consumable(player, item_choice - 1);
-                        waitForKeyPress();
-                    } else {
-                        printf("Cancelando uso de item.\n");
-                        waitForKeyPress();
-                    }
+                    printf("Cancelando uso de item.\n");
+                    waitForKeyPress();
                 }
             }
         } else {
@@ -135,7 +143,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
         // --- TURNO DEL ENEMIGO ---
         printf("\x1b[31m⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
         printf("\x1b[31m⇦  Es el turno de %s!\x1b[0m\n", enemy->name);
-        printf("\x1b[31m⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
+        printf("\x1b[31m⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
         int enemy_damage_to_player = calculate_damage(enemy->attack, player->defense + player->tempDefenseBoost); // Usar defensa efectiva
         apply_damage(&player->currentHP, enemy_damage_to_player);
         printf("\x1b[31m« %s ataca a %s y le inflige %d de daño. »\x1b[0m\n", enemy->name, player->name, enemy_damage_to_player);
@@ -150,159 +158,4 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
     }
 
     return false; 
-}
-
-// === COMBATE ESPECIAL DEL BOSS FINAL ===
-
-bool combat_final_boss(Player* player, Enemy* boss) {
-    if (player == NULL || boss == NULL) {
-        printf("Error: Parámetros inválidos para combate del boss final.\n");
-        return false;
-    }
-
-    // Mostrar banner especial del combate final
-    
-    // El boss final tiene HP completo al inicio
-    boss->currentHP = boss->HP;
-    
-    // Variables especiales para el boss final
-    int boss_phase = 1; // Fase 1, 2, 3
-    int boss_rage_turns = 0; // Turnos en modo furia
-    bool boss_enraged = false;
-    
-    printf("\x1b[91m¡%s despierta con toda su furia!\x1b[0m\n\n", boss->name);
-    waitForKeyPress();
-
-    while (player->currentHP > 0 && boss->currentHP > 0) {
-        clearScreen();
-        
-        // Determinar fase del boss basada en HP
-        int hp_percentage = (boss->currentHP * 100) / boss->HP;
-        if (hp_percentage > 66) {
-            boss_phase = 1;
-        } else if (hp_percentage > 33) {
-            boss_phase = 2;
-        } else {
-            boss_phase = 3;
-            if (!boss_enraged) {
-                boss_enraged = true;
-                printf("\x1b[91m Algo dentro del %s esta cambiando", boss->name);
-                wait_three_points();
-                printf("\x1b[91m╔═══════════════════════════════════════════════════════════════╗\x1b[0m\n");
-                printf("\x1b[91m║  ¡%-22s ENTRA EN MODO FURIA FINAL!           ║\x1b[0m\n", boss->name);
-                printf("\x1b[91m║              ¡Sus ataques son más devastadores!               ║\x1b[0m\n");
-                printf("\x1b[91m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n");
-                boss->attack += 20; // Aumenta ataque en fase final
-                Sleep(1000);
-            }
-        }
-
-        // Mostrar estado con información especial del boss
-        printf("\x1b[91m╔═══════════════════════════════════════════════╗\x1b[0m\n");
-        printf("\x1b[91m║           COMBATE FINAL - FASE %d              ║\x1b[0m\n", boss_phase);
-        printf("\x1b[91m╠═══════════════════════════════════════════════╣\x1b[0m\n");
-        printf("  %s HP: \x1b[32m%d\x1b[0m/\x1b[32m%d\x1b[0m  (Atk: \x1b[31m%d\x1b[0m, Def: \x1b[34m%d\x1b[0m)\n",
-            player->name, player->currentHP, player->maxHP,
-            player->attack + player->tempAttackBoost,
-            player->defense + player->tempDefenseBoost);
-        printf("  \x1b[91m%s HP: \x1b[31m%d\x1b[0m/%d (Fase %d%s)\x1b[0m\n", 
-            boss->name, boss->currentHP, boss->HP, boss_phase,
-            boss_enraged ? " - FURIA" : "");
-        printf("\x1b[91m╚═══════════════════════════════════════════════╝\x1b[0m\n");
-
-        // --- TURNO DEL JUGADOR ---
-        int action = player_choose_action();
-        
-        if (action == 1) { // Atacar
-            int player_damage_to_boss = calculate_damage(player->attack + player->tempAttackBoost, boss->defense);
-            apply_damage(&boss->currentHP, player_damage_to_boss);
-            printf("\x1b[32m» %s ataca al %s y le inflige %d de daño. «\x1b[0m\n", 
-                   player->name, boss->name, player_damage_to_boss);
-        } else if (action == 2) { // Usar ítem
-            // --- Inventario de uso de ítem (igual que combate normal) ---
-            printf("--- Inventario de %s ---\n", player->name);
-            if (player->inventoryCount == 0) {
-                printf("Tu inventario esta vacio.\n");
-            } else {
-                for (int i = 0; i < player->inventoryCount; i++) {
-                    Item currentItem = player->inventory[i];
-                    printf("%d. %s (Curacion: %d, Daño Boost: %d, Def Boost: %d, Duracion: %d)\n",
-                           i + 1, currentItem.name, currentItem.heal,
-                           currentItem.damage, currentItem.defense, currentItem.effectDuration);
-                }
-                printf("Elige un item a usar (0 para cancelar): ");
-                char item_input[10];
-                if (fgets(item_input, sizeof(item_input), stdin) == NULL) {
-                    printf("Error de lectura de item.\n");
-                } else {
-                    int item_choice = atoi(item_input);
-                    if (item_choice > 0 && item_choice <= player->inventoryCount) {
-                        player_use_consumable(player, item_choice - 1);
-                        waitForKeyPress();
-                    } else {
-                        printf("Cancelando uso de item.\n");
-                        waitForKeyPress();
-                    }
-                }
-            }
-        }
-
-        if (boss->currentHP <= 0) {
-            printf("\x1b[93m¡Has derrotado al %s!\x1b[0m\n", boss->name);
-            return true; // Jugador gana
-        }
-
-        // Actualizar efectos temporales del jugador
-        player_update_temporary_boosts(player);
-
-        // --- TURNO DEL BOSS FINAL (con ataques especiales) ---
-        printf("\x1b[91m⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
-        printf("\x1b[91m⇦  ¡%s contraataca con poder abismal!\x1b[0m\n", boss->name);
-        printf("\x1b[91m⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦\x1b[0m\n");
-
-        // Ataques especiales según la fase
-        int boss_damage = 0;
-        int special_attack_chance = (boss_phase - 1) * 20 + (boss_enraged ? 30 : 0); // 0%, 20%, 40% + 30% si está en furia
-        
-        if (rand() % 100 < special_attack_chance) {
-            // Ataque especial
-            switch (boss_phase) {
-                case 1:
-                    printf("\x1b[95m¡%s usa 'Golpe Devastador'!\x1b[0m\n", boss->name);
-                    boss_damage = calculate_damage(boss->attack * 1.3f, player->defense + player->tempDefenseBoost);
-                    break;
-                case 2:
-                    printf("\x1b[96m¡%s canaliza 'Tormenta de Sombras'!\x1b[0m\n", boss->name);
-                    boss_damage = calculate_damage(boss->attack * 1.5f, player->defense + player->tempDefenseBoost);
-                    printf("\x1b[90m¡La oscuridad debilita tu defensa temporalmente!\x1b[0m\n");
-                    player->tempDefenseBoost -= 5; // Debuff temporal
-                    break;
-                case 3:
-                    printf("\x1b[91m¡%s desata 'ANIQUILACIÓN FINAL'!\x1b[0m\n", boss->name);
-                    boss_damage = calculate_damage(boss->attack * 1.8f, player->defense + player->tempDefenseBoost);
-                    printf("\x1b[91m¡El poder del vacío consume todo a su paso!\x1b[0m\n");
-                    break;
-            }
-        } else {
-            // Ataque normal
-            printf("\x1b[91m%s ataca con sus garras del vacío.\x1b[0m\n", boss->name);
-            boss_damage = calculate_damage(boss->attack, player->defense + player->tempDefenseBoost);
-        }
-        
-        apply_damage(&player->currentHP, boss_damage);
-        printf("\x1b[31m« %s inflige %d de daño devastador. »\x1b[0m\n", boss->name, boss_damage);
-        printf("\x1b[90m──────────────────────────────────────────────────────────────\x1b[0m\n");
-
-        if (player->currentHP <= 0) {
-            printf("\x1b[91m¡%s ha caído ante el poder del %s!\x1b[0m\n", player->name, boss->name);
-            return false; // Jugador pierde
-        } else {
-            waitForKeyPress();
-        }
-
-        // Incrementar contadores especiales
-        if (boss_enraged) boss_rage_turns++;
-    }
-
-    return false; // No debería llegar aquí, pero por seguridad
 }

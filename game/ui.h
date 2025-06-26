@@ -49,6 +49,7 @@ void display_shop_exit();
 void display_shop_invalid_option();
 void display_shop_error(const char* msg);
 void display_shop_input(const char* msg);
+void display_merchant_appearance(int merchantItemCount, int maxDifficulty);
 
 // Menú para salir o volver a jugar tras derrota
 int menu_gameover_retry();

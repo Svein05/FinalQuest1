@@ -75,14 +75,6 @@ void player_choose_and_assign_class(Player* player);
  */
 void player_add_initial_class_items(Player* player, const char* initial_items_csv);
 
-/**
- * @brief Muestra el inventario del jugador con formato visual, ocultando stats en 0.
- * @param player Puntero al jugador.
- * @param show_index Si es true, muestra el índice para selección.
- * @param show_use_option Si es true, muestra la opción de usar/cancelar.
- */
-void display_inventory(Player* player, bool show_index, bool show_use_option);
-
 // --- DECLARACIONES DE FUNCIONES ADICIONALES (que ya estaban en player.c) ---
 // Función para usar un consumible (ej. poción) desde el inventario del jugador
 void player_use_consumable(Player* player, int itemIndexInInventory);
