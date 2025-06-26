@@ -52,7 +52,6 @@ Map* shop_initialize_random_merchant(Item* item_array, int numItems, int maxDiff
     }
     free(selected);
     free(indices);
-    display_merchant_appearance(merchantItemCount, maxDifficulty);
     return tempMap;
 }
 
@@ -134,7 +133,6 @@ bool shop_buy_item(Player* player, Map* itemMap, int itemId) {
     if (player_add_item_to_inventory(player, *itemToBuy)) {
         player->gold -= itemToBuy->price;
         map_remove(itemMap, &itemId);
-        printf("\033[1;32mHas comprado %s y se ha gestionado tu inventario.\033[0m\n", itemToBuy->name);
         return true;
     } else {
         printf("\033[1;31mNo se pudo comprar %s. (Inventario lleno o no fue mejor equipo)\033[0m\n", itemToBuy->name);

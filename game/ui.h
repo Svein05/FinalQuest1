@@ -41,10 +41,8 @@ int get_random_unused_lore(LoreTracker* tracker);
 void mark_lore_used(LoreTracker* tracker, int idx);
 
 // Declaraciones de las funciones display para ui.h
-void display_merchant_appearance(int merchantItemCount, int maxDifficulty);
 void display_shop_welcome(int gold);
 void display_shop_items(Map* itemMap);
-void display_shop_item_detail(Item* item, int id);
 void display_shop_menu();
 void display_shop_buy_success(int gold);
 void display_shop_exit();

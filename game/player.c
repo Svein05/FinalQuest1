@@ -356,7 +356,7 @@ void player_add_initial_class_items(Player* player, const char* initial_items_cs
     else if (player->classID == 3) clase = "Asesino";
     MapPair* pair = map_search(clase_a_items, clase);
     List* lista = (List*)pair->value;
-    printf("\033[1;36m==============================================\033[0m\n");
+    printf("\033[1;36m══════════════════════════════════════════════\033[0m\n");
     printf("\033[1;32m¡Has recibido tu equipo inicial!\033[0m\n");
     printf("\033[1;36m──────────────────────────────────────────────\033[0m\n");
     for (Item* item = list_first(lista); item; item = list_next(lista)) {
@@ -374,7 +374,7 @@ void player_add_initial_class_items(Player* player, const char* initial_items_cs
         }
         Sleep(500);
     }
-    printf("\033[1;36m==============================================\033[0m\n");
+    printf("\033[1;36m══════════════════════════════════════════════\033[0m\n");
     // Liberar memoria del Map y listas
     map_first(clase_a_items);
     MapPair* p;

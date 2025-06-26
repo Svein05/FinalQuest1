@@ -203,7 +203,8 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         }
         show_random_lore_no_repeat(lore_map, tracker_ambiental, 0);
     } else if (event_type == 1) { // Mercader
-        printf("Has encontrado a un mercader errante!\n");
+        printf("Un mercader aparece en tu camino");
+        wait_three_points();
         Map* itemMap = shop_initialize_random_merchant(allItems, numItems, currentScenarioDifficulty, player);
         if (itemMap != NULL) {
             shop_interact(player, itemMap);
