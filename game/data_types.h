@@ -13,7 +13,7 @@
 typedef struct {
     int id;                                
     char name[MAX_NAME_LENGTH];          
-    int type;                               // Tipo del item (1. Arma, 2. Armadura, 3. Accesorio, 4. Consumible)
+    int type;                               // Tipo del item (1. Arma, 2. Armadura, 3. Consumible)
     char rarity[MAX_RARITY_LENGTH];         // Rareza del Item 
     int damage;                             
     int defense;        

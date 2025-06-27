@@ -202,8 +202,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         }
         show_random_lore_no_repeat(lore_map, tracker_ambiental, 0);
     } else if (event_type == 1) { // Mercader
-        printf("Un mercader aparece en tu camino");
-        ui_wait_dots();
+        ui_shop();
         Map* itemMap = shop_initialize_random_merchant(allItems, numItems, currentScenarioDifficulty, player);
         if (itemMap != NULL) {
             shop_interact(player, itemMap);
@@ -213,19 +212,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         }
         show_random_lore_no_repeat(lore_map, tracker_ambiental, 0); // Mostrar lore ambiental
     } else if (event_type == 2) { // Bonus
-        printf("\x1b[33m╔══════════════════════════════════════════════════════════════╗\x1b[0m\n");
-        printf("\x1b[33m            ¡Has descubierto algo interesante!\x1b[0m\n");
-        printf("\x1b[33m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
-
-        printf("\x1b[33m   _________\n");
-        printf("  /        /\\\n");
-        printf(" /        /  \\\n");
-        printf("/________/____\\\n");
-        printf("|        |    |\n");
-        printf("|        | 💰 |\n");
-        printf("|________|____|\x1b[0m\n\n");
-        printf("Buscando");
-        ui_wait_dots();
+        ui_bonus();
         int bonus_type = rand() % 10; // 0-3: oro (40%), 4-6: stats (30%), 7-9: item (30%)
         if (bonus_type < 4) { // Oro
             int gold_found = (rand() % 100) + 50;
@@ -281,58 +268,6 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies, Map* lore_map,
 
     // Mostrar la entrada épica del boss final
     ui_entrance_boss(finalBoss->name);
-
-    // Dar una última oportunidad al jugador para prepararse
-    printf("\x1b[93m╔═══════════════════════════════════════════════════════════════╗\x1b[0m\n");
-    printf("\x1b[93m║              ÚLTIMA OPORTUNIDAD DE PREPARACIÓN                ║\x1b[0m\n");
-    printf("\x1b[93m╠═══════════════════════════════════════════════════════════════╣\x1b[0m\n");
-    printf("\x1b[93m║  ¿Quieres usar algún ítem de tu inventario antes del combate? ║\x1b[0m\n");
-    printf("\x1b[93m║                    [1] Sí  [2] No, estoy listo                ║\x1b[0m\n");
-    printf("\x1b[93m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n");
-    
-    char input[10];
-    printf("Tu elección: ");
-    if (fgets(input, sizeof(input), stdin) != NULL) {
-        int choice = atoi(input);
-        if (choice == 1) {
-            printf("\x1b[96m¡Úsalo sabiamente, puede ser tu última oportunidad!\x1b[0m\n\n");
-            // --- Inventario de uso de ítem (igual que combate normal) ---
-            display_inventory(player, true, true);
-            if (player->inventoryCount == 0) {
-                waitForKeyPress();
-            } else {
-                char item_input[10];
-                if (fgets(item_input, sizeof(item_input), stdin) == NULL) {
-                    printf("Error de lectura de item.\n");
-                } else {
-                    int item_choice = atoi(item_input);
-                    if (item_choice > 0 && item_choice <= player->inventoryCount) {
-                        player_use_consumable(player, item_choice - 1);
-                        waitForKeyPress();
-                    } else {
-                        printf("Cancelando uso de item.\n");
-                        waitForKeyPress();
-                    }
-                }
-            }
-        }
-    }
-
-    // Mostrar estadísticas finales antes del combate
-    printf("\x1b[95m╔═══════════════════════════════════════════════════════════════╗\x1b[0m\n");
-    printf("\x1b[95m║                     ESTADÍSTICAS FINALES                      ║\x1b[0m\n");
-    printf("\x1b[95m╠═══════════════════════════════════════════════════════════════╣\x1b[0m\n");
-    printf("\x1b[95m║  Héroe: %-20s  Enemigos Derrotados: %-8d   ║\x1b[0m\n", 
-           player->name, player->enemiesDefeated);
-    printf("\x1b[95m║  HP: %3d/%-3d  ATK: %-3d  DEF: %-3d  Oro: %-5d                ║\x1b[0m\n", 
-           player->currentHP, player->maxHP, 
-           player->attack + player->tempAttackBoost,
-           player->defense + player->tempDefenseBoost, 
-           player->gold);
-    printf("\x1b[95m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n\n");
-    
-    printf("¡Que el destino esté de tu lado!");
-    ui_wait_dots();
 
     // ¡COMBATE FINAL!
     bool victory = combat_final_boss(player, finalBoss);

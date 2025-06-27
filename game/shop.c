@@ -61,18 +61,57 @@ Map* shop_initialize_random_merchant(Item* item_array, int numItems, int maxDiff
             indices[validCount++] = i;
         }
     }
+    Map* tempMap = map_create(int_equals);
+    // --- SIEMPRE agregar una poción de curación ---
+    int healingPotionIdx = -1;
+    int boostPotionIdx = -1;
+    for (int i = 0; i < numItems; i++) {
+        if (item_array[i].type == 3 && item_array[i].heal > 0 && item_array[i].difficulty <= maxDifficulty) {
+            if (healingPotionIdx == -1 || item_array[i].difficulty > item_array[healingPotionIdx].difficulty) {
+                healingPotionIdx = i;
+            }
+        }
+    }
+    if (healingPotionIdx != -1) {
+        int* key = malloc(sizeof(int));
+        *key = item_array[healingPotionIdx].id;
+        map_insert(tempMap, key, &item_array[healingPotionIdx]);
+    }
+    // --- SIEMPRE agregar una poción de boost (ataque o defensa, la de mayor dificultad posible) ---
+    for (int i = 0; i < numItems; i++) {
+        if (item_array[i].type == 3 && item_array[i].effectDuration > 0 && item_array[i].difficulty <= maxDifficulty) {
+            if (boostPotionIdx == -1 || item_array[i].difficulty > item_array[boostPotionIdx].difficulty) {
+                boostPotionIdx = i;
+            }
+        }
+    }
+    if (boostPotionIdx != -1 && boostPotionIdx != healingPotionIdx) {
+        int* key = malloc(sizeof(int));
+        *key = item_array[boostPotionIdx].id;
+        map_insert(tempMap, key, &item_array[boostPotionIdx]);
+    }
+    // --- Agregar ítems aleatorios, sin repetir los ya agregados ---
+    bool* selected = calloc(validCount, sizeof(bool));
+    int alreadyAdded[2] = {-1, -1};
+    int alreadyCount = 0;
+    if (healingPotionIdx != -1) alreadyAdded[alreadyCount++] = healingPotionIdx;
+    if (boostPotionIdx != -1 && boostPotionIdx != healingPotionIdx) alreadyAdded[alreadyCount++] = boostPotionIdx;
     int merchantItemCount = 0;
     if (validCount > 0) {
         merchantItemCount = (rand() % 3) + 1;
         if (merchantItemCount > validCount) merchantItemCount = validCount;
     }
-    Map* tempMap = map_create(int_equals);
-    bool* selected = calloc(validCount, sizeof(bool));
     for (int count = 0; count < merchantItemCount && validCount > 0;) {
         int r;
         do { r = rand() % validCount; } while (selected[r]);
-        selected[r] = true;
         int idx = indices[r];
+        // No repetir los ya agregados
+        bool skip = false;
+        for (int j = 0; j < alreadyCount; j++) {
+            if (idx == alreadyAdded[j]) { skip = true; break; }
+        }
+        if (skip) { selected[r] = true; continue; }
+        selected[r] = true;
         int* key = malloc(sizeof(int));
         *key = item_array[idx].id;
         map_insert(tempMap, key, &item_array[idx]);
@@ -101,6 +140,11 @@ void shop_interact(Player* player, Map* itemMap) {
         MapPair* pair = map_first(itemMap);
         bool hay_items = (pair != NULL);
 
+        if (!hay_items) {
+            waitForPress("Presiona ENTER para salir de la tienda...");
+            break;
+        }
+
         ui_shop_menu(hay_items);
 
         if (fgets(input, sizeof(input), stdin) == NULL) {
@@ -110,32 +154,23 @@ void shop_interact(Player* player, Map* itemMap) {
 
         choice = atoi(input);
 
-        if (hay_items) {
-            if (choice == 1) {
-                printf("\033[1;36mIngresa el ID del item a comprar: \033[0m");
-                if (fgets(input, sizeof(input), stdin) == NULL) {
-                    ui_msg_error("Error al leer la entrada. Regresando al menu.");
-                    continue;
-                }
-                int itemId = atoi(input);
-                bool purchased = shop_buy_item(player, itemMap, itemId);
-                if (purchased) {
-                    ui_shop_buy(player->gold);
-                }
-            } else if (choice == 2) {
-                printf("\033[1;35mGracias por tu visita! Vuelve pronto.\033[0m\n");
-                break;
-            } else {
-                printf("\033[1;31mOpcion invalida. Por favor, elige 1 o 2.\033[0m\n");
+        if (choice == 1) {
+            printf("\033[1;36mIngresa el ID del item a comprar: \033[0m");
+            if (fgets(input, sizeof(input), stdin) == NULL) {
+                ui_msg_error("Error al leer la entrada. Regresando al menu.");
+                continue;
             }
+            int itemId = atoi(input);
+            bool purchased = shop_buy_item(player, itemMap, itemId);
+            if (purchased) {
+                ui_shop_buy(player->gold);
+            }
+        } else if (choice == 2) {
+            printf("\033[1;35mGracias por tu visita! Vuelve pronto.\033[0m\n");
+            break;
         } else {
-            // Solo permitir salir
-            if (choice == 1) {
-                printf("\033[1;35mGracias por tu visita! Vuelve pronto.\033[0m\n");
-                break;
-            } else {
-                printf("\033[1;31mOpcion invalida.\033[0m\n");
-            }
+            ui_msg_error("Opcion invalida. Por favor, elige 1 o 2.");
+            printf("\x1b[90m──────────────────────────────────────────────────────────────\x1b[0m\n");
         }
     }
 }

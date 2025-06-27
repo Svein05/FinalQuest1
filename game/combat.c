@@ -134,7 +134,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
                 }
             }
         } else {
-            printf("Accion invalida. Pierdes tu turno.\n");
+            ui_msg_error("Accion invalida. Pierdes tu turno.\n");
             Sleep(500);
         }
 
@@ -184,9 +184,6 @@ bool combat_final_boss(Player* player, Enemy* boss) {
     bool boss_enraged = false;
     bool boss_buffed_phase2 = false;
     bool boss_buffed_phase1 = false;
-    
-    printf("\x1b[91m¡%s despierta con toda su furia!\x1b[0m\n\n", boss->name);
-    waitForKeyPress();
 
     while (player->currentHP > 0 && boss->currentHP > 0) {
         clearScreen();
@@ -221,9 +218,7 @@ bool combat_final_boss(Player* player, Enemy* boss) {
             player->name, player->currentHP, player->maxHP,
             player->attack + player->tempAttackBoost,
             player->defense + player->tempDefenseBoost);
-        printf("  \x1b[91m%s HP: \x1b[31m%d\x1b[0m/%d (Fase %d%s)\x1b[0m\n", 
-            boss->name, boss->currentHP, boss->HP, boss_phase,
-            boss_enraged ? " - FURIA" : "");
+        printf("  \x1b[91m%s HP: \x1b[31m%d\x1b[0m/%d \n", boss->name, boss->currentHP, boss->HP);
         printf("\x1b[91m╚═══════════════════════════════════════════════╝\x1b[0m\n");
 
         // --- TURNO DEL JUGADOR ---
