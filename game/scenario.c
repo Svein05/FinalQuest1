@@ -298,6 +298,23 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
             printf("\x1b[96m¡Úsalo sabiamente, puede ser tu última oportunidad!\x1b[0m\n\n");
             // --- Inventario de uso de ítem (igual que combate normal) ---
             display_inventory(player, true, true);
+            if (player->inventoryCount == 0) {
+                waitForKeyPress();
+            } else {
+                char item_input[10];
+                if (fgets(item_input, sizeof(item_input), stdin) == NULL) {
+                    printf("Error de lectura de item.\n");
+                } else {
+                    int item_choice = atoi(item_input);
+                    if (item_choice > 0 && item_choice <= player->inventoryCount) {
+                        player_use_consumable(player, item_choice - 1);
+                        waitForKeyPress();
+                    } else {
+                        printf("Cancelando uso de item.\n");
+                        waitForKeyPress();
+                    }
+                }
+            }
         }
     }
 
