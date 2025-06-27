@@ -48,6 +48,9 @@ void ui_load_animation();
 int ui_gameover_retry();
 int ui_sleep_skip(int ms);
 void ui_bonus();
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 // Declaraciones de las funciones display para ui.h
