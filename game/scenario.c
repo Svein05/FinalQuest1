@@ -1,21 +1,21 @@
-#include <stdio.h>    // Para printf, fopen, fclose, perror
-#include <stdlib.h>   // Para malloc, free, atoi, rand, srand
-#include <string.h>   // Para strncpy, strlen, strcspn
-#include <stdbool.h>  // Para bool
-#include <time.h>     // Para srand(time(NULL))
+#include <stdio.h>    
+#include <stdlib.h>   
+#include <string.h>   
+#include <stdbool.h>  
+#include <time.h>     
 
-#include "scenario.h"   // Declaraciones de las funciones de escenario
-#include "data_types.h" // Definiciones de las estructuras Player, Enemy, Item, Scenario
-#include "combat.h"     // Funciones de combate (combat_manage_turn)
-#include "player.h"     // Funciones del jugador (player_add_item_to_inventory, etc.)
-#include "shop.h"       // Funciones de tienda (shop_initialize_random_merchant, shop_interact)
-#include "../tdas/map.h" // Para Map*
-#include "../tdas/extra.h" // Función para leer líneas del CSV
+#include "scenario.h"   
+#include "data_types.h" 
+#include "combat.h"     
+#include "player.h"     
+#include "shop.h"       
+#include "../tdas/map.h" 
+#include "../tdas/extra.h" 
 #include "../tdas/queue.h"
-#include "lore.h" // Incluir lore.h para lógica de trackers
+#include "lore.h" 
 
 // --- FUNCIONES DE LIBERACIÓN DE MEMORIA ---
-#define NUM_EVENT_TYPES 4 // Ahora hay 4 tipos de eventos
+#define NUM_EVENT_TYPES 4 
 #define MAX_DIFFICULTY 3    
 
 Enemy* spawnRandomEnemy(int currentScenarioDifficulty, Enemy* enemy_array, int numEnemies) {
@@ -57,7 +57,7 @@ Enemy* spawnRandomEnemy(int currentScenarioDifficulty, Enemy* enemy_array, int n
         spawnedEnemy->currentHP = spawnedEnemy->HP; // HP completo para todos
     }
     
-    free(filteredEnemies); // Liberar memoria de la lista filtrada
+    free(filteredEnemies); // Liberar memoria
     return spawnedEnemy; 
 }
 

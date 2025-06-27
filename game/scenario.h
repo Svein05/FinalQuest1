@@ -8,12 +8,6 @@
 #include "ui.h"
 #include "lore.h"
 
-// --- DEFINICIONES DE TIPOS DE ESCENARIO ---
-// Estos valores corresponden a los tipos de escenario en la estructura Scenario.
-// 1: Combate
-// 2: Tienda (solo la inicial)
-// 3: Evento Aleatorio (puede ser combate, mercader o bonus)
-// 4: Jefe Final
 #define SCENARIO_TYPE_COMBAT 1
 #define SCENARIO_TYPE_SHOP 2
 #define SCENARIO_TYPE_EVENT 3
@@ -44,15 +38,31 @@ Enemy* getEnemyForScenario(Scenario* Scenario, Enemy* allEnemies, int numEnemies
  */
 void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario, Map* lore_map, LoreTracker* tracker_ambiental, LoreTracker* tracker_profundo);
 
+/**
+ * @brief Llena la cola del mapa de juego con los escenarios definidos.
+ * @param game_map Puntero a la cola donde se almacenarán los escenarios.
+ * @param escenarios Arreglo de escenarios a poblar.
+ * @param numScenarios Número total de escenarios en el arreglo.
+ */
 void poblarGameMap(Queue* game_map, Scenario* escenarios, int numScenarios);
-bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies, Map* lore_map, LoreTracker* tracker_profundo);
-void show_random_lore_no_repeat(Map* lore_map, LoreTracker* tracker, int tipo);
 
-// Ya NO se deben usar helpers antiguos de UI para trackers:
-// get_random_unused_lore → get_random_unused_lore
-// free_lore_tracker → free_lore_tracker
-// init_lore_tracker → init_lore_tracker
-// mark_lore_used → mark_lore_used
-// Si ves referencias a los antiguos helpers en otros archivos, reemplázalos por los equivalentes de lore.c
+/**
+ * @brief Ejecuta el evento del jefe final, gestionando el combate y la narrativa.
+ * @param player Puntero al jugador actual.
+ * @param allEnemies Arreglo de todos los enemigos disponibles en el juego.
+ * @param numEnemies Número total de enemigos en allEnemies.
+ * @param lore_map Mapa de fragmentos de lore.
+ * @param tracker_profundo Tracker de lore profundo para el jefe final.
+ * @return true si el jugador vence al jefe final, false si es derrotado.
+ */
+bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies, Map* lore_map, LoreTracker* tracker_profundo);
+
+/**
+ * @brief Muestra un fragmento de lore aleatorio sin repetir, según el tipo indicado.
+ * @param lore_map Mapa de fragmentos de lore.
+ * @param tracker Tracker de uso de fragmentos de lore.
+ * @param tipo Tipo de lore a mostrar (ambiental o profundo).
+ */
+void show_random_lore_no_repeat(Map* lore_map, LoreTracker* tracker, int tipo);
 
 #endif // SCENARIO_H

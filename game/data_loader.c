@@ -34,21 +34,18 @@ void free_tokens(char** tokens) {
 void freeEnemies(Enemy* enemies) {
     if (enemies != NULL) {
         free(enemies); 
-        // printf("Memoria de enemigos liberada.\n");
     }
 }
 
 void freeScenarioMap(Scenario* scenarios) {
     if (scenarios != NULL) {
         free(scenarios);
-        // printf("Memoria de escenarios liberada.\n");
     }
 }
 
 void freeItems(Item* items) {
     if (items != NULL) {
         free(items);
-        // printf("Memoria de ítems liberada.\n");
     }
 }
 
@@ -120,7 +117,6 @@ bool parse_scenario(char** tokens, Scenario* node) {
     // Verificar que tenemos todos los campos necesarios
     for (int i = 0; i < 4; i++) {
         if (!tokens[i]) {
-            // printf(stderr, "Error: Faltan campos en el escenario\n");
             return false;
         }
     }
@@ -129,7 +125,6 @@ bool parse_scenario(char** tokens, Scenario* node) {
     char* endptr;
     node->id = strtol(tokens[0], &endptr, 10);
     if (*endptr != '\0' || node->id <= 0) {
-        // printf(stderr, "Error: ID de escenario inválido '%s'\n", tokens[0]);
         return false;
     }
 
@@ -144,7 +139,6 @@ bool parse_scenario(char** tokens, Scenario* node) {
     // Parsear Dificultad
     node->difficulty = strtol(tokens[3], &endptr, 10);
     if (*endptr != '\0' || node->difficulty < 1 || node->difficulty > 3) {
-        // printf(stderr, "Error: Dificultad inválida '%s' (debe ser 1-3)\n", tokens[3]);
         return false;
     }
 
@@ -169,13 +163,11 @@ Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
         *numEnemies = 0;
         return NULL;
     }
-    // printf("Memoria asignada para %d enemigos.\n", capacity);
     // Leer y descartar el encabezado
     char** tokens = read_csv_line(file, CSV_DELIMITER);
     free_tokens(tokens);
 
     // Leer enemigos del CSV
-    // printf("Leyendo enemigos...\n");
     while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
         if (count >= capacity) {
             capacity *= 2;
@@ -199,11 +191,8 @@ Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
 
         free_tokens(tokens);
     }
-
-    // printf("Total de enemigos leídos: %d\n", count);
     fclose(file);
     *numEnemies = count;
-    // printf("Cargados %d enemigos desde %s.\n", count, ENEMIES_CSV_PATH);
     return enemies;
 }
 
@@ -253,7 +242,6 @@ Item* load_items(const char* ITEMS_CSV_PATH, int* numItems) {
 
     fclose(file);
     *numItems = count;
-    // printf("Cargados %d ítems desde %s.\n", count, ITEMS_CSV_PATH);
     return items;
 }
 
@@ -347,11 +335,6 @@ Map* load_initial_items_map(const char* INITIAL_ITEMS_CSV_PATH) {
     return clase_a_items;
 }
 
-/**
- * Carga todos los fragmentos de lore desde el CSV y los agrupa en un Map,
- * donde la key es el tipo (int*) y el value es una List* de strings (char*).
- * El Map debe ser liberado por el llamador.
- */
 // Comparador para claves int en Map
 int int_key_equal(void* a, void* b) {
     return *((int*)a) == *((int*)b);

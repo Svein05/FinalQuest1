@@ -30,7 +30,7 @@ void mark_lore_used(LoreTracker* tracker, int idx) {
 }
 
 Map* lore_init_all(const char* path, LoreTracker* tracker_ambiental, LoreTracker* tracker_profundo) {
-    extern Map* load_lore_map(const char* path); // Declaración externa
+    extern Map* load_lore_map(const char* path); 
     Map* lore_map = load_lore_map(path);
     if (!lore_map) return NULL;
     int cantidad_ambiental = 0, cantidad_profundo1 = 0, cantidad_profundo2 = 0;
@@ -41,10 +41,7 @@ Map* lore_init_all(const char* path, LoreTracker* tracker_ambiental, LoreTracker
     if (pair_ambiental && pair_ambiental->value) cantidad_ambiental = list_size((List*)pair_ambiental->value);
     if (pair_profundo1 && pair_profundo1->value) cantidad_profundo1 = list_size((List*)pair_profundo1->value);
     if (pair_profundo2 && pair_profundo2->value) cantidad_profundo2 = list_size((List*)pair_profundo2->value);
-    // Inicializa tracker ambiental (tipo 0)
     init_lore_tracker(tracker_ambiental, tipo_ambiental, cantidad_ambiental);
-    // Inicializa tracker profundo para tipo 1 (historia) y tipo 2 (final)
-    // Si hay lore tipo 2, inicializa tracker_profundo para tipo 2, si no, para tipo 1
     if (cantidad_profundo2 > 0) {
         init_lore_tracker(tracker_profundo, tipo_profundo2, cantidad_profundo2);
     } else {

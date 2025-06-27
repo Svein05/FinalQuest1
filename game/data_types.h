@@ -17,7 +17,7 @@ typedef struct {
     char rarity[MAX_RARITY_LENGTH];         // Rareza del Item 
     int damage;                             
     int defense;        
-    int heal;           // (Solo para Pociones)
+    int heal;           // Solo para Pociones
     int price;          // Valor del Item
     int difficulty;     // Enlazar a Mapa - Tienda
     int effectDuration;  
@@ -36,15 +36,12 @@ typedef struct {
     Item inventory[INVENTORY_SLOTS];    
     int inventoryCount;                 // Cantidad de Items en Inventario
     Item equippedWeapon;                
-    Item equippedArmor;                 
-
-    // Estos campos gestionan los efectos TEMPORALES ACTUALMENTE APLICADOS al jugador.
-    // Una poción podría aumentar solo ataque, solo defensa, o ambos. 
-    int tempAttackBoost;    // Cantidad de ataque temporal ACTIVA en el jugador
-    int tempDefenseBoost;   // Cantidad de defensa temporal ACTIVA en el jugador
-    int attackBoostTurns;   // Turnos restantes para el aumento de ataque
-    int defenseBoostTurns;  // Turnos restantes para el aumento de defensa
-    int enemiesDefeated;    // NUEVO: cantidad de enemigos derrotados
+    Item equippedArmor;                  
+    int tempAttackBoost;    // Cantidad de boost de ataque en el jugador
+    int tempDefenseBoost;   // Cantidad de boost de defensa en el jugador
+    int attackBoostTurns;   // Turnos restantes para el boost de ataque
+    int defenseBoostTurns;  // Turnos restantes para el boost de defensa
+    int enemiesDefeated;    // cantidad de enemigos derrotados
 } Player;
 
 // Struct de Enemy
@@ -63,7 +60,7 @@ typedef struct {
     int id;                                             
     int difficulty;                                     // Dificultad del escenario (1, 2 o 3)
     char name[MAX_NAME_LENGTH];                        
-    char description[MAX_DESCRIPTION_LENGTH];           // Descripción breve del lugar
+    char description[MAX_DESCRIPTION_LENGTH];           // Descripción breve del escenario
 } Scenario;
 
 #endif
