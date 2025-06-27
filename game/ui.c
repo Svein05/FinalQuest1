@@ -53,6 +53,12 @@ void ui_load_animation(const char* mensaje) {
     fflush(stdout);
 }
 
+/**
+ * @brief texto de lore con animación de letra por letra y salto de línea automático.
+ * @param texto Texto a mostrar animado.
+ * @param line_width Ancho máximo de línea antes de salto.
+ * @param delay_ms Milisegundos de retardo por carácter
+**/
 void print_lore_text_animated_wrapped(const char* texto, int line_width, int delay_ms) {
     int len = strlen(texto);
     int col = 0;
@@ -70,6 +76,10 @@ void print_lore_text_animated_wrapped(const char* texto, int line_width, int del
     putchar('\n');
 }
 
+/**
+ * @brief Muestra el menú de game over y pregunta si el usuario quiere reintentar.
+ * @return 1 si el usuario quiere reintentar, 0 si quiere salir.
+**/
 int ui_gameover_retry() {
     printf("\n\x1b[41m═══════════════════════════════════════════════════════════════\x1b[0m\n");
     printf("\x1b[41m  ☠️  Has sido derrotado. ¿Qué deseas hacer?                \x1b[0m\n");
@@ -108,7 +118,12 @@ void ui_player_init(Player* player) {
     printf("\x1b[36m╚════════════════════════════════════════════╝\x1b[0m\n");
 }
 
-// Formatea y muestra la descripción del escenario dentro de los bordes
+/**
+ * Formatea y muestra la descripción del escenario dentro de los bordes
+ * Imprime la descripción de un escenario con saltos de línea y formato de cuadro.
+ * @param texto Texto de la descripción.
+ * @param line_width Ancho máximo de línea.
+**/
 void print_scenario_description(const char *texto, int line_width) 
 {
     // Tomamo el largo de la cadena

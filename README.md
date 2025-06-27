@@ -1,10 +1,14 @@
-# ⚔️ El Último Caballero
+# ⚔️ FinalQuest 1
 
 ## 📌 Descripción:
 
-**El Último Caballero** es un desafiante RPG clásico por turnos, donde la estrategia y la gestión de recursos son clave para la supervivencia. Te embarcarás en un viaje lineal a través de un mapa, enfrentando peligros crecientes y tomando decisiones críticas en cada paso. El objetivo final es prepararte para el inevitable enfrentamiento contra el **Boss Final**, la máxima prueba de tu astucia y poder.
+**FinalQuest 1** es un juego de rol (RPG) por turnos con estilo clásico, en el que el jugador controla a un héroe que avanza de forma lineal a través de distintos escenarios. A lo largo del recorrido, deberá enfrentarse a enemigos, encontrar tiendas y atravesar eventos aleatorios, gestionando de manera eficiente su inventario y recursos.
 
-Tu aventura se desarrollará a través de **nueve escenarios de combate**, divididos en tres niveles de dificultad progresiva, que te obligarán a adaptar tus tácticas. A lo largo del camino, encontrarás tiendas preestablecidas donde podrás reabastecerte y mejorar tu equipo con el oro ganado en batalla. Sin embargo, no todo es predecible: algunos escenarios "vacíos" te sorprenderán con eventos aleatorios, desde el hallazgo de valiosos ítems y bonificaciones de estadísticas temporales, hasta el encuentro con comerciantes únicos que ofrecen artículos exclusivos. Cada elección de compra y cada bonificación obtenida será crucial, ya que la supervivencia ante el Boss Final dependerá enteramente de cómo maximices tus recursos y fortalezcas a tu caballero antes de la confrontación decisiva.
+El objetivo principal es alcanzar el enfrentamiento contra el jefe final, tomando decisiones estratégicas durante cada combate, compra o uso de ítems para aumentar las probabilidades de éxito. Las batallas por turnos exigen planificación táctica, mientras que la correcta administración del oro y la selección de equipamiento son clave para progresar.
+
+Durante la aventura, el jugador podrá mejorar su equipo, adquirir armas, armaduras y consumibles en tiendas, y participar en eventos especiales que otorgan bonificaciones o ítems únicos. Cada elección realizada a lo largo del juego tendrá un impacto directo en la preparación y desempeño del héroe en el combate final.
+
+¿Estás listo para sobrevivir y vencer al jefe final?
 
 ## ⚙️ Como compilar y ejecutar:
 
@@ -30,7 +34,7 @@ Para comenzar a trabajar con el sistema en tu equipo local, asegúrate de tener 
     - Abre la terminal integrada (`Terminal > Nueva Terminal`)
     - En la terminal *(De preferencia Git Bash)*, compila el programa con el siguiente comando:
         ```
-        gcc tdas/*.c proyecto.c -Wno-unused-result -o proyecto
+        gcc -o proyecto tdas/*.c game/*.c main.c -Igame -Itdas -Wno-unused-result -Werror
         ```
     - Una vez compilado, puedes ejecutar el programa en la misma terminal, con:
         ```
@@ -41,532 +45,434 @@ Para comenzar a trabajar con el sistema en tu equipo local, asegúrate de tener 
 
 ### ✅ Funcionando Correctamente
 
-- 📂 Carga del laberinto desde un archivo **CSV**.
-- 🎮 Inicio de partida en modo **Solitario**.
-- 👥 Inicio de partida en modo **Multijugador**.
-- 🎒 **Recolección** de ítems durante el recorrido.
-- 🗑️ Posibilidad de **descartar** ítems del inventario.
-- 🚪 Opción para **avanzar** al siguiente escenario.
-- 🔁 **Reinicio** de la partida desde el inicio.
-- ❌ **Salir** del juego en cualquier momento.
+- 📜 Avance lineal por escenarios de dificultad progresiva.
+- ⚔️ Sistema de combate por turnos.
+- 🛒 Tiendas para comprar ítems.
+- 🎲 Eventos aleatorios.
+- 🎒 Gestión de inventario.
+- 💰 Administración de oro y compras estratégicas.
+- 👑 Enfrentamiento contra el jefe final.
 
 > #### ⚠️ Sin Problemas Conocidos
 
 ## Ejemplo de Uso:
-### Menú Principal:
-```
-+--------------------------------------+
-|              GraphQuest              |
-+--------------------------------------+
-| 1) Cargar Laberinto                  |
-| 2) Iniciar Partida: Solitario        |
-| 3) Iniciar Partida: Multijugador     |
-+--------------------------------------+
-```
-### 👾 Procedimiento de Ejemplo:
-#### 📌 Comienza cargando el laberinto en el sistema.
-Antes de comenzar a jugar **GraphQuest**, es fundamental seleccionar la **opción 1**, ya que este paso permite **cargar el laberinto en el sistema**. Sin ello, no será posible iniciar la partida ni acceder a las funcionalidades del juego.
+
+### 👾 FinalQuest 1:
+#### 📌 Comienza eligiendo la clase de tu héroe
+Antes de comenzar a jugar FinalQuest 1, deberás elegir cuidadosamente la clase de tu héroe. Cada clase tiene características únicas que influirán en tu forma de combatir y avanzar en el juego. Esta decisión será clave para enfrentar a los distintos enemigos y alcanzar al jefe final.
 ``` 
-+--------------------------------------+
-|              GraphQuest              |
-+--------------------------------------+
-| 1) Cargar Laberinto                  |
-| 2) Iniciar Partida: Solitario        |
-| 3) Iniciar Partida: Multijugador     |
-+--------------------------------------+
-Ingrese su opcion: 1
-Laberinto cargado exitosamente.
-Presione una tecla para continuar...
+╔══════════════════════════════════════╗
+║            FinalQuest 1              ║
+╚══════════════════════════════════════╝
+
+╔══════════════════════════════════════╗
+║      BIENVENIDO A TU AVENTURA        ║
+╟──────────────────────────────────────╢
+║ ELIGE TU CLASE:                      ║
+║ 1. Guerrero                          ║
+║ 2. Tanque                            ║
+║ 3. Asesino                           ║
+╚══════════════════════════════════════╝
+Ingresa el número de tu clase: _
 ```
 
-> Una vez cargado el laberinto, ya se puede iniciar una partida en cualquiera de los dos modos disponibles. Si el usuario intenta seleccionar nuevamente la **opción 1** tras haber cargado el archivo CSV, el sistema informará que el laberinto ya ha sido cargado.
+> El jugador tendrá la posibilidad de elegir entre tres clases distintas para su héroe. Cada una presenta estadísticas únicas que influyen directamente en el rendimiento durante los combates por turnos. Por lo tanto, la elección de clase representa un aspecto clave para el desarrollo y la estrategia del juego.
 
 
-#### 🎮 Iniciar partida en **Solitario**.
-Para comenzar una partida en **modo solitario**, el usuario debe seleccionar la **opción 2** desde el menú principal. Una vez iniciada la partida, se desplegará el primer escenario junto a la información relevante del jugador.
+#### 🎮 Cargando aventura.
+Una vez seleccionada la clase del héroe, el sistema procederá a cargar automáticamente los datos necesarios para iniciar la partida.
 ```
-+--------------------------------------+
-|              GraphQuest              |
-+--------------------------------------+
-| 1) Cargar Laberinto                  |
-| 2) Iniciar Partida: Solitario        |
-| 3) Iniciar Partida: Multijugador     |
-+--------------------------------------+
-Ingrese su opcion: 2
+╔════════════════════════════════════════════╗
+║              FinalQuest 1                  ║
+╚════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════╗
+║        ¡Héroe creado exitosamente!         ║
+╠════════════════════════════════════════════╣
+║ Clase: Guerrero                            ║
+║ Vida: 100   Ataque: 10    Defensa: 5       ║
+║ Oro inicial: 200                           ║
+╚════════════════════════════════════════════╝
+Cargando datos del juego [■■■■■] 100%
+══════════════════════════════════════════════
+¡Has recibido tu equipo inicial!
+──────────────────────────────────────────────
+- Espada de Aprendiz (+12 Atk, equipada)      
+- Armadura Acolchada (+6 Def, equipada)
+- Pocion de Novato (añadido al inventario)
+- Amuleto de Suerte (añadido al inventario)
+══════════════════════════════════════════════
+Los items se equiparan automaticamente.
+Presione Enter para continuar...       
 ```
+> El programa se encargará de cargar automáticamente los archivos CSV que contienen la información necesaria para el desarrollo del juego, incluyendo los datos de enemigos, escenarios, ítems iniciales según la clase seleccionada e ítems disponibles en las tiendas. La clase elegida por el jugador determinará tanto los ítems iniciales como las estadísticas del personaje. Este proceso se realiza de manera automática al iniciar la partida, garantizando una experiencia personalizada desde el comienzo. 
+
+#### 🎮 Inicio del juego.
+Una vez que los datos del juego se hayan cargado por completo, se mostrará la pantalla de portada junto con una breve historia para contextualizar al jugador.
 ```
-========================================
-         GraphQuest: Un Jugador
-========================================
+╔─────────────────────────────────────────────────────╗
 
-+------------------------------+
-| ESCENARIO                    |
-+------------------------------+
-| Entrada principal            |
-|                              |
-| Una puerta rechinante abre   |
-| paso a esta mansion olvidada |
-| por los dioses y los         |
-| conserjes. El aire huele a   |
-| humedad y a misterios sin    |
-| resolver.                    |
-|                              |
-| Acciones Posibles:           |
-| - ABAJO                      |
-|                              |
-| Objetos Disponibles:         |
-| - (Sin Items Disponibles)    |
-+------------------------------+
+▒█▀▀▀ ░▀░ █▀▀▄ █▀▀█ █░░ ▒█▀▀█ █░░█ █▀▀ █▀▀ ▀▀█▀▀   ▄█░ 
+▒█▀▀▀ ▀█▀ █░░█ █▄▄█ █░░ ▒█░▒█ █░░█ █▀▀ ▀▀█ ░░█░░   ░█░ 
+▒█░░░ ▀▀▀ ▀░░▀ ▀░░▀ ▀▀▀ ░▀▀█▄ ░▀▀▀ ▀▀▀ ▀▀▀ ░░▀░░   ▄█▄ 
 
-+------------------------------+
-| JUGADOR                      |
-+------------------------------+
-| (Inventario Vacio)           |
-| Peso Total: 0                |
-| Puntaje Acumulado: 0         |
-| Tiempo Restante: 15          |
-+------------------------------+
-
-========================================
-1) Recoger Item(s)
-2) Descartar Item(s)
-3) Avanzar
-4) Reiniciar Partida
-5) Salir del Juego
-========================================
-Ingrese su opcion: _
-```
-> Durante la partida, el jugador podrá avanzar por los escenarios, tomar decisiones estratégicas, recolectar objetos y administrar su inventario y tiempo disponible. Cada acción influirá en el puntaje final obtenido al completar el laberinto. 
-
-#### 🎮 Iniciar partida en **Multijugador**.
-Para comenzar una partida en **modo multijugador**, el usuario debe seleccionar la **opción 3** desde el menú principal. Una vez iniciada la partida, se desplegará el primer escenario junto a la información relevante del *Jugador 1*.
-```
-+--------------------------------------+
-|              GraphQuest              |
-+--------------------------------------+
-| 1) Cargar Laberinto                  |
-| 2) Iniciar Partida: Solitario        |
-| 3) Iniciar Partida: Multijugador     |
-+--------------------------------------+
-Ingrese su opcion: 3
-```
-```
-========================================
-        GraphQuest: Multijugador
-========================================
-
-+------------------------------+
-| ESCENARIO                    |
-+------------------------------+
-| Entrada principal            |
-|                              |
-| Una puerta rechinante abre   |
-| paso a esta mansion olvidada |
-| por los dioses y los         |
-| conserjes. El aire huele a   |
-| humedad y a misterios sin    |
-| resolver.                    |
-|                              |
-| Acciones Posibles:           |
-| - ABAJO                      |
-|                              |
-| Objetos Disponibles:         |
-| - (Sin Items Disponibles)    |
-+------------------------------+
-
-+------------------------------+
-| JUGADOR                      |
-+------------------------------+
-| (Inventario Vacio)           |
-| Peso Total: 0                |
-| Puntaje Acumulado: 0         |
-| Tiempo Restante: 15          |
-+------------------------------+
-
->>> TURNO DE JUGADOR 1 <<<
-
-========================================
-1) Recoger Item(s)
-2) Descartar Item(s)
-3) Avanzar
-4) Reiniciar Partida
-5) Salir del Juego
-========================================
-Ingrese su opcion: _
-```
-> Durante la partida, el *Jugador 1* y *Jugador 2* podrán avanzar por los escenarios, tomar decisiones estratégicas, recolectar objetos y administrar sus inventarios y tiempo disponible. Cada acción se hara por **Turnos** y esto influirá en el puntaje final obtenido al completar el laberinto.
-
-> Observaciones:
->   - Cada jugador **puede explorar caminos distintos** del laberinto.
->   - **Los ítems son únicos**: si un jugador recoge uno, ya no estará disponible para el otro.
->   - Si un jugador llega a la salida antes que el otro, debe **esperar** a que el segundo también finalice su recorrido.
->   - El **resultado final** depende de múltiples condiciones:
-
-#### 🧭 Recoleccion de Ítems.
-Para recoger ítems, el jugador debe seleccionar la **opción 1** desde el menú de juego. El sistema mostrará los objetos disponibles en el escenario actual, incluyendo su **ID**, **peso** y **puntos**. Luego, solicitará al jugador que ingrese el **ID del ítem o items que desea recoger**. 
-```
-========================================
-         GraphQuest: Un Jugador
-========================================
-
-+------------------------------+        
-| ESCENARIO                    |        
-+------------------------------+        
-| Cocina                       |        
-|                              |        
-| Restos de una batalla        |        
-| culinaria. Cuchillos por     |        
-| aqui, migajas por alla.      |        
-| Alguien cocinoÔÇª o fue      |        
-| cocinado.                    |        
-|                              |        
-| Acciones Posibles:           |        
-| - ARRIBA                     |        
-| - ABAJO                      |        
-| - DERECHA                    |        
-|                              |
-| Objetos Disponibles:         |
-| -> #03 / Cuchillo            |
-|    Peso: 1   ,  Puntos: 3    |
-|                              |
-| -> #04 / Pan                 |
-|    Peso: 1   ,  Puntos: 2    |
-|                              |
-+------------------------------+
-
-+------------------------------+
-| JUGADOR                      |
-+------------------------------+
-| (Inventario Vacio)           |
-| Peso Total: 0                |
-| Puntaje Acumulado: 0         |
-| Tiempo Restante: 9           |
-+------------------------------+
-
-========================================
-1) Recoger Item(s)
-2) Descartar Item(s)
-3) Avanzar
-4) Reiniciar Partida
-5) Salir del Juego
-========================================
-Ingrese su opcion: 1
-
-Objetos disponibles para recoger:
-  #03 - Cuchillo (Peso: 1, Puntos: 3)
-  #04 - Pan (Peso: 1, Puntos: 2)
-
-Ingrese el ID del objeto a recoger (0 para cancelar): 03
-Has recogido: Cuchillo
-Tiempo Restante: 14 - 1 = 13
-Presione una tecla para continuar...
-```
-> Al seleccionar un ítem, el programa verifica que el ID ingresado corresponda a uno válido en el escenario. No es necesario preocuparse por ceros a la izquierda: ingresar (03) o (3) funcionará de igual manera si ese ítem está disponible. Una vez confirmado, el objeto se añade al inventario del jugador, su peso y puntaje se suman, y se descuenta una unidad de tiempo restante como penalización por la acción. Luego, el jugador puede continuar seguir ingresando items del escenario o cancelar la accion para poder seguir explorando el laberitno.
-
-#### ❌ Descartar Ítems.
-Para descartar ítems, el jugador deberá seleccionar la opcion 2 desde el menú del juego. El sistema mostrará todos los objetos actualmente almacenados en el inventario del jugador, junto a su **ID**, **nombre**, **peso** y **puntos**. Luego, se solicitará el ID del objeto que se desea eliminar.
-```
-========================================
-         GraphQuest: Un Jugador
-========================================
-
-+------------------------------+        
-| ESCENARIO                    |        
-+------------------------------+        
-| Cocina                       |        
-|                              |        
-| Restos de una batalla        |        
-| culinaria. Cuchillos por     |        
-| aqui, migajas por alla.      |        
-| Alguien cocinoÔÇª o fue      |        
-| cocinado.                    |        
-|                              |        
-| Acciones Posibles:           |        
-| - ARRIBA                     |        
-| - ABAJO                      |        
-| - DERECHA                    |        
-|                              |
-| Objetos Disponibles:         |
-| -> #04 / Pan                 |
-|   Peso: 1   ,  Puntos: 2     |
-|                              |
-+------------------------------+
-
-+------------------------------+
-| JUGADOR                      |
-+------------------------------+
-| -> #03 / Cuchillo            |
-|    Peso: 1   ,  Puntos: 3    |
-|                              |
-| Peso Total: 0                |
-| Puntaje Acumulado: 0         |
-| Tiempo Restante: 9           |
-+------------------------------+
-
-========================================
-1) Recoger Item(s)
-2) Descartar Item(s)
-3) Avanzar
-4) Reiniciar Partida
-5) Salir del Juego
-========================================
-Ingrese su opcion: 2
-
-Objetos en tu inventario:
-  #03 - Cuchillo (Peso: 1, Puntos: 3)
-
-Ingrese el ID del objeto a descartar (0 para cancelar): 03
-Has descartado: Cuchillo.
-Tiempo Restante: 13 - 1 = 12
-Presione una tecla para continuar...
-```
-> Al seleccionar un ítem para descartar, el programa verifica que el ID ingresado exista en el inventario del jugador. No importa si se ingresa el ID con ceros a la izquierda (03) o sin ellos (3), ya que ambos serán interpretados correctamente si el objeto está disponible. Una vez confirmado, el objeto es eliminado del inventario, su peso y puntos se descuentan, y se penaliza al jugador restando una unidad de tiempo restante. Luego de esta acción, el jugador puede seguir su aventura por el laberinto.
-
-#### 🏃‍♂️ Avanzar al siguiente escenario.
-Para avanzar, el jugador debe seleccionar la **opción 3** desde el menú de juego. Al hacerlo, el sistema mostrará por pantalla las direcciones disponibles y los escenarios a los que conducen. El jugador deberá elegir la dirección deseada ingresando el número correspondiente.
-```
-========================================
-         GraphQuest: Un Jugador
-========================================
-
-+------------------------------+        
-| ESCENARIO                    |        
-+------------------------------+        
-| Cocina                       |        
-|                              |        
-| Restos de una batalla        |        
-| culinaria. Cuchillos por     |        
-| aqui, migajas por alla.      |        
-| Alguien cocinoÔÇª o fue      |        
-| cocinado.                    |        
-|                              |        
-| Acciones Posibles:           |        
-| - ARRIBA                     |        
-| - ABAJO                      |        
-| - DERECHA                    |        
-|                              |
-| Objetos Disponibles:         |
-| -> #03 / Cuchillo            |
-|    Peso: 1   ,  Puntos: 3    |
-|                              |
-| -> #04 / Pan                 |
-|    Peso: 1   ,  Puntos: 2    |
-|                              |
-+------------------------------+
-
-+------------------------------+
-| JUGADOR                      |
-+------------------------------+
-| (Inventario Vacio)           |
-| Peso Total: 0                |
-| Puntaje Acumulado: 0         |
-| Tiempo Restante: 9           |
-+------------------------------+
-
-========================================
-1) Recoger Item(s)
-2) Descartar Item(s)
-3) Avanzar
-4) Reiniciar Partida
-5) Salir del Juego
-========================================
-Ingrese su opcion: 3
-
-Opciones para Avanzar
- 1) ARRIBA (Entrada principal)
- 2) ABAJO (Jardin)
- 3) DERECHA (Comedor)
-
-Elija una opcion (0 para cancelar): 2
-
-Te has movido de Cocina hacia Jardin.
-Tiempo Restante: 12 - 1 = 11
-Presione una tecla para continuar...
-```
-> Al elegir la dirección, el programa confirma hacia qué escenario se ha movido el jugador. Luego calcula el tiempo perdido usando la fórmula: Tiempo perdido = ((peso total del inventario + 1) / 10). Esto refleja el esfuerzo adicional que implica moverse con peso. El valor resultante se resta al tiempo restante del jugador. Finalmente, se actualiza la pantalla con la nueva ubicación y el tiempo disponible para continuar explorando el laberinto.
-
-#### 🔁 Reiniciar Partida
-Para reiniciar partida, el jugador debe seleccionar la **opcion 4** en el menú del juego.
-```
-========================================
-         GraphQuest: Un Jugador
-========================================
-
-+------------------------------+        
-| ESCENARIO                    |        
-+------------------------------+        
-| Cocina                       |        
-|                              |        
-| Restos de una batalla        |        
-| culinaria. Cuchillos por     |        
-| aqui, migajas por alla.      |        
-| Alguien cocinoÔÇª o fue      |        
-| cocinado.                    |        
-|                              |        
-| Acciones Posibles:           |        
-| - ARRIBA                     |        
-| - ABAJO                      |        
-| - DERECHA                    |        
-|                              |
-| Objetos Disponibles:         |
-| -> #03 / Cuchillo            |
-|    Peso: 1   ,  Puntos: 3    |
-|                              |
-| -> #04 / Pan                 |
-|    Peso: 1   ,  Puntos: 2    |
-|                              |
-+------------------------------+
-
-+------------------------------+
-| JUGADOR                      |
-+------------------------------+
-| (Inventario Vacio)           |
-| Peso Total: 0                |
-| Puntaje Acumulado: 0         |
-| Tiempo Restante: 9           |
-+------------------------------+
-
-========================================
-1) Recoger Item(s)
-2) Descartar Item(s)
-3) Avanzar
-4) Reiniciar Partida
-5) Salir del Juego
-========================================
-Ingrese su opcion: 4
-Estas seguro que deseas reiniciar la partida?
-Todo tu progreso se perdera.
- 1) Si
- 2) No
-Ingrese su opcion: 1
-Volviendo a cargar el Laberinto...
-Laberinto cargado exitosamente.
-La Partida se Reincio.
-Presione una tecla para continuar...
-```
-> Al confirmar la opción, el juego reinicia todo el estado del jugador, incluyendo el inventario, puntaje acumulado, tiempo restante y ubicación. Esta función es útil si el jugador queda atascado o desea empezar desde cero para mejorar su desempeño.
-
-#### 🏠 Salir del Juego.
-Para cerrar completamente la aplicación, el jugador debe seleccionar la **opción 5** en el menú principal. Esta acción finaliza la ejecución del programa y cierra el sistema de forma definitiva.
-```
-========================================
-         GraphQuest: Un Jugador
-========================================
-
-+------------------------------+        
-| ESCENARIO                    |        
-+------------------------------+        
-| Entrada principal            |        
-|                              |        
-| Una puerta rechinante abre   |        
-| paso a esta mansion olvidada |        
-| por los dioses y los         |        
-| conserjes. El aire huele a   |        
-| humedad y a misterios sin    |        
-| resolver.                    |        
-|                              |        
-| Acciones Posibles:           |        
-| - ABAJO                      |        
-|                              |        
-| Objetos Disponibles:         |        
-| - (Sin Items Disponibles)    |        
-+------------------------------+        
-
-+------------------------------+        
-| JUGADOR                      |        
-+------------------------------+        
-| (Inventario Vacio)           |        
-| Peso Total: 0                |        
-| Puntaje Acumulado: 0         |        
-| Tiempo Restante: 10          |        
-+------------------------------+        
-
-========================================
-1) Recoger Item(s)
-2) Descartar Item(s)
-3) Avanzar
-4) Reiniciar Partida
-5) Salir del Juego
-========================================
-Ingrese su opcion: 5
-Estas seguro que deseas salir de la partida?
-Todo tu progreso se perdera.
- 1) Si
- 2) No
-Ingrese su opcion: 1
-```
-> Se recomienda asegurarse de haber finalizado cualquier partida antes de salir, ya que esta acción cerrará por completo el juego.
-
-### 🏁 Finales
-#### Modo Solitario
-##### Si el jugador llega al final del laberinto.
-Si el jugador alcanza con éxito la salida del laberinto, se mostrará el siguiente mensaje:
-```
-FIN - Has llegado a la Salida
-Inventario final:
-  #08 - Moneda (Peso: 1, Puntos: 2)
-  #12 - Rubi (Peso: 5, Puntos: 20)
-  #13 - Mapa (Peso: 1, Puntos: 10)
-Puntaje final: 32
-Se reiniciara el Laberinto...
-Laberinto cargado exitosamente.
-Presione una tecla para continuar...
-```
-> ¡Felicidades! Ahora puedes planear una mejor estrategia para superar tu puntaje en la próxima partida y continuar jugando!
-
-##### Si el jugador no llega al final del laberinto.
-En caso contrario, si no se llega al final del laberinto, se mostrará un mensaje de derrota:
-```
-DERROTA - Se ha agotado el tiempo
-Inventario final:
-  #08 - Moneda (Peso: 1, Puntos: 2)
-  #12 - Rubi (Peso: 5, Puntos: 20)
-  #13 - Mapa (Peso: 1, Puntos: 10)
-Puntaje final: 32
-Se reiniciara el Laberinto...
-Laberinto cargado exitosamente.
-Presione una tecla para continuar...
-```
-> Se ha agotado el tiempo. ¡Inténtalo de nuevo utilizando una estrategia más eficiente!
-#### Modo Multijugador.
-Cuando ambos jugadores **llegan al escenario final** o **se les haya acabado el tiempo**, la partida termina y se muestra un resumen de resultados:
-```
-+------------------------------+
-|    EL JUEGO HA FINALIZADO    |
-+------------------------------+
-
-+------------------------------+
-| JUGADOR 1                    |
-+------------------------------+
-| -> #03 / Cuchillo            |
-|    Peso: 1   ,  Puntos: 3    |
-|                              |
-| Puntaje Acumulado: 3         |
-| Llego al Final? SI
-+------------------------------+
-
-+------------------------------+
-| JUGADOR 2                    |
-+------------------------------+
-| (Inventario Vacio)           |
-| Puntaje Acumulado: 0         |
-| Llego al Final? SI
-+------------------------------+
-
-+------------------------------+
-|    EL JUGADOR 1 HA GANADO    |
-+------------------------------+
-Se reiniciara el Laberinto...
-Laberinto cargado exitosamente.
-Presione una tecla para continuar...
+           __...--~~~~~-._   _.-~~~~~--...__
+         //      Aqui     `V'      Tu       \\
+        //     Empieza     |     Aventura    \\        
+       //__...--~~~~~~-._  |  _.-~~~~~~--...__\\       
+      //__.....----~~~~._\ | /_.~~~~----.....__\\      
+     ====================\\|//====================     
+                         `---`
+╔─────────────────────────────────────────────────────╗
+  Despiertas en un mundo envuelto en sombras. Una 
+  marca arde en tu mano, pero no recuerdas su origen. 
+  Voces antiguas susurran tu nombre, y un peso 
+  invisible te acompana. Eres el Heraldo, destinado 
+  a enfrentar la Oscuridad. Podras descubrir la 
+  verdad antes de que todo se repita una vez mas?
+╚─────────────────────────────────────────────────────╝
+Presione Enter para continuar...
 ```
 
->📝 **Observaciones**:
->  - Si uno llega al final y el otro no, **gana quien llegó**.
->  - Si ambos llegan pero con distinto puntaje, **gana quien acumuló más puntos**.
->  - Si ambos llegan y tienen el mismo puntaje, **es un empate**.
->  - Si ninguno llega al final, **no hay ganador**.
 
+#### 📊 Resumen detallado del escenario y del estado del jugador
+A continuación, se presentará en pantalla un resumen completo que incluye la información del escenario actual y el estado del jugador, mostrando datos relevantes para el progreso de la partida.
+```
+╔════════════════════════════════════════════╗
+║              FinalQuest 1                  ║
+╚════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════╗
+║ ESCENARIO: El Abismo Olvidado              ║
+╟────────────────────────────────────────────╢
+║ Un lugar profundo y aislado, donde el eco  ║
+║ de viejas leyendas resuena entre las       ║
+║ piedras y criaturas olvidadas se ocultan   ║
+║ en las sombras.                            ║
+╚════════════════════════════════════════════╝
+
+╔══════════════════════════════════════════════════════════════╗
+║ RESUMEN DEL JUGADOR                                          ║
+╟──────────────────────────────────────────────────────────────╢
+║ Clase: Guerrero             Enemigos derrotados: 0           ║
+║ Vida:  100/100   Atk: 22    Def: 11    Oro: 200              ║
+║ Arma equipada: Espada de Aprendiz       (+12 Atk)            ║
+║ Armadura equipada: Armadura Acolchada   (+ 6 Def)            ║
+╟──────────────────────────────────────────────────────────────╢
+║ Slots disponibles de inventario: 8                           ║
+╚══════════════════════════════════════════════════════════════╝
+Presione Enter para continuar...
+```
+> Esta pantalla se mostrará cada 9 eventos aleatorios (como batallas, comerciantes, bonus o fragmentos de la historia), presentando un nuevo escenario con una dificultad distinta. Después de repetir este ciclo tres veces, y al llegar al último evento, el jugador deberá enfrentarse al jefe final.
+
+#### 🎲 Eventos Aleatorios.
+Durante el transcurso del juego se presentarán eventos aleatorios que afectarán el desarrollo de la partida. Estos eventos pueden ser de cuatro tipos: combates, comerciantes, bonus o fragmentos de historia.
+##### 🔪 Evento combate:
+Cuando ocurra un evento de combate, se mostrará un mensaje destacado que alerta al jugador sobre la aparición inminente de un enemigo:
+```
+╔══════════════════════════════════════════════════════════════╗
+║                  ¡ENEMIGO INESPERADO APARECE!                ║
+╠══════════════════════════════════════════════════════════════╣
+║        ¡Prepárate para la batalla, valiente aventurero!      ║
+╚══════════════════════════════════════════════════════════════╝
+```
+A continuación, se desplegará el estado actual del combate, mostrando la información relevante tanto del jugador como del enemigo:
+```
+╔══════════════════════════════════════════════════════════════╗
+║ ¡COMBATE INICIADO!   Guerrero vs Rata Gigante                ║
+╚══════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════╗
+║           --- ESTADO DE COMBATE ---           ║
+╠═══════════════════════════════════════════════╣
+  Guerrero HP: 100/100  (Atk: 22, Def: 11)
+  Rata Gigante HP: 40
+╚═══════════════════════════════════════════════╝
+⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨
+⇨  ¡Tu turno!
+⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨
+  [1] Atacar
+  [2] Usar Ítem (Inventario)
+──────────────────────────────────────────────────────────────
+Tu elección: _
+```
+> El jugador dispondrá de dos opciones principales durante el combate: atacar o usar ítems. El uso estratégico de ítems puede proporcionar ventajas significativas, tales como aumentar el daño, mejorar la defensa o recuperar vida, agregando profundidad táctica a las batallas.
+
+Si el jugador decide atacar, se mostrará el siguiente mensaje en pantalla:
+```
+╔═══════════════════════════════════════════════╗
+║           --- ESTADO DE COMBATE ---           ║
+╠═══════════════════════════════════════════════╣
+  Guerrero HP: 100/100  (Atk: 22, Def: 11)
+  Rata Gigante HP: 40
+╚═══════════════════════════════════════════════╝
+⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨
+⇨  ¡Tu turno!
+⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨
+  [1] Atacar
+  [2] Usar Ítem (Inventario)
+──────────────────────────────────────────────────────────────
+Tu elección: 1
+» Guerrero ataca a Rata Gigante y le inflige 22 de daño. «    
+──────────────────────────────────────────────────────────────
+⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦
+⇦  Es el turno de Rata Gigante!
+⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇦⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇦⇦⇦⇦⇦⇦⇦⇦
+« Rata Gigante ataca a Guerrero y le inflige 4 de daño. »
+──────────────────────────────────────────────────────────────
+Presione Enter para continuar...
+```
+En cambio, si el jugador opta por usar un ítem desde el inventario, se mostrará la siguiente secuencia:
+```
+╔═══════════════════════════════════════════════╗
+║           --- ESTADO DE COMBATE ---           ║
+╠═══════════════════════════════════════════════╣
+  Guerrero HP: 96/100  (Atk: 22, Def: 11)
+  Rata Gigante HP: 18
+╚═══════════════════════════════════════════════╝
+⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨
+⇨  ¡Tu turno!
+⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨
+  [1] Atacar
+  [2] Usar Ítem (Inventario)
+──────────────────────────────────────────────────────────────
+Tu elección: 2
+╔═══════════════════════════════════════════════╗
+║              --- INVENTARIO ---               ║
+╠═══════════════════════════════════════════════╣
+ 1. Pocion de Novato (Cura: 50)
+ 2. Amuleto de Suerte (Cura: 10, Atk+: 50, Def+: 10, Duración: 1)
+╚═══════════════════════════════════════════════╝
+Elige un item a usar (0 para cancelar):
+```
+> Estos dos caminos permiten al jugador tomar decisiones estratégicas durante el combate. Atacar es directo y simple, mientras que el uso de ítems puede modificar significativamente las condiciones del enfrentamiento, ofreciendo ventajas temporales pero cruciales en momentos clave.
+
+Si el jugador logra vencer al enemigo, se mostrará el siguiente mensaje en pantalla:
+```
+═══════════════════════════════════════════════════════════════
+🏅  Rata Gigante ha caído en combate. ¡Recompensa: 153 oro!
+═══════════════════════════════════════════════════════════════
+╔──────────────────────────────────────────────────────────────╗
+  Las paginas estan en blanco, pero sientes que cuentan 
+  tu historia.
+╚──────────────────────────────────────────────────────────────╝
+--- FIN DE EVENTO ---
+Pasos restantes: 5
+Presione Enter para continuar...
+```
+En caso contrario, si el jugador es derrotado durante el combate:
+```
+═══════════════════════════════════════════════════════════════
+  ☠️  Has sido derrotado. ¿Qué deseas hacer?
+═══════════════════════════════════════════════════════════════
+  [1] Volver a jugar desde el inicio
+  [2] Salir del juego
+Tu elección:
+```
+> Estos mensajes marcan un punto de inflexión en la experiencia del jugador. La victoria permite avanzar y obtener recompensas, mientras que la derrota ofrece opciones claras para reiniciar o salir, manteniendo una dinámica justa y coherente con la naturaleza de los juegos de rol por turnos.
+##### 💰 Evento Comerciante:
+Cuando ocurra un evento relacionado con un comerciante, se mostrará el siguiente mensaje en pantalla:
+```
+Un mercader aparece en tu camino...
+```
+Luego, se desplegará la interfaz de la tienda con los ítems disponibles y el oro actual del jugador:
+```
+╔════════════════════════════════════════════════════════════╗
+║ Bienvenido a la tienda! Tienes 200   de oro                ║
+╚════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════════════════════╗
+   Items disponibles:
+   [9] Amuleto de Defensa   (Comun ) - Costo: 60   oro. Defensa Boost: +25 Def por 3 turnos. 
+   [4] Armadura Ligera      (Comun ) - Costo: 60   oro. Defensa: 18 .
+╚════════════════════════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════╗
+║                  ¿Qué deseas hacer?                        ║
+╟────────────────────────────────────────────────────────────╢
+║ 1. Comprar Item                                            ║
+║ 2. Salir de la tienda                                      ║
+╚════════════════════════════════════════════════════════════╝
+Tu eleccion:
+```
+> Durante esta fase, el jugador puede adquirir ítems utilizando el oro obtenido en combates. El sistema verificará automáticamente si el nuevo ítem ofrece mejores estadísticas que el actualmente equipado. En caso contrario, se notificará al jugador que el ítem es inferior y no será añadido al inventario. Esta mecánica busca fomentar decisiones estratégicas y evitar compras innecesarias, manteniendo el equilibrio en el progreso del juego.
+
+Cuando el jugador decide comprar un ítem, se muestra la siguiente secuencia en pantalla:
+```
+╔════════════════════════════════════════════════════════════╗
+║ Bienvenido a la tienda! Tienes 200   de oro                ║
+╚════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════════════════════╗
+   Items disponibles:
+   [9] Amuleto de Defensa   (Comun ) - Costo: 60   oro. Defensa Boost: +25 Def por 3 turnos. 
+   [4] Armadura Ligera      (Comun ) - Costo: 60   oro. Defensa: 18 .
+╚════════════════════════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════╗
+║                  ¿Qué deseas hacer?                        ║
+╟────────────────────────────────────────────────────────────╢
+║ 1. Comprar Item                                            ║
+║ 2. Salir de la tienda                                      ║
+╚════════════════════════════════════════════════════════════╝
+Tu eleccion: 1
+Ingresa el ID del item a comprar: 9
+Amuleto de Defensa ha sido añadido al inventario.
+¡Compra exitosa!
+Presione Enter para continuar...
+```
+Si la tienda ya no dispone de ítems en venta, el sistema mostrará lo siguiente:
+```
+╔════════════════════════════════════════════════════════════════════════════════╗
+   Items disponibles:
+   (No hay ítems en venta en este momento.)
+╚════════════════════════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════╗
+║                  No hay ítems disponibles.                 ║
+╠════════════════════════════════════════════════════════════╣
+║ 1. Salir de la tienda                                      ║
+╚════════════════════════════════════════════════════════════╝
+Tu eleccion: 1
+Gracias por tu visita! Vuelve pronto.
+╔──────────────────────────────────────────────────────────────╗
+  Los Heraldos luchan juntos, pero uno cae en la sombra.
+╚──────────────────────────────────────────────────────────────╝
+--- FIN DE EVENTO ---
+Pasos restantes: 5
+Presione Enter para continuar...
+```
+> Esta mecánica garantiza una experiencia de compra dinámica y controlada. El sistema valida la compra, descuenta el oro correspondiente y actualiza el inventario del jugador. Además, si el stock de ítems se agota, se informa al jugador, evitando acciones innecesarias y permitiendo continuar con el avance del juego. Esto refuerza la inmersión y mantiene el flujo narrativo en equilibrio.
+
+##### ✨ Evento Bonus:
+Cuando ocurra un evento de tipo bonus, se mostrará el siguiente mensaje en pantalla:
+```
+╔══════════════════════════════════════════════════════════════╗
+            ¡Has descubierto algo interesante!
+╚══════════════════════════════════════════════════════════════╝
+   _________
+  /        /\
+ /        /  \
+/________/____\
+|        |    |
+|        | 💰 |
+|________|____|
+
+Buscando...
+```
+Durante este evento, el jugador podrá encontrar objetos valiosos que mejoran su equipamiento o le otorgan alguna ventaja adicional. Un ejemplo de lo que puede suceder es el siguiente:
+```
+¡Has cambiado a una armadura mejor!
+Has equipado Coraza Tiempo Oscuro. (+70 Def)
+Encontraste un Coraza Tiempo Oscuro!        
+╔──────────────────────────────────────────────────────────────╗
+  Forman un circulo antiguo. Al pisarlas, escuchas un susurro: 
+  'El ciclo continua'.
+╚──────────────────────────────────────────────────────────────╝
+Presione Enter para continuar...
+```
+> Estos eventos representan momentos de descubrimiento dentro del juego, brindando recompensas inesperadas al jugador. Las mejoras obtenidas pueden marcar una diferencia clave en combates futuros, por lo que explorar y aprovechar estos bonus aporta profundidad estratégica a la experiencia.
+
+##### 📖 Fragmentos de historia:
+Cuando ocurra un evento relacionado con fragmentos de historia, se mostrará el siguiente mensaje en pantalla:
+```
+Recuerdos vienen hacia ti...
+```
+A continuación, se desplegará uno de los textos narrativos disponibles, seleccionados de forma aleatoria. Un ejemplo de esto es:
+```
+╔──────────────────────────────────────────────────────────────╗
+  Un ser de piedra te observa. 'Solo los dignos recordaran', 
+  dice. Tras la puerta, ves simbolos y nombres de Heraldos 
+  olvidados. El guardian te permite pasar, pero advierte: 
+  recordar tiene un precio. Sientes que cada paso te acerca 
+  a una revelacion dolorosa.
+╚──────────────────────────────────────────────────────────────╝
+```
+> Estos fragmentos aportan profundidad al universo del juego y ofrecen una experiencia narrativa más rica. No afectan directamente al combate o inventario, pero contribuyen al desarrollo del trasfondo y la ambientación, revelando partes del misterio que rodea a los Heraldos y su destino.
+
+##### 💀 Evento Jefe Final
+cuando ocurra el evento del jefe final que es cuando llegamos al final del recorrido del mapa se mostrara lo siguiente:
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║                          ¡BOSS FINAL APARECE!                             ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+                            ░░░░░░░░░░░░░░░░░░░░░░░░░░
+                          ░░██████████████████████░░
+                        ░░████████████████████████░░
+                      ░░██████████████████████████░░
+                      ░░██████████████████████████░░
+                      ░░██████████████████████████░░
+                      ░░██████░░░░░░░░░░░░██████░░
+                      ░░██████░░  ████  ░░██████░░
+                      ░░██████░░  ████  ░░██████░░
+                      ░░██████░░░░░░░░░░░░██████░░
+                      ░░██████████████████████████░░
+                      ░░██████████████████████████░░
+                      ░░██████████░░░░██████████░░
+                      ░░██████████░░░░██████████░░
+                      ░░██████████████████████████░░
+                        ░░████████████████████░░
+                          ░░██████████████░░
+
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║   "¡Has llegado hasta aquí, mortal! Pero tu viaje termina aquí." ║
+    ║              "¡Prepárate para enfrentar tu destino!"             ║
+    ╚══════════════════════════════════════════════════════════════════╝
+
+La oscuridad se intensifica...
+¡EL COMBATE FINAL COMIENZA!
+Presione Enter para continuar...
+```
+para luego mostrar
+```
+╔═══════════════════════════════════════════════════════════════╗
+║              ÚLTIMA OPORTUNIDAD DE PREPARACIÓN                ║
+╠═══════════════════════════════════════════════════════════════╣
+║  ¿Quieres usar algún ítem de tu inventario antes del combate? ║
+║                    [1] Sí  [2] No, estoy listo                ║
+╚═══════════════════════════════════════════════════════════════╝
+Tu elección:
+```
+si el jugador pone que si se mostrara:
+```
+xd hay que arreglarlo
+```
+si no: 
+```
+╔═══════════════════════════════════════════════════════════════╗
+║                     ESTADÍSTICAS FINALES                      ║
+╠═══════════════════════════════════════════════════════════════╣
+║  Héroe: Asesino               Enemigos Derrotados: 7          ║
+║  HP: 999/999  ATK: 1029  DEF: 1001  Oro: 3339                 ║
+╚═══════════════════════════════════════════════════════════════╝
+
+¡Que el destino esté de tu lado!...
+¡El Devorador de Mundos despierta con toda su furia!
+
+Presione Enter para continuar...
+```
+luego mostrara el combate final con las distintas fases del jefe
+```
+╔═══════════════════════════════════════════════╗
+║           COMBATE FINAL - FASE 1              ║
+╠═══════════════════════════════════════════════╣
+  Asesino HP: 999/999  (Atk: 1029, Def: 1001)
+  El Devorador de Mundos HP: 666/666 (Fase 1)
+╚═══════════════════════════════════════════════╝
+⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨
+⇨  ¡Tu turno!
+⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨
+  [1] Atacar
+  [2] Usar Ítem (Inventario)
+──────────────────────────────────────────────────────────────
+Tu elección: 
+```
+
+```
+```
+
+```
+```
+
+```
+```
 ## Contribuciones
 
 ### Elias Manríquez
@@ -579,6 +485,17 @@ Presione una tecla para continuar...
 > Auto-evaluación: 5/5 (Aporte Excelente)
 
 ### Maximiliano Rodríguez
+- **Diseño del menú principal**: Creó la estructura de navegación del menú principal, facilitando el acceso a las distintas funcionalidades del juego.
+
+- **Manejo de errores y validaciones**: Implementó validaciones de entrada del usuario y control de errores para evitar fallos durante la ejecución del juego.
+
+- **Mejoras en la experiencia de usuario**: Refinó la interacción del jugador en la interfaz de texto, con mensajes más claros y un flujo de juego más intuitivo.
+
+- **Redacción final del README**: Redactó y organizó el contenido del archivo `README.md`, documentando detalladamente el funcionamiento, modos de juego y estructura técnica del programa.
+
+> Auto-evaluación: 5/5 (Aporte excelente)
+
+### Lukas Navarro
 - **Diseño del menú principal**: Creó la estructura de navegación del menú principal, facilitando el acceso a las distintas funcionalidades del juego.
 
 - **Manejo de errores y validaciones**: Implementó validaciones de entrada del usuario y control de errores para evitar fallos durante la ejecución del juego.

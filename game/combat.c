@@ -1,42 +1,34 @@
-#include <stdio.h>    // Para printf, scanf, fgets
-#include <stdlib.h>   // Para atoi, system
-#include <string.h>   // Para strlen, strcspn
-#include <stdbool.h>  // Para bool
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
-#include "combat.h"     // Declaraciones de las funciones de combate
-#include "data_types.h" // Definiciones de las estructuras Player, Enemy, Item
-#include "player.h"     // Funciones del jugador (initializePlayer, player_add_item_to_inventory, etc.)
-#include "ui.h" // Para waitForKeyPress y otros helpers visuales
+#include "combat.h"
+#include "data_types.h"
+#include "player.h"
+#include "ui.h"
 
 // --- FUNCIONES AUXILIARES DEL MÓDULO COMBATE ---
+
+/**
+ * @brief Calcula el daño efectivo considerando ataque 
+ * y defensa en base a una funcion lineal.
+ * Siempre retorna al menos 1 de daño.
+ * @param attack Valor de ataque del atacante.
+ * @param defense Valor de defensa del defensor.
+ * @return Daño efectivo a aplicar.
+ */
 int calculate_damage(int attack, int defense) {
-    // Fórmula no lineal: la defensa reduce el daño con rendimientos decrecientes
-    // Daño = ataque * (100 / (100 + defensa))
     float reduction = 100.0f / (100.0f + (float)defense);
     int damage_dealt = (int)(attack * reduction + 0.5f); // Redondeo
     if (damage_dealt < 1) damage_dealt = 1; // Daño mínimo siempre 1
     return damage_dealt;
 }
 
-void display_combat_status(Player* player, Enemy* enemy) {
-    if (player == NULL || enemy == NULL) return;
-
-    printf("\x1b[36m╔═══════════════════════════════════════════════╗\x1b[0m\n");
-    printf("\x1b[36m║           \x1b[1m--- ESTADO DE COMBATE ---\x1b[0m           \x1b[36m║\x1b[0m\n");
-    printf("\x1b[36m╠═══════════════════════════════════════════════╣\x1b[0m\n");
-    printf("  %s HP: \x1b[32m%d\x1b[0m/\x1b[32m%d\x1b[0m  (Atk: \x1b[31m%d\x1b[0m, Def: \x1b[34m%d\x1b[0m)\n",
-        player->name, player->currentHP, player->maxHP,
-        player->attack + player->tempAttackBoost,
-        player->defense + player->tempDefenseBoost);
-    printf("  %s HP: \x1b[32m%d\x1b[0m\n", enemy->name, enemy->currentHP);
-    printf("\x1b[36m╚═══════════════════════════════════════════════╝\x1b[0m\n");
-}
-
 /**
- * @brief Permite al jugador elegir una acción durante su turno.
- * Muestra las opciones y valida la entrada del usuario.
- * @param player Puntero a la estructura del Jugador.
- * @return Un entero que representa la acción elegida (1 para Atacar, 2 para Usar Ítem, etc.).
+ * @brief Permite al jugador elegir una acción durante su turno de combate.
+ * Devuelve 1 para atacar, 2 para usar ítem, -1 si la entrada es inválida.
+ * @return Acción elegida por el jugador.
  */
 int player_choose_action() {
     int choice;
@@ -62,7 +54,30 @@ int player_choose_action() {
     return choice;
 }
 
+/**
+ * @brief Muestra el estado actual de vida, ataque y defensa de ambos combatientes.
+ * @param player Puntero al jugador.
+ * @param enemy Puntero al enemigo.
+ */
+void display_combat_status(Player* player, Enemy* enemy) {
+    if (player == NULL || enemy == NULL) return;
 
+    printf("\x1b[36m╔═══════════════════════════════════════════════╗\x1b[0m\n");
+    printf("\x1b[36m║           \x1b[1m--- ESTADO DE COMBATE ---\x1b[0m           \x1b[36m║\x1b[0m\n");
+    printf("\x1b[36m╠═══════════════════════════════════════════════╣\x1b[0m\n");
+    printf("  %s HP: \x1b[32m%d\x1b[0m/\x1b[32m%d\x1b[0m  (Atk: \x1b[31m%d\x1b[0m, Def: \x1b[34m%d\x1b[0m)\n",
+        player->name, player->currentHP, player->maxHP,
+        player->attack + player->tempAttackBoost,
+        player->defense + player->tempDefenseBoost);
+    printf("  %s HP: \x1b[32m%d\x1b[0m\n", enemy->name, enemy->currentHP);
+    printf("\x1b[36m╚═══════════════════════════════════════════════╝\x1b[0m\n");
+}
+
+/**
+ * @brief Aplica daño a un puntero de vida, asegurando que no sea menor que 0.
+ * @param current_hp Puntero a la vida actual a modificar.
+ * @param damage_dealt Daño a aplicar.
+ */
 void apply_damage(int* current_hp, int damage_dealt) {
     if (current_hp == NULL) return;
 

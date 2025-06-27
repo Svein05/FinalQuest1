@@ -4,18 +4,20 @@
 #include <stdbool.h> 
 #include <time.h>   
 
-#include "data_types.h"    // Definiciones de los structs para Player, Enemy, Item, Scenario
-#include "combat.h"        // Funciones de combate 
-#include "player.h"        // Funciones del jugador
-#include "shop.h"          // Funciones de tienda
+#include "data_types.h"
+#include "combat.h"
+#include "player.h"
+#include "shop.h"
+#include "lore.h"
 #include "../tdas/extra.h" 
 #include "../tdas/map.h"
 #include "../tdas/list.h"
+#include "../tdas/queue.h"
 
-// --- CONSTANTES INTERNAS ---
-#define CSV_DELIMITER ',' 
-#define NUM_EVENT_TYPES 3 // Número de tipos de eventos aleatorios (Batalla, Mercader, Bonus)
+#define CSV_DELIMITER ','
+#define NUM_EVENT_TYPES 3 // (Batalla, Mercader, Bonus)
 #define MAX_DIFFICULTY 3    
+
 /**  --- FUNCIONES DE LECTURA ---
  * @param tokens Arreglo de cadenas (char**) a parsear; cada linea del .csv 
  * @return true si el parseo fue exitoso, false en caso de error.
@@ -56,9 +58,6 @@ void freeGameData(Scenario* gameMap, Enemy* enemy_array, Item* item_array, int n
     freeItems(item_array);     
 }
 
-
-// El orden de las columnas de enemigos:
-// ID, Nombre, Vida maxima, Ataque, Defensa, Dificultad
 bool parse_enemy(char** tokens, Enemy* enemy) {
     if (tokens == NULL || enemy == NULL) return false;
 
@@ -73,8 +72,6 @@ bool parse_enemy(char** tokens, Enemy* enemy) {
     return true;
 }
 
-// El orden de las columnas de items para initial_items.csv:
-// ID, Nombre, Tipo, Rareza, Daño, Curación, Defensa, Costo, Dificultad
 bool parse_item(char** tokens, Item* item) {
     if (tokens == NULL || item == NULL) return false;
 
@@ -99,8 +96,6 @@ bool parse_item(char** tokens, Item* item) {
     return true;
 }
 
-// El orden de las columnas de items para items.csv:
-// ID, Nombre, Tipo, Rareza, Daño, Defensa, Curación, Costo, Dificultad, EffectDuration
 bool parse_item_basic(char** tokens, Item* item) {
     if (tokens == NULL || item == NULL) return false;
     item->id = atoi(tokens[0]);
@@ -119,8 +114,6 @@ bool parse_item_basic(char** tokens, Item* item) {
     return true;
 }
 
-// El orden de las columnas de escenarios:
-// ID, Nombre, Descripción, Dificultad
 bool parse_scenario(char** tokens, Scenario* node) {
     if (!tokens || !node) return false;
 
@@ -166,7 +159,7 @@ Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
         *numEnemies = 0;
         return NULL;
     }
-    // printf("Cargando enemigos desde %s...\n", ENEMIES_CSV_PATH);
+    
     int capacity = 10;
     int count = 0;
     Enemy* enemies = malloc(sizeof(Enemy) * capacity);
@@ -261,58 +254,6 @@ Item* load_items(const char* ITEMS_CSV_PATH, int* numItems) {
     fclose(file);
     *numItems = count;
     // printf("Cargados %d ítems desde %s.\n", count, ITEMS_CSV_PATH);
-    return items;
-}
-
-Item* load_initial_items(const char* INITIAL_ITEMS_CSV_PATH, int* numItems) {
-    FILE* file = fopen(INITIAL_ITEMS_CSV_PATH, "r");
-    if (!file) {
-        perror("Error al abrir el archivo de ítems iniciales");
-        *numItems = 0;
-        return NULL;
-    }
-
-    int capacity = 10;
-    int count = 0;
-    Item* items = malloc(sizeof(Item) * capacity);
-    if (!items) {
-        perror("Error al asignar memoria para ítems iniciales");
-        fclose(file);
-        *numItems = 0;
-        return NULL;
-    }
-
-    // Leer encabezado
-    char** tokens = read_csv_line(file, CSV_DELIMITER);
-    free_tokens(tokens);
-
-    // Leer ítems iniciales
-    while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
-        if (count >= capacity) {
-            capacity *= 2;
-            Item* temp = realloc(items, sizeof(Item) * capacity);
-            if (!temp) {
-                perror("Error al redimensionar memoria para ítems iniciales");
-                freeItems(items);
-                fclose(file);
-                *numItems = 0;
-                return NULL;
-            }
-            items = temp;
-        }
-
-        if (parse_item(tokens, &items[count])) {
-            count++;
-        } else {
-            printf("Advertencia: Error al parsear un ítem inicial. Saltando línea.\n");
-        }
-
-        free_tokens(tokens);
-    }
-
-    fclose(file);
-    *numItems = count;
-    // printf("Cargados %d ítems iniciales desde %s.\n", count, INITIAL_ITEMS_CSV_PATH);
     return items;
 }
 
@@ -448,5 +389,14 @@ Map* load_lore_map(const char* lore_csv_path) {
     }
     fclose(file);
     return lore_map;
+}
+
+void free_all_resources(Scenario* scenario_array, Enemy* enemy_array, Item* item_array, int numEnemies, int numItems, int numScenarios, Queue* game_map, Map* lore_map, LoreTracker* tracker_ambiental, LoreTracker* tracker_profundo) {
+    freeGameData(scenario_array, enemy_array, item_array, numEnemies, numItems, numScenarios);
+    queue_clean(game_map);
+    if (lore_map) {
+        lore_free_all(lore_map, tracker_ambiental, tracker_profundo);
+        free(lore_map);
+    }
 }
 

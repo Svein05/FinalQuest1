@@ -19,7 +19,7 @@
 #define ITEMS_CSV_PATH "data/items.csv"
 #define INITIAL_ITEMS_CSV_PATH "data/initial_items.csv"
 #define LORE_CSV_PATH "data/lore.csv"
-#define MAX_DIFFICULTY 3    
+#define MAX_DIFFICULTY 3
 #define MAX_STEPS_PER_SCENARIO 5
 
 extern int gameover_retry_flag;
@@ -110,12 +110,7 @@ int main() {
                 // Si el usuario eligió reiniciar tras perder con el boss, saltar a reinicio
                 if (gameover_retry_flag) {
                     // Liberar memoria antes de reiniciar
-                    freeGameData(scenario_array, enemy_array, item_array);
-                    queue_clean(game_map);
-                    free(lore_map);
-                    if (lore_map) {
-                        lore_free_all(lore_map, &tracker_ambiental, &tracker_profundo);
-                    }
+                    free_all_resources(scenario_array, enemy_array, item_array, numEnemies, numItems, numScenarios, game_map, lore_map, &tracker_ambiental, &tracker_profundo);
                     continue;
                 }
                 printf("\nNo has logrado derrotar al jefe final. Fin del juego.\n");
@@ -126,13 +121,7 @@ int main() {
         }
 
         // --- 4. Liberar Memoria ---
-        freeGameData(scenario_array, enemy_array, item_array);
-        queue_clean(game_map);
-        free(lore_map); // Liberar memoria del mapa de lore
-        // Liberar memoria de trackers de lore
-        if (lore_map) {
-            lore_free_all(lore_map, &tracker_ambiental, &tracker_profundo);
-        }
+        free_all_resources(scenario_array, enemy_array, item_array, numEnemies, numItems, numScenarios, game_map, lore_map, &tracker_ambiental, &tracker_profundo);
     } while (gameover_retry_flag);
     printf("¡Gracias por jugar!\n");
     return EXIT_SUCCESS; 

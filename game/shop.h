@@ -27,13 +27,4 @@ Map* shop_initialize_random_merchant(Item* item_array, int numItems, int maxDiff
  */
 void shop_interact(Player* player, Map* itemMap);
 
-/**
- * @brief Permite al jugador comprar un ítem específico de la tienda.
- * @param player Puntero al jugador actual.
- * @param itemMap Mapa de ítems del mercader.
- * @param itemId ID del ítem a comprar.
- * @return 'true' si la compra fue exitosa, 'false' en caso contrario.
- */
-bool shop_buy_item(Player* player, Map* itemMap, int itemId);
-
 #endif

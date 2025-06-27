@@ -45,5 +45,6 @@ List *split_string(const char *str, const char *delim);
 void clearScreen();
 
 void waitForKeyPress();
+void waitForPress(char* str);
 
 #endif

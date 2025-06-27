@@ -143,4 +143,9 @@ void waitForKeyPress() {
     while (getchar() != '\n');
 }
 
+void waitForPress(char *str) {
+    printf("%s", str);
+    while(getchar() != '\n');
+}
+
 // Animación de carga bonita para consola (barra de progreso)

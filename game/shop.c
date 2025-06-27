@@ -1,20 +1,48 @@
-#include <stdio.h>    // Para printf, fopen, fclose, perror
-#include <stdlib.h>   // Para malloc, free, realloc, atoi
-#include <string.h>   // Para strncpy, strlen, strcspn
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include <time.h>
 
 #include "shop.h"
 #include "data_types.h"
-#include "player.h" // Incluido para las funciones de jugador
-#include "../tdas/extra.h" // Asegúrate de que esta ruta es correcta para tu extra.h y extra.c
+#include "ui.h"
+#include "player.h"
 #include "data_loader.h"
+#include "../tdas/extra.h"
 #include "../tdas/map.h"
-#include "ui.h" // Incluido para las funciones de interfaz de usuario
+
 
 // Comparador para IDs de ítems (int)
 static int int_equals(void* a, void* b) {
     return (*(int*)a) == (*(int*)b);
+}
+
+
+bool shop_buy_item(Player* player, Map* itemMap, int itemId) {
+    if (player == NULL || itemMap == NULL) {
+        ui_msg_error("Error interno de compra. Por favor, reporta este bug.");
+        return false;
+    }
+    MapPair* pair = map_search(itemMap, &itemId);
+    if (!pair || !pair->value) {
+        ui_msg_error("Error: El ítem seleccionado no existe en la tienda.");
+        return false;
+    }
+    Item* itemToBuy = (Item*)pair->value;
+    if (player->gold < itemToBuy->price) {
+        printf("\033[1;31mNo tienes suficiente oro para comprar %s (necesitas %d, tienes %d).\033[0m\n",
+               itemToBuy->name, itemToBuy->price, player->gold);
+        return false;
+    }
+    if (player_add_item_to_inventory(player, *itemToBuy)) {
+        player->gold -= itemToBuy->price;
+        map_remove(itemMap, &itemId);
+        return true;
+    } else {
+        printf("\033[1;31mNo se pudo comprar %s. (Inventario lleno o no fue mejor equipo)\033[0m\n", itemToBuy->name);
+        return false;
+    }
 }
 
 // Cambia la firma para recibir Player* y filtrar armas/armaduras ya equipadas
@@ -109,31 +137,5 @@ void shop_interact(Player* player, Map* itemMap) {
                 printf("\033[1;31mOpcion invalida.\033[0m\n");
             }
         }
-    }
-}
-
-bool shop_buy_item(Player* player, Map* itemMap, int itemId) {
-    if (player == NULL || itemMap == NULL) {
-        ui_msg_error("Error interno de compra. Por favor, reporta este bug.");
-        return false;
-    }
-    MapPair* pair = map_search(itemMap, &itemId);
-    if (!pair || !pair->value) {
-        ui_msg_error("Error: El ítem seleccionado no existe en la tienda.");
-        return false;
-    }
-    Item* itemToBuy = (Item*)pair->value;
-    if (player->gold < itemToBuy->price) {
-        printf("\033[1;31mNo tienes suficiente oro para comprar %s (necesitas %d, tienes %d).\033[0m\n",
-               itemToBuy->name, itemToBuy->price, player->gold);
-        return false;
-    }
-    if (player_add_item_to_inventory(player, *itemToBuy)) {
-        player->gold -= itemToBuy->price;
-        map_remove(itemMap, &itemId);
-        return true;
-    } else {
-        printf("\033[1;31mNo se pudo comprar %s. (Inventario lleno o no fue mejor equipo)\033[0m\n", itemToBuy->name);
-        return false;
     }
 }
