@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <windows.h>
 
-// Los módulos que se van a utilizar
+// Módulos del juego y estructuras de datos
 #include "game/data_loader.h"
 #include "game/data_types.h" 
 #include "game/player.h"     
@@ -19,9 +19,12 @@
 #define ITEMS_CSV_PATH "data/items.csv"
 #define INITIAL_ITEMS_CSV_PATH "data/initial_items.csv"
 #define LORE_CSV_PATH "data/lore.csv"
+
+// Parámetros de juego
 #define MAX_DIFFICULTY 3
 #define MAX_STEPS_PER_SCENARIO 1
 
+// Variable para volver a jugar
 extern int gameover_retry_flag;
 
 int main() {
@@ -30,7 +33,7 @@ int main() {
         clearScreen();
         gameover_retry_flag = 0;
 
-        // --- 1. Inicializamos al Jugador ---
+        // INICIALIZACIÓN DEL JUGADOR
         Player player;
         player_choose_and_assign_class(&player);
 
@@ -44,7 +47,7 @@ int main() {
         int numItems = 0;  
         int numScenarios = 0;
 
-        // --- 2. Cargar Datos del Juego ---
+        // CARGA DE DATOS DEL JUEGO
         enemy_array = load_enemies(ENEMIES_CSV_PATH, &numEnemies);
         if (enemy_array == NULL) return EXIT_FAILURE;
 
@@ -57,70 +60,62 @@ int main() {
         Map* lore_map = lore_init_all(LORE_CSV_PATH, &tracker_ambiental, &tracker_profundo);
         if (lore_map == NULL) return EXIT_FAILURE;
 
-        // --- 3. Bucle Principal del Juego: Recorrer el Mapa ---
-        poblarGameMap(game_map, scenario_array, numScenarios); // Crear una cola para el mapa del juego
-        Scenario* currentScenario = queue_front(game_map); // Comenzar desde el primer escenario
-
+        // CONFIGURACIÓN DEL MAPA, LORE INICIAL Y ITEMS INICIALES
+        poblarGameMap(game_map, scenario_array, numScenarios); // Crear cola de escenarios
         player_add_initial_class_items(&player, INITIAL_ITEMS_CSV_PATH);
 
-        // Mostrar portada del juego usando el lore_map y tipo -1 (portada)
+        // Mostrar portada del juego con su lore inicial
         ui_lore_zero(lore_map, -1);
 
+        // BUCLE PRINCIPAL DEL JUEGO
+        Scenario* currentScenario = queue_front(game_map); // Primer escenario
         while (currentScenario != NULL) {
             clearScreen();
-            ui_scenario(currentScenario);
+            ui_scenario(currentScenario); // Descripcion de Escenario
             ui_player_summary(&player);
 
-            int steps = MAX_STEPS_PER_SCENARIO; // Simular pasos del jugador en el escenario actual
+            // Pasos en el escenario actual
+            int steps = MAX_STEPS_PER_SCENARIO;
                 
             waitForKeyPress();
             
+            // SIMULAR PASOS
             while (steps) { 
-                // Generar el evento para el paso actual
+                // Evento del escenario actual
                 scenario_manage_event(&player, item_array, numItems, enemy_array, numEnemies, currentScenario, lore_map, &tracker_ambiental, &tracker_profundo); 
                 printf("Pasos restantes: %d\n", steps);
                 waitForKeyPress();
                 steps--;
 
-                // Si el jugador ha muerto, termina el juego
+                // Si el jugador muere sale del bucle
                 if (player.currentHP <= 0) {
-                    // Si el usuario eligió reiniciar, salir del bucle de escenarios
                     if (gameover_retry_flag) {
                         currentScenario = NULL;
                         break;
                     }
-                    // Si el usuario eligió salir, terminar inmediatamente
                     break;
                 }
                 clearScreen();
             }
-            
-            // Si el juego no terminó, avanza al siguiente escenario
+            // Avanzar al siguiente escenario si el juego no terminó
             if (currentScenario != NULL) {  
                 queue_remove(game_map);       
                 currentScenario = queue_front(game_map); 
             }
-            
         }
-        // Si el jugador ha llegado al final del juego y no ha muerto, se enfrenta al jefe final
+
+        // ENFRENTAMIENTO FINAL (JEFE)
         if (player.currentHP > 0 && currentScenario == NULL) { 
-            if (FINALBOSS(&player, enemy_array, numEnemies)) { 
-                printf("\n¡Felicidades! Has derrotado al jefe final y completado el juego.\n");
-            } else {
-                // Si el usuario eligió reiniciar tras perder con el boss, saltar a reinicio
-                if (gameover_retry_flag) {
-                    // Liberar memoria antes de reiniciar
-                    free_all_resources(scenario_array, enemy_array, item_array, numEnemies, numItems, numScenarios, game_map, lore_map, &tracker_ambiental, &tracker_profundo);
-                    continue;
-                }
-                printf("\nNo has logrado derrotar al jefe final. Fin del juego.\n");
+            if (!FINALBOSS(&player, enemy_array, numEnemies, lore_map, &tracker_profundo) && gameover_retry_flag) { 
+                free_all_resources(scenario_array, enemy_array, item_array, numEnemies, numItems, numScenarios, game_map, lore_map, &tracker_ambiental, &tracker_profundo);
+                continue;
             }
             printf("\n--- FIN DEL JUEGO ---\n");
         } else if (player.currentHP <= 0) {
             printf("Mejor suerte la proxima vez, %s.\n", player.name);
         }
 
-        // --- 4. Liberar Memoria ---
+        // LIBERACIÓN DE MEMORIA Y REINICIO
         free_all_resources(scenario_array, enemy_array, item_array, numEnemies, numItems, numScenarios, game_map, lore_map, &tracker_ambiental, &tracker_profundo);
     } while (gameover_retry_flag);
     printf("¡Gracias por jugar!\n");

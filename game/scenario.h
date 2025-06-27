@@ -45,8 +45,7 @@ Enemy* getEnemyForScenario(Scenario* Scenario, Enemy* allEnemies, int numEnemies
 void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario, Map* lore_map, LoreTracker* tracker_ambiental, LoreTracker* tracker_profundo);
 
 void poblarGameMap(Queue* game_map, Scenario* escenarios, int numScenarios);
-bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies);
-void show_random_lore(Map* lore_map, int tipo);
+bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies, Map* lore_map, LoreTracker* tracker_profundo);
 void show_random_lore_no_repeat(Map* lore_map, LoreTracker* tracker, int tipo);
 
 // Ya NO se deben usar helpers antiguos de UI para trackers:

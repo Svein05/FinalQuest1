@@ -97,6 +97,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
     ui_combat_banner(player->name, enemy->name);
     Sleep(1000);
 
+    // Bucle de la batalla
     while (player->currentHP > 0 && enemy->currentHP > 0) {
         display_combat_status(player, enemy);
 
@@ -113,7 +114,7 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             printf("\x1b[90m──────────────────────────────────────────────────────────────\x1b[0m\n");
             Sleep(500);
 
-        } else if (action_choice == 2) { 
+        } else if (action_choice == 2) { // Usar Item
             display_inventory(player, true, true);
             if (player->inventoryCount == 0) {
                 waitForKeyPress();
@@ -144,7 +145,6 @@ bool combat_manage_turn(Player* player, Enemy* enemy) {
             return true; // Jugador gana
         }
 
-
         player_update_temporary_boosts(player); 
 
         // --- TURNO DEL ENEMIGO ---
@@ -174,8 +174,6 @@ bool combat_final_boss(Player* player, Enemy* boss) {
         printf("Error: Parámetros inválidos para combate del boss final.\n");
         return false;
     }
-
-    // Mostrar banner especial del combate final
     
     // El boss final tiene HP completo al inicio
     boss->currentHP = boss->HP;
@@ -201,21 +199,17 @@ bool combat_final_boss(Player* player, Enemy* boss) {
             boss_phase = 2;
             if (!boss_buffed_phase2) {
                 boss_buffed_phase2 = true;
-                ui_boss_phase2();
                 boss->attack += 10;
+
+                ui_boss_phase2();
             }
         } else {
             boss_phase = 3;
             if (!boss_enraged) {
                 boss_enraged = true;
-                printf("\x1b[91m Algo dentro del %s esta cambiando", boss->name);
-                ui_wait_dots();
-                printf("\x1b[91m╔═══════════════════════════════════════════════════════════════╗\x1b[0m\n");
-                printf("\x1b[91m║  ¡%-22s ENTRA EN MODO FURIA FINAL!           ║\x1b[0m\n", boss->name);
-                printf("\x1b[91m║              ¡Sus ataques son más devastadores!               ║\x1b[0m\n");
-                printf("\x1b[91m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n");
                 boss->attack += 20; // Aumenta ataque en fase final
-                Sleep(1000);
+
+                ui_boss_phase3();
             }
         }
 

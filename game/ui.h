@@ -27,6 +27,7 @@ void ui_entrance_boss(const char* boss_name);
 void ui_boss_victory();
 void ui_boss_defeat(const char* boss_name);
 void ui_boss_phase2();
+void ui_boss_phase3();
 
 
 // ------ Funciones de muestreo para el Jugador ------

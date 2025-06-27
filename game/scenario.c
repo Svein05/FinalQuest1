@@ -266,7 +266,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
     printf("--- FIN DE EVENTO ---\n");
 }
 
-bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
+bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies, Map* lore_map, LoreTracker* tracker_profundo) {
     if (!player || !allEnemies || numEnemies <= 0) {
         printf("Error: Parámetros inválidos para el boss final.\n");
         return false;
@@ -355,6 +355,8 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
         printf("\x1b[93m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n");
         
         free(finalBoss);
+        clearScreen();
+        show_random_lore_no_repeat(lore_map, tracker_profundo, 2);
         return true;
     } else {
         // Derrota final
@@ -364,21 +366,6 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
         free(finalBoss);
         return false;
     }
-}
-
-// Recibe el Map* de lore y el tipo de evento, y muestra un fragmento aleatorio con animación
-void show_random_lore(Map* lore_map, int tipo) {
-    int key = tipo;
-    MapPair* pair = map_search(lore_map, &key);
-    if (!pair || !pair->value) return;
-    List* lista = (List*)pair->value;
-    int n = list_size(lista);
-    if (n == 0) return;
-    int idx = rand() % n;
-    void* node = list_first(lista);
-    for (int i = 0; i < idx; i++) node = list_next(lista);
-    char* lore = (char*)node;
-    ui_lore_event(lore);
 }
 
 // Recibe el Map* de lore, el tracker y el tipo de evento, y muestra un fragmento aleatorio no repetido
