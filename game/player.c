@@ -326,13 +326,16 @@ void player_update_temporary_boosts(Player* player) {
 void player_assign_class(Player* player, int clase) {
     switch (clase) {
         case 1: // Guerrero
-            initializePlayer(player, "Guerrero", 100, 10, 5, 200);
+            // Guerrero: balance entre vida, ataque y defensa
+            initializePlayer(player, "Guerrero", 350, 35, 25, 200);
             break;
         case 2: // Tanque
-            initializePlayer(player, "Tanque", 130, 7, 12, 200);
+            // Tanque: máxima vida y defensa, ataque bajo
+            initializePlayer(player, "Tanque", 450, 22, 40, 200);
             break;
         case 3: // Asesino
-            initializePlayer(player, "Asesino", 200, 200, 999, 999);
+            // Asesino: ataque muy alto, vida y defensa bajas
+            initializePlayer(player, "Asesino", 260, 50, 12, 200);
             break;
     }
 }
