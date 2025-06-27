@@ -242,7 +242,7 @@ Tu elección: 2
  1. Pocion de Novato (Cura: 50)
  2. Amuleto de Suerte (Cura: 10, Atk+: 50, Def+: 10, Duración: 1)
 ╚═══════════════════════════════════════════════╝
-Elige un item a usar (0 para cancelar):
+Elige un item a usar (0 para cancelar): _
 ```
 > Estos dos caminos permiten al jugador tomar decisiones estratégicas durante el combate. Atacar es directo y simple, mientras que el uso de ítems puede modificar significativamente las condiciones del enfrentamiento, ofreciendo ventajas temporales pero cruciales en momentos clave.
 
@@ -290,7 +290,7 @@ Luego, se desplegará la interfaz de la tienda con los ítems disponibles y el o
 ║ 1. Comprar Item                                            ║
 ║ 2. Salir de la tienda                                      ║
 ╚════════════════════════════════════════════════════════════╝
-Tu eleccion:
+Tu eleccion: _
 ```
 > Durante esta fase, el jugador puede adquirir ítems utilizando el oro obtenido en combates. El sistema verificará automáticamente si el nuevo ítem ofrece mejores estadísticas que el actualmente equipado. En caso contrario, se notificará al jugador que el ítem es inferior y no será añadido al inventario. Esta mecánica busca fomentar decisiones estratégicas y evitar compras innecesarias, manteniendo el equilibrio en el progreso del juego.
 
@@ -385,7 +385,7 @@ A continuación, se desplegará uno de los textos narrativos disponibles, selecc
 > Estos fragmentos aportan profundidad al universo del juego y ofrecen una experiencia narrativa más rica. No afectan directamente al combate o inventario, pero contribuyen al desarrollo del trasfondo y la ambientación, revelando partes del misterio que rodea a los Heraldos y su destino.
 
 ##### 💀 Evento Jefe Final
-cuando ocurra el evento del jefe final que es cuando llegamos al final del recorrido del mapa se mostrara lo siguiente:
+Cuando el jugador alcance el final del recorrido del mapa, se activará el evento del **jefe final**, mostrando la siguiente escena:
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
@@ -418,9 +418,10 @@ cuando ocurra el evento del jefe final que es cuando llegamos al final del recor
 
 La oscuridad se intensifica...
 ¡EL COMBATE FINAL COMIENZA!
+
 Presione Enter para continuar...
 ```
-para luego mostrar
+A continuación, el jugador tendrá una última oportunidad de prepararse antes de iniciar el combate:
 ```
 ╔═══════════════════════════════════════════════════════════════╗
 ║              ÚLTIMA OPORTUNIDAD DE PREPARACIÓN                ║
@@ -430,11 +431,18 @@ para luego mostrar
 ╚═══════════════════════════════════════════════════════════════╝
 Tu elección:
 ```
-si el jugador pone que si se mostrara:
+Si el jugador elige sí, se desplegará su inventario para que pueda seleccionar y usar un ítem:
 ```
-xd hay que arreglarlo
+╔═══════════════════════════════════════════════╗
+║              --- INVENTARIO ---               ║
+╠═══════════════════════════════════════════════╣
+ 1. Elixir Mayor (Cura: 100)
+ 2. Amuleto de Furia (Atk+: 40, Def+: 10, Duración: 3)
+ 3. Poción Reforzada (Cura: 60)
+╚═══════════════════════════════════════════════╝
+Elige un ítem a usar (0 para cancelar): _
 ```
-si no: 
+Si el jugador elige No, se mostrarán las estadísticas finales del personaje antes de iniciar el combate:
 ```
 ╔═══════════════════════════════════════════════════════════════╗
 ║                     ESTADÍSTICAS FINALES                      ║
@@ -448,7 +456,10 @@ si no:
 
 Presione Enter para continuar...
 ```
-luego mostrara el combate final con las distintas fases del jefe
+> Este evento constituye el punto culminante de la aventura. En esta instancia decisiva, el jugador debe analizar con detenimiento su estado actual y la disponibilidad de recursos antes de enfrentarse al oponente más difícil del juego. El uso estratégico de un ítem en este momento puede ser determinante para inclinar la balanza entre la victoria y la derrota. Se trata de una prueba definitiva que sintetiza y evalúa todas las decisiones tomadas a lo largo del recorrido.
+
+###### ⚔️ Combate Final – Fase 1
+Al comenzar el enfrentamiento, se muestra la primera fase del jefe final:
 ```
 ╔═══════════════════════════════════════════════╗
 ║           COMBATE FINAL - FASE 1              ║
@@ -464,44 +475,66 @@ luego mostrara el combate final con las distintas fases del jefe
 ──────────────────────────────────────────────────────────────
 Tu elección: 
 ```
-
+ahora se muestra la fase 2 luego de terminar la 1 xd
 ```
+fase 2
 ```
-
+ahora se muestra la fase final omg!!! 
 ```
+fase 3
 ```
+> El combate contra el jefe final se compone de tres fases consecutivas, cada una más desafiante que la anterior. Las estadísticas del jefe evolucionan en cada fase, exigiendo al jugador adaptar su estrategia y gestionar cuidadosamente sus recursos hasta el desenlace final del juego. La victoria dependerá de todas las decisiones tomadas a lo largo de la aventura.
 
+en caso de ganar! hooray!!! pankeiks
 ```
+╔═══════════════════════════════════════════════════════════════╗
+║                      RECOMPENSAS ÉPICAS                       ║
+╠═══════════════════════════════════════════════════════════════╣
+║  • Oro del Tesoro Final: 9990                                 ║
+║  • Título: 'Devorador de Devoradores'                         ║
+║  • Leyenda Eterna: Tu nombre será recordado por siempre       ║
+╚═══════════════════════════════════════════════════════════════╝
 ```
-## Contribuciones
+en caso de perder >:c grrrr
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                             DERROTA FINAL                                 ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════╗
+║          La oscuridad consume todo... incluso a ti.              ║
+║             El reino permanece en tinieblas eternas.             ║
+╚══════════════════════════════════════════════════════════════════╝
+```
+> si el jugador es derrotado se le dara la opcion de intentarlo denuevo, por pete xd
+## Contribuciones 🔥
 
-### Elias Manríquez
-- **Desarrollo de la función principal del juego**: Implementó la lógica central de la aplicación, incluyendo la carga del laberinto desde un archivo CSV y la ejecución de la partida tanto en modo solitario como multijugador.
+### Elias Manríquez 👿
+- **Diseño e implementación de estructuras clave**: Definió y programó las estructuras `Player`, `Item`, `Enemy` y `Scenario`, fundamentales para el funcionamiento del juego.
 
-- **Implementación de funciones clave**: Desarrolló funciones esenciales como avanzar entre escenarios, recoger y descartar ítems, reiniciar la partida, y gestionar el tiempo y el inventario.
+- **Implementación de TDAs y lógica principal**: Desarrolló los Tipos de Datos Abstractos utilizados en el juego y organizó los archivos cabecera para mantener una arquitectura modular. También implementó funcionalidades esenciales como el sistema de combate, la lógica de la tienda y el manejo del jugador.
 
-- **Documentación básica**: Añadió comentarios al código fuente y contribuyó a la elaboración inicial del `README.md`.
+- **Narrativa y dinámica**: Programó la visualización de fragmentos de historia y lore, enriqueciendo el contenido narrativo y la experiencia general del jugador.
 
 > Auto-evaluación: 5/5 (Aporte Excelente)
 
-### Maximiliano Rodríguez
-- **Diseño del menú principal**: Creó la estructura de navegación del menú principal, facilitando el acceso a las distintas funcionalidades del juego.
+### Maximiliano Rodríguez 😎
+- **Estructuración de archivos CSV**: Organizó y normalizó los datos utilizados en el juego, creando una base coherente y clara para `enemigos`, `ítems` y `escenarios`.
 
-- **Manejo de errores y validaciones**: Implementó validaciones de entrada del usuario y control de errores para evitar fallos durante la ejecución del juego.
+- **Mejoras en la interfaz del usuario**: Introdujo colores en la consola, optimizó menús iniciales y el módulo de tienda, haciendo la experiencia más visual e intuitiva.
 
-- **Mejoras en la experiencia de usuario**: Refinó la interacción del jugador en la interfaz de texto, con mensajes más claros y un flujo de juego más intuitivo.
-
-- **Redacción final del README**: Redactó y organizó el contenido del archivo `README.md`, documentando detalladamente el funcionamiento, modos de juego y estructura técnica del programa.
-
-> Auto-evaluación: 5/5 (Aporte excelente)
-
-### Lukas Navarro
-- **Diseño del menú principal**: Creó la estructura de navegación del menú principal, facilitando el acceso a las distintas funcionalidades del juego.
-
-- **Manejo de errores y validaciones**: Implementó validaciones de entrada del usuario y control de errores para evitar fallos durante la ejecución del juego.
-
-- **Mejoras en la experiencia de usuario**: Refinó la interacción del jugador en la interfaz de texto, con mensajes más claros y un flujo de juego más intuitivo.
+- **Narrativa y personalización de la tienda**: Aportó contenido narrativo adicional e implementó mejoras en la lógica de la tienda, incluyendo una historia específica asociada al módulo, aportando profundidad al universo del juego.
 
 - **Redacción final del README**: Redactó y organizó el contenido del archivo `README.md`, documentando detalladamente el funcionamiento, modos de juego y estructura técnica del programa.
 
 > Auto-evaluación: 5/5 (Aporte excelente)
+
+### Lukas Navarro 🤑
+- **Carga y parseo de datos desde archivos CSV**: Implementó la lógica que permite leer e interpretar correctamente los archivos con `enemigos`, `ítems` y `escenarios`, asegurando una integración adecuada al sistema y facilitando la escalabilidad del juego.
+
+- **Progresión por escenarios y eventos aleatorios**: Desarrolló el sistema de avance lineal utilizando una cola, así como la generación de eventos aleatorios (`combates`, `tiendas`, `bonus` y `fragmentos de historia`).
+
+- **Balance y depuración**: Ajustó las recompensas obtenidas por el jugador para mantener un equilibrio durante la partida. También se encargó de la depuración y optimización del código, mejorando su estabilidad y mantenibilidad.
+
+> Auto-evaluación: 5/5 (Aporte excelente)
+
+> **A lo largo de todo el proceso, los tres integrantes colaboraron de manera activa y constante en la revisión cruzada de módulos, la toma de decisiones de diseño, la resolución de problemas y la elaboración del codigo. Por lo tanto consideramos que cada integrante trabajo de manera óptima y eficiente**.

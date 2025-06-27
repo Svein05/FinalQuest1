@@ -184,6 +184,8 @@ bool combat_final_boss(Player* player, Enemy* boss) {
     int boss_phase = 1; // Fase 1, 2, 3
     int boss_rage_turns = 0; // Turnos en modo furia
     bool boss_enraged = false;
+    bool boss_buffed_phase2 = false;
+    bool boss_buffed_phase1 = false;
     
     printf("\x1b[91m¡%s despierta con toda su furia!\x1b[0m\n\n", boss->name);
     waitForKeyPress();
@@ -195,8 +197,20 @@ bool combat_final_boss(Player* player, Enemy* boss) {
         int hp_percentage = (boss->currentHP * 100) / boss->HP;
         if (hp_percentage > 66) {
             boss_phase = 1;
+            if (!boss_buffed_phase1) {
+                boss_buffed_phase1 = true;
+                printf("\x1b[94m%s observa y mide tu poder. Su defensa aumenta ligeramente.\x1b[0m\n", boss->name);
+                boss->defense += 5;
+                Sleep(1000);
+            }
         } else if (hp_percentage > 33) {
             boss_phase = 2;
+            if (!boss_buffed_phase2) {
+                boss_buffed_phase2 = true;
+                printf("\x1b[95m%s ruge y su aura oscura crece. ¡Su ataque aumenta!\x1b[0m\n", boss->name);
+                boss->attack += 10;
+                Sleep(1000);
+            }
         } else {
             boss_phase = 3;
             if (!boss_enraged) {

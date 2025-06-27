@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <windows.h> // Para Sleep()
+#include <windows.h>
+#include <conio.h>
 
 #include "player.h"
 #include "data_types.h"
@@ -356,7 +357,12 @@ void player_add_initial_class_items(Player* player, const char* initial_items_cs
     printf("\033[1;36m══════════════════════════════════════════════\033[0m\n");
     printf("\033[1;32m¡Has recibido tu equipo inicial!\033[0m\n");
     printf("\033[1;36m──────────────────────────────────────────────\033[0m\n");
+    int skip = 0;
     for (Item* item = list_first(lista); item; item = list_next(lista)) {
+        if (!skip && _kbhit()) {
+            int ch = _getch();
+            if (ch == 13) skip = 1;
+        }
         if (item->type == 1) { // Arma
             player->equippedWeapon = *item;
             player->attack += item->damage;
@@ -369,7 +375,8 @@ void player_add_initial_class_items(Player* player, const char* initial_items_cs
             player->inventory[player->inventoryCount++] = *item;
             printf("\033[1;36m- %s (añadido al inventario)\033[0m\n", item->name);
         }
-        Sleep(500);
+        fflush(stdout);
+        if (!skip) skip = ui_sleep_skip(500);
     }
     printf("\033[1;36m══════════════════════════════════════════════\033[0m\n");
     // Liberar memoria del Map y listas

@@ -20,7 +20,7 @@
 #define INITIAL_ITEMS_CSV_PATH "data/initial_items.csv"
 #define LORE_CSV_PATH "data/lore.csv"
 #define MAX_DIFFICULTY 3
-#define MAX_STEPS_PER_SCENARIO 5
+#define MAX_STEPS_PER_SCENARIO 1
 
 extern int gameover_retry_flag;
 

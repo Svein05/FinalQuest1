@@ -297,29 +297,7 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
         if (choice == 1) {
             printf("\x1b[96m¡Úsalo sabiamente, puede ser tu última oportunidad!\x1b[0m\n\n");
             // --- Inventario de uso de ítem (igual que combate normal) ---
-            printf("--- Inventario de %s ---\n", player->name);
-            if (player->inventoryCount == 0) {
-                printf("Tu inventario esta vacio.\n");
-            } else {
-                for (int i = 0; i < player->inventoryCount; i++) {
-                    Item currentItem = player->inventory[i];
-                    printf("%d. %s (Curacion: %d, Daño Boost: %d, Def Boost: %d, Duracion: %d)\n",
-                           i + 1, currentItem.name, currentItem.heal,
-                           currentItem.damage, currentItem.defense, currentItem.effectDuration);
-                }
-                printf("Elige un item a usar (0 para cancelar): ");
-                char item_input[10];
-                if (fgets(item_input, sizeof(item_input), stdin) != NULL) {
-                    int item_choice = atoi(item_input);
-                    if (item_choice > 0 && item_choice <= player->inventoryCount) {
-                        player_use_consumable(player, item_choice - 1);
-                        waitForKeyPress();
-                    } else {
-                        printf("Cancelando uso de item.\n");
-                        waitForKeyPress();
-                    }
-                }
-            }
+            display_inventory(player, true, true);
         }
     }
 
@@ -355,7 +333,7 @@ bool FINALBOSS(Player* player, Enemy* allEnemies, int numEnemies) {
         printf("\x1b[93m║                      RECOMPENSAS ÉPICAS                       ║\x1b[0m\n");
         printf("\x1b[93m╠═══════════════════════════════════════════════════════════════╣\x1b[0m\n");
         printf("\x1b[93m║  • Oro del Tesoro Final: %d                                 ║\x1b[0m\n", epic_gold);
-        printf("\x1b[93m║  • Título: 'Devorador de Devouradores'                        ║\x1b[0m\n");
+        printf("\x1b[93m║  • Título: 'Devorador de Devoradores'                         ║\x1b[0m\n");
         printf("\x1b[93m║  • Leyenda Eterna: Tu nombre será recordado por siempre       ║\x1b[0m\n");
         printf("\x1b[93m╚═══════════════════════════════════════════════════════════════╝\x1b[0m\n");
         

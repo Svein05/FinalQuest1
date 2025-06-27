@@ -16,6 +16,7 @@ void ui_menu_title();
 void ui_wait_dots();
 void ui_load_animation();
 int ui_gameover_retry();
+int ui_sleep_skip(int ms);
 
 
 // ------ Funciones de muestreo para el Combate ------

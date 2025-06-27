@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <conio.h>
 
 #include "data_types.h"
 #include "ui.h"
@@ -27,18 +28,44 @@ void ui_menu_welcome() {
     ui_choice_class();
 }
 
-void ui_wait_dots() {
-    for (int i = 0; i < 3; i++) {
-        Sleep(1000); // Esperar medio segundo
-        printf(".");
+/**
+ * @brief Espera la cantidad de milisegundos indicada, pero si el usuario presiona Enter, termina la espera inmediatamente.
+ * @param ms Milisegundos a esperar (máximo).
+ * @return 1 si se presionó Enter, 0 si no.
+ */
+int ui_sleep_skip(int ms) {
+    int elapsed = 0;
+    int interval = 30; // ms entre chequeos
+    while (elapsed < ms) {
+        if (_kbhit()) {
+            int ch = _getch();
+            if (ch == 13) return 1; // Enter
+        }
+        Sleep(interval);
+        elapsed += interval;
     }
-    Sleep(1500); // Esperar medio segundo
+    return 0;
+}
+
+void ui_wait_dots() {
+    int skip = 0;
+    for (int i = 0; i < 3; i++) {
+        if (!skip && _kbhit()) {
+            int ch = _getch();
+            if (ch == 13) skip = 1;
+        }
+        if (!skip) skip = ui_sleep_skip(1000);
+        printf(".");
+        fflush(stdout);
+    }
+    if (!skip) skip = ui_sleep_skip(1500);
     printf("\n");
 }
 
 void ui_load_animation(const char* mensaje) {
     int steps = 5;
     int percent[] = {20, 40, 60, 80, 100};
+    int skip = 0;
     for (int i = 1; i <= steps; i++) {
         printf("%s [", mensaje);
         for (int j = 1; j <= steps; j++) {
@@ -47,7 +74,7 @@ void ui_load_animation(const char* mensaje) {
         }
         printf("] %d%%\r", percent[i-1]);
         fflush(stdout);
-        Sleep(350); // velocidad de la animación
+        if (!skip) skip = ui_sleep_skip(350);
     }
     printf("%s [■■■■■] 100%%\n", mensaje);
     fflush(stdout);
@@ -62,16 +89,21 @@ void ui_load_animation(const char* mensaje) {
 void print_lore_text_animated_wrapped(const char* texto, int line_width, int delay_ms) {
     int len = strlen(texto);
     int col = 0;
+    int skip = 0;
     for (int i = 0; i < len; i++) {
+        if (!skip && _kbhit()) {
+            int ch = _getch();
+            if (ch == 13) skip = 1; // Enter
+        }
         putchar(texto[i]);
         fflush(stdout);
-        Sleep(delay_ms);
         col++;
         if (col >= line_width && texto[i] == ' ') {
             putchar('\n');
             printf("  ");
             col = 0;
         }
+        if (!skip) Sleep(delay_ms);
     }
     putchar('\n');
 }
@@ -196,7 +228,7 @@ void ui_player_summary(const Player* player) {
 
 void ui_combat_text() {
     int combate_disenio = rand() % 3;
-    
+    int skip = 0;
     for (int i = 0 ; i < 2 ; i++){
         clearScreen();
         if (combate_disenio == 0) {
@@ -222,9 +254,9 @@ void ui_combat_text() {
             printf("\x1b[31m╚══════════════════════════════════════════════════════════════╝\x1b[0m\n");
         }
         fflush(stdout);
-        Sleep(500);
+        if (!skip) skip = ui_sleep_skip(500);
         clearScreen();
-        Sleep(500); 
+        if (!skip) skip = ui_sleep_skip(500);
     }
     if (combate_disenio == 0) {
         // Diseño 1: Clásico de peligro
@@ -283,7 +315,6 @@ void ui_lore_zero(Map* lore_map, int tipo) {
 }
 
 void ui_lore_event(const char* lore) {
-    Sleep(1000);
     printf("\x1b[35m╔──────────────────────────────────────────────────────────────╗\x1b[0m\n");
     printf("  ");
     print_lore_text_animated_wrapped(lore, 54, 18); // 18 ms por caracter
@@ -376,23 +407,27 @@ void ui_entrance_boss(const char* boss_name) {
     
     // ASCII Art del boss
     printf("\x1b[91m");
-    printf("                            ░░░░░░░░░░░░░░░░░░░░░░░░░░\n");
-    printf("                          ░░██████████████████████░░\n");
-    printf("                        ░░████████████████████████░░\n");
-    printf("                      ░░██████████████████████████░░\n");
-    printf("                      ░░██████████████████████████░░\n");
-    printf("                      ░░██████████████████████████░░\n");
-    printf("                      ░░██████░░░░░░░░░░░░██████░░\n");
-    printf("                      ░░██████░░  ████  ░░██████░░\n");
-    printf("                      ░░██████░░  ████  ░░██████░░\n");
-    printf("                      ░░██████░░░░░░░░░░░░██████░░\n");
-    printf("                      ░░██████████████████████████░░\n");
-    printf("                      ░░██████████████████████████░░\n");
-    printf("                      ░░██████████░░░░██████████░░\n");
-    printf("                      ░░██████████░░░░██████████░░\n");
-    printf("                      ░░██████████████████████████░░\n");
-    printf("                        ░░████████████████████░░\n");
-    printf("                          ░░██████████████░░\n");
+    printf("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⢟⢡⣿⣿⣿⣿⠶⡙⣿⡿⣿⣯⢛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
+    printf("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢟⢝⣴⣿⠟⣿⣼⣭⣴⣶⣾⡇⡇⣿⣿⣷⣶⡏⡇⣟⣻⠿⣜⢭⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
+    printf("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢟⣫⡝⣾⢞⣯⣷⣗⢻⣻⣿⣿⣿⣿⠓⢠⣿⣿⣿⡟⠍⢃⣿⣿⣿⡶⣸⡟⢿⣮⣽⣻⣿⣿⡟⡻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿\n");
+    printf("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢻⢳⠟⣫⡥⡑⣹⣿⣿⠄⣣⣿⣿⣿⡇⣴⣿⣿⣿⣿⠇⣠⣿⣛⣿⣿⠃⢡⣼⣷⣟⠏⢷⢿⣿⣿⡙⢦⣟⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣴⣿⣿⣿⣿⣿\n");
+    printf("⣿⣿⣿⣿⣿⣿⣿⠋⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⣝⣾⡳⣕⢚⠗⡹⣰⢿⣿⣿⣾⣿⡿⠻⡡⣾⣮⣍⣻⣿⣿⣼⣿⣿⣿⣿⣇⣾⣿⣿⡿⠇⠰⣤⡻⣿⣿⣷⡈⢻⣷⣌⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
+    printf("⣿⣿⣿⣿⣿⣿⣿⣷⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡉⣉⠛⠙⠀⢀⡜⢁⣿⣿⣿⣿⣿⣿⠐⠇⢻⢋⣿⣿⣟⢿⣿⣿⢿⣿⣿⢿⣿⣍⠉⢑⣄⣴⣶⣿⣷⣝⠿⣿⣷⢠⢻⣿⣷⡌⣙⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
+    printf("⣻⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⡭⣢⣿⣿⣿⣇⣧⠘⣧⢊⣰⣷⣿⡿⠿⠟⠛⠹⠉⠁⠀⠈⣈⠄⠀⠀⠀⠀⠀⠀⠉⠀⠈⠑⢌⡻⣷⣦⣝⣿⣿⣿⣿⣾⣷⡈⢻⡇⡇⢿⣿⣿⡙⣷⣮⣙⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
+    printf("⣿⣏⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢟⡽⣾⢏⣴⣿⣿⣿⣿⣿⣦⣄⣱⠾⡟⠉⠀⠀⠀⠐⠃⠆⠰⢿⣥⣆⣅⣄⠀⠀⠀⠀⠀⣀⣀⣀⡀⠀⠀⠈⣼⣿⣿⢸⣿⣿⣿⣿⣿⣷⡀⠑⣆⢹⣿⣿⣏⣈⠙⢿⣷⣬⡻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
+    printf("⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣣⣼⢟⣿⢇⣼⣿⣿⠿⢛⣿⣿⡿⣣⠄⠀⠀⠀⠀⠀⠀⢀⠘⠀⢀⠀⠻⣿⣿⣿⡄⠀⠀⢀⣣⣿⣿⣿⣧⡄⠀⢀⣿⣿⡟⣼⣿⣿⣿⣿⣿⣿⡇⠀⣼⢸⣿⣿⣿⢠⡇⡜⠿⣿⣿⡜⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
+    printf("⣿⣧⣹⣿⣿⣿⣿⣿⣿⣿⣿⡟⢹⣾⢟⣵⣿⢣⡿⣛⣭⡞⣱⣿⣿⠿⠳⡍⠀⠀⠀⠀⣤⣼⣶⡎⠀⠀⠈⠀⠐⢝⢿⣯⡀⠀⠁⣸⣿⣿⣿⣿⣿⡿⢀⣾⣿⣿⢳⣿⣿⣿⣿⣿⣿⢻⣿⠀⣛⠨⣿⣿⣿⡇⢳⠹⡄⢻⣿⣿⡸⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n");
+    printf("⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢸⡀⠀⣿⣿⡏⠗⣻⡽⢫⣾⠿⢋⣡⢾⣧⠹⡀⠀⠠⣤⣿⣿⡟⠁⡀⠁⠸⠀⠀⠀⢡⣿⣿⣶⠠⠧⠰⢰⢂⠮⠹⠴⠟⢿⣿⣿⣶⣝⣛⡛⢿⣿⣿⣼⣿⡇⢱⠀⣿⣿⣿⣿⠹⣆⢣⠘⣿⣿⣧⢲⣮⣙⢿⣿⣿⣿⣿⣿⣿\n");
+    printf("⣿⣿⣟⣟⣿⠩⢻⣿⣿⣿⣇⣏⠃⢰⣿⣿⢰⣿⢟⣵⣿⢧⣺⡿⣻⣿⣿⣇⣏⠀⠀⣩⣹⣴⢂⠃⠅⠀⡄⡀⠀⢀⣬⣿⣿⣿⣿⣦⣃⠃⢎⠞⢎⣦⡫⢚⢿⣿⣿⣿⣿⣿⣶⡿⣿⣿⣿⣷⢸⡧⣿⣿⣿⣿⡇⣜⡈⡂⢿⣿⣿⡆⣿⣿⡎⣿⣿⣿⣿⣿⣿\n");
+    printf("⣿⣿⡿⣟⣼⣿⣿⣿⣿⡟⣼⡹⠀⣾⣿⡏⣾⢿⠂⢠⣷⣿⢏⣾⣿⡿⡁⡤⠈⣈⣭⣶⣿⠋⠋⢀⢠⡀⠸⣷⣾⣿⣿⣿⣿⣿⣿⣿⣿⣶⡠⣨⡈⠉⠐⢦⣀⡻⠿⠿⠟⣿⢻⣟⣈⠻⠿⠍⣿⣇⣿⣿⣿⣿⣿⢻⣧⢋⢸⣿⣿⣿⠸⣿⣿⡜⣿⣿⣿⣿⣿\n");
+    printf("⣿⣿⢻⣿⣿⣿⣿⣿⣿⢣⣿⢧⣀⣿⣿⢣⡇⡏⡌⢸⣿⡟⣿⣿⡟⣴⢡⡇⠀⠹⣿⣿⡟⢠⠠⢏⣘⡙⠄⣰⣮⠃⣽⡿⠁⣙⢿⢿⣿⣿⣷⣯⡆⠀⠀⡀⠀⠉⢀⣼⣿⣿⣿⣿⣿⢟⣡⣾⣿⠟⠁⠉⡭⣛⣿⡟⡿⢸⡇⣿⣿⣿⣇⢿⣿⣷⢹⣿⣿⣿⣿\n");
+    printf("⣿⣿⡯⣿⣿⣿⣿⣿⡏⣾⡿⡌⢹⣿⣿⢸⣧⢡⠡⣿⣿⡝⣿⣿⣃⣸⡏⣡⠀⠉⠉⠈⠀⠈⢠⡇⢸⣿⡀⠿⠟⠁⣿⠇⠂⣿⡇⢀⣾⡁⢟⠹⠷⠀⠀⢠⣴⠠⣹⣿⣿⣿⣿⣿⣵⣿⣿⠟⠁⢀⡔⣬⣴⣿⠏⢣⣾⣿⣷⠿⠿⣿⣿⡸⣿⣿⣆⢿⣿⣿⣿\n");
+    printf("⣿⣿⣹⣿⣿⣿⣿⣿⢸⣿⣿⡿⣿⣿⣿⣦⣄⠺⢴⣿⣿⢘⡛⢃⡀⢙⢿⣝⣦⣄⡀⠀⠄⡆⡈⣁⠐⣷⠀⢹⡇⢼⣿⡰⢿⡏⣡⣝⡛⡧⢼⡞⣶⢠⢀⢸⢣⣰⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀⡔⣈⣼⣿⡿⣧⣾⣿⡿⠋⠁⠂⢀⣴⡾⠇⣿⣿⣿⡜⣿⣿⣿\n");
+    printf("⣿⣿⡟⣿⣿⣿⣿⣧⢿⠩⢠⠀⠌⠻⢿⣿⣿⣿⣶⣬⣉⠃⢹⣭⣿⣯⣆⢿⣿⣿⠀⠤⠈⡤⠃⠸⡀⢋⡤⣉⣵⢪⣩⡔⢞⡅⡹⣿⡳⣿⠇⣬⡍⣘⡘⢇⢣⣿⣿⣿⣿⣿⣿⠹⠁⠀⠀⣀⣾⣿⣿⢟⢱⣿⠟⠋⠀⣔⣴⣶⡿⢏⣵⣦⢛⡿⠿⢷⢹⣿⣿\n");
+    printf("⣿⣿⣷⠻⣿⣿⣿⣿⢱⡝⢦⣇⠐⡀⠀⠉⠻⢿⣿⣿⣿⣷⡤⣏⣿⣿⣸⠀⠂⠀⢀⡅⢠⢰⢱⠆⠇⣹⡷⡡⣾⢔⢕⣅⡿⢃⠁⡻⢁⣾⣤⡹⠀⢯⡏⣄⣿⣿⣿⣿⣿⣿⣿⠀⢶⡓⣾⣿⣿⣿⢫⣾⠞⠁⠀⣠⣾⣿⡿⣯⡵⠟⢃⠔⢉⣼⡴⢋⣾⣿⣿\n");
+    printf("⣿⢳⣾⣿⣿⣿⣿⡇⡛⠁⠤⠙⢷⣦⡀⢄⠀⠀⠉⠻⣿⣿⢶⣻⣿⣿⣿⡆⠀⠀⠀⣂⠀⠉⠄⢀⡾⣮⣾⣾⣷⣷⣿⣾⣶⣭⣮⣒⠔⡩⢟⣞⣠⡟⣜⣾⣿⣿⣿⣿⣿⣿⡿⠰⠘⢿⣿⣿⣟⣵⣿⡟⠀⠨⣾⣿⡿⣫⠾⠋⡀⢀⣱⣶⠿⢫⢸⣿⣿⣿⣿\n");
+    printf("⣿⢸⣿⣿⣿⣿⣿⣿⣎⠢⠀⠄⠀⠙⢿⣶⣅⢀⣁⠀⢤⠙⣲⣿⣿⣿⡟⣇⠀⠀⢈⣽⢰⣢⣽⣷⣿⡿⠿⠿⠿⡟⢛⡛⢿⢿⣿⣿⣿⣿⣾⣿⢏⣜⣾⣿⣿⣿⣿⣿⣿⣿⡷⠰⠶⠊⢿⣿⣾⣿⣿⡏⠒⠁⢙⣿⣿⣿⠀⣾⣧⣾⠟⣡⠚⢀⣾⣿⣿⣿⣿\n");
+    printf("⣭⣾⣿⣿⣿⣿⣿⣿⣿⣷⣄⠂⡱⣄⠐⠙⢿⣿⣿⣦⠄⣰⣿⣿⣿⣿⣿⡹⡀⠀⠈⠑⡱⠟⢉⠑⠈⠐⠁⠀⠁⠁⠀⠉⠈⠀⠉⠙⠹⠻⡿⡣⣪⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠠⢀⢤⣾⣿⣿⣿⣿⡆⣉⠙⣾⣿⣿⡏⢆⡘⢫⠑⣷⠟⣴⣿⣿⣿⣿⣿⣿\n");
     printf("\x1b[0m\n");
     
     printf("\x1b[91m");
