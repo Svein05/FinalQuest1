@@ -22,7 +22,7 @@
 
 // Parámetros de juego
 #define MAX_DIFFICULTY 3
-#define MAX_STEPS_PER_SCENARIO 9
+#define MAX_STEPS_PER_SCENARIO 1
 
 // Variable para volver a jugar
 extern int gameover_retry_flag;

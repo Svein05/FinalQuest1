@@ -234,9 +234,7 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
                 Item randomItem = allItems[rand() % numItems];
                 if (player_add_item_to_inventory(player, randomItem)) {
                     printf("Encontraste un %s!\n", randomItem.name);
-                } else {
-                    printf("Encontraste un %s, pero tu inventario esta lleno!\n", randomItem.name);
-                }
+                } 
             } else {
                 printf("No se encontraron ítems para dar como bonificación.\n");
             }
