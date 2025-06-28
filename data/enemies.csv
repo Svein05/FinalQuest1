@@ -7,7 +7,7 @@ ID,Name,HP,Damage,Defense,Difficulty
 6,Esqueleto Poseido,70,6,3,1
 7,Arana de Cueva,60,5,2,1
 8,Espiritu,90,10,6,2
-9,Lobo Sombrío,85,9,5,2
+9,Lobo Sombrio,85,9,5,2
 10,Planta Asesina,100,12,7,2
 11,Orco,120,30,0,2
 12,Espectro Corrupto,110,13,9,2
@@ -28,4 +28,4 @@ ID,Name,HP,Damage,Defense,Difficulty
 27,Golem de Magma,270,35,30,3
 28,Guardian del Templo,260,34,28,3
 29,Serpiente de Piedra,250,32,26,3
-30,El Devorador de Mundos,400,45,40,4
+30,El Devorador de Mundos,500,45,40,4
