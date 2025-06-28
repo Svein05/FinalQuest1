@@ -62,12 +62,12 @@ void ui_wait_dots() {
     printf("\n");
 }
 
-void ui_load_animation(const char* mensaje) {
+void ui_load_animation() {
     int steps = 5;
     int percent[] = {20, 40, 60, 80, 100};
     int skip = 0;
     for (int i = 1; i <= steps; i++) {
-        printf("%s [", mensaje);
+        printf("%s [", "Cargando datos del juego");
         for (int j = 1; j <= steps; j++) {
             if (j <= i) printf("■");
             else printf("□");
@@ -76,7 +76,7 @@ void ui_load_animation(const char* mensaje) {
         fflush(stdout);
         if (!skip) skip = ui_sleep_skip(350);
     }
-    printf("%s [■■■■■] 100%%\n", mensaje);
+    printf("%s [■■■■■] 100%%\n", "Cargando datos del juego");
     fflush(stdout);
 }
 

@@ -364,7 +364,7 @@ static int string_equals(void* a, void* b) {
 
 void player_add_initial_class_items(Player* player, const char* initial_items_csv) {
     // Mostrar animación de carga y cargar el mapa de ítems iniciales
-    ui_load_animation("Cargando datos del juego");
+    ui_load_animation();
     Map* clase_a_items = load_initial_items_map(initial_items_csv);
     if (!clase_a_items) return;
     

@@ -1,21 +1,21 @@
 ID,Nombre,Tipo,Rareza,Daño,Curación,Defensa,Costo,Dificultad,EffectDuration
 1,Espada Oxidada,1,Comun,25,0,0,30,1,0
-2,Pocion de Curacion,3,Comun,0,80,0,35,1,0
-3,Escudo Roble,2,Comun,0,0,15,40,1,0
-4,Armadura Ligera,2,Comun,0,0,18,60,1,0
-5,Arco del Alba,1,Comun,28,0,0,50,1,0
-6,Hoja Eco Profundo,1,Comun,30,0,0,60,1,0
-7,Capa Susurrante,2,Comun,0,0,20,70,1,0
-8,Amuleto de Ataque,3,Comun,25,0,0,60,1,3
-9,Amuleto de Defensa,3,Comun,0,0,25,60,1,3
-10,Espada Cortaviento,1,Poco Comun,38,0,0,130,2,0
-11,Casco de Ecos,2,Poco Comun,0,0,22,100,2,0
-12,Botas del Nomada,3,Poco Comun,0,180,0,80,2,0
-13,Armadura Reforzada,2,Rara,0,0,28,100,2,0
-14,Pocion Curacion Superior,3,Rara,0,220,0,120,2,0
-15,Guantes de Hielo,1,Rara,40,0,10,160,3,0
-16,Piedra de Poder,3,Rara,30,0,0,150,3,4
-17,Piedra de Resistencia,3,Rara,0,0,30,150,3,4
-18,Coraza Tiempo Oscuro,2,Legendaria,0,0,50,450,3,0
-19,Elixir Divino,3,Legendaria,0,300,0,350,3,0
-20,Hoja Infinidad,1,Legendaria,65,0,0,450,3,0
+2,Arco Ligero,1,Comun,28,0,0,50,1,0
+3,Hoja Afilada,1,Comun,30,0,0,60,1,0
+4,Espada Cortaviento,1,Poco Comun,38,0,0,130,2,0
+5,Guanteletes de Hielo,1,Rara,40,0,10,160,3,0
+6,Filo del Infito,1,Legendaria,65,0,0,450,3,0
+7,Escudo de Roble,2,Comun,0,0,15,40,1,0
+8,Armadura Ligera,2,Comun,0,0,18,60,1,0
+9,Capa Refinada,2,Comun,0,0,20,70,1,0
+10,Casco de Acero,2,Poco Comun,0,0,22,100,2,0
+11,Armadura Reforzada,2,Rara,0,0,28,100,2,0
+12,Coraza de la Era Oscura,2,Legendaria,0,0,50,450,3,0
+13,Poción de Curación,3,Comun,0,80,0,35,1,0
+14,Elixir de fuerza,3,Comun,40,0,0,60,1,3
+15,Pergamino de Defensa,3,Comun,0,0,50,60,1,3
+16,Poción Mediana,3,Poco Comun,0,180,0,80,2,0
+17,Pocion Superior,3,Rara,0,220,0,120,2,0
+18,Pergamino de Poder,3,Rara,60,0,0,150,3,4
+19,Pergamino de Resistencia,3,Rara,0,0,100,150,3,4
+20,Poción Divina,3,Legendaria,0,300,0,350,3,0

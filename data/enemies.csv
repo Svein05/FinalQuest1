@@ -1,28 +1,28 @@
 ID,Name,HP,Damage,Defense,Difficulty
-1,Murcielago Subterraneo,50,5,2,1
+1,Murcielago Subterráneo,50,5,2,1
 2,Goblin de las Cavernas,65,7,3,1
-3,Serpiente Subterranea,55,6,2,1
+3,Serpiente Gigante,55,6,2,1
 4,Rata Gigante,45,4,1,1
-5,Slime Pegajoso,60,3,2,1
-6,Esqueleto Marchito,70,6,3,1
-7,Arana de Cueva,60,5,2,1
-8,Espiritu del Bosque,90,10,6,2
-9,Lobo Sombrio,85,9,5,2
-10,Planta Carnivora,100,12,7,2
-11,Kraken Menor,120,15,10,2
+5,Slime,60,3,2,1
+6,Esqueleto Poseído,70,6,3,1
+7,Araña de Cueva,60,5,2,1
+8,Espiritu,90,10,6,2
+9,Lobo Sombrío,85,9,5,2
+10,Planta Asesina,100,12,7,2
+11,Orco,120,30,0,2
 12,Espectro Corrupto,110,13,9,2
 13,Zombi Errante,100,10,5,2
-14,Golem de Piedra,130,16,13,2
+14,Golem de Piedra,130,10,25,2
 15,Espectro del Desierto,95,12,7,2
 16,Serpiente de Arena,90,11,6,2
-17,Mirage,80,14,4,2
+17,Conejo de Caerbannog,50,999,0,2
 18,Hechicero Oscuro,160,22,15,3
-19,Golem Arcano,200,25,20,3
+19,Golem Arcano,200,20,50,3
 20,Espiritu Anciano,170,20,18,3
-21,Kraken Mayor,210,28,22,3
+21,Orco Lider,210,28,22,3
 22,Guerrero Celestial,200,28,22,3
 23,Aguila de Cristal,190,24,20,3
-24,Dragon Volador,230,30,25,3
+24,Dragon Terrestre,230,30,25,3
 25,Elemental de Lava,250,32,28,3
 26,Demonio del Fuego,240,30,25,3
 27,Golem de Magma,270,35,30,3
