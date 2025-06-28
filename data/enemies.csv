@@ -1,11 +1,11 @@
 ID,Name,HP,Damage,Defense,Difficulty
-1,Murcielago Subterráneo,50,5,2,1
+1,Murcielago Subterraneo,50,5,2,1
 2,Goblin de las Cavernas,65,7,3,1
 3,Serpiente Gigante,55,6,2,1
 4,Rata Gigante,45,4,1,1
 5,Slime,60,3,2,1
-6,Esqueleto Poseído,70,6,3,1
-7,Araña de Cueva,60,5,2,1
+6,Esqueleto Poseido,70,6,3,1
+7,Arana de Cueva,60,5,2,1
 8,Espiritu,90,10,6,2
 9,Lobo Sombrío,85,9,5,2
 10,Planta Asesina,100,12,7,2
