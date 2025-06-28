@@ -147,37 +147,34 @@ void poblarGameMap(Queue* game_map, Scenario* escenarios, int numScenarios) {
     }
 }
 
-// --- Variables de control para eventos aleatorios ---
-static int merchant_count = 0;
-static int last_event_type = -1;
-static int forced_merchant = 0; // Para forzar aparición de mercader
-static int scenario_event_count = 0; // Cuenta eventos en el escenario
+// --- Variables de control para eventos aleatorios por escenario ---
+static int merchant_count = 0;           // Contador de mercaderes en el escenario actual
+static int last_event_type = -1;         // Último tipo de evento ejecutado
+static int scenario_event_count = 0;     // Contador total de eventos del escenario actual
+static int current_scenario_id = -1;     // ID del escenario actual para detectar cambios
 
 // --- Variable global para reinicio tras derrota ---
 int gameover_retry_flag = 0;
 
-static int choose_event(int *merchant_count, int last_event_type, int forced_merchant, int scenario_event_count) {
-    // Si el mercader no ha salido 2 veces, forzamos su aparición (nunca dos veces seguidas)
+static int choose_event(int *merchant_count, int last_event_type, int scenario_event_count) {
+    // Si el mercader no ha aparecido 2 veces en este escenario, considerar forzar aparición
     if (*merchant_count < 2 && last_event_type != 1) {
-        // Forzar mercader cada 3 eventos si no ha salido suficiente
-        if ((scenario_event_count % 3 == 2) || (forced_merchant < 2 && rand() % 4 == 0)) {
+        // Forzar mercader si estamos cerca del final del escenario (paso 7 o más)
+        if (scenario_event_count >= 7) {
+            return 1; // Forzar mercader
+        }
+        // También hay una pequeña probabilidad aleatoria de mercader
+        if (rand() % 5 == 0) { // 20% de probabilidad
             return 1;
         }
     }
-    // Probabilidades: 0-69 combate, 70-84 bonus, 85-99 lore
+    
+    // Probabilidades normales si no se fuerza mercader
+    // 70% combate, 15% bonus, 15% lore
     int roll = rand() % 100;
-    int event_type = -1;
-    if (roll < 70) event_type = 0; // Combate
-    else if (roll < 85) event_type = 2; // Bonus
-    else event_type = 3; // Lore
-
-    // Si el evento es igual al anterior y NO es combate, se elige otro
-    if (event_type == last_event_type && event_type != 0) {
-        if (*merchant_count < 2 && last_event_type != 1) return 1; // Mercader
-        // Alternar entre bonus y lore si bonus/lore fue el anterior
-        event_type = (event_type == 2) ? 3 : 2;
-    }
-    return event_type;
+    if (roll < 70) return 0;      // Combate
+    else if (roll < 85) return 2; // Bonus
+    else return 3;                // Lore
 }
 
 void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* allEnemies, int numEnemies, Scenario *scenario, Map* lore_map, LoreTracker* tracker_ambiental, LoreTracker* tracker_profundo) {
@@ -187,42 +184,53 @@ void scenario_manage_event(Player* player, Item* allItems, int numItems, Enemy* 
         return;
     }
 
+    // Detectar si cambió de escenario y resetear contadores si es necesario
+    if (current_scenario_id != scenario->difficulty) {
+        // Nuevo escenario detectado - resetear todos los contadores
+        current_scenario_id = scenario->difficulty;
+        merchant_count = 0;
+        scenario_event_count = 0;
+        last_event_type = -1;
+    }
+
     // Limpiar pantalla para mostrar el evento
     clearScreen();  
 
-    // Obtener la dificultad del escenario actual y preparar variables de evento
-    int currentScenarioDifficulty = scenario->difficulty;
-    int event_type = -1;
-    scenario_event_count++;  // Incrementar contador de eventos del escenario
+    // Incrementar contador de eventos del escenario actual
+    scenario_event_count++;
     
-    // Elegir tipo de evento usando la función de selección
-    event_type = choose_event(&merchant_count, last_event_type, forced_merchant, scenario_event_count);
+    // Obtener la dificultad del escenario actual
+    int currentScenarioDifficulty = scenario->difficulty;
+    
+    // Elegir tipo de evento usando la función de selección mejorada
+    int event_type = choose_event(&merchant_count, last_event_type, scenario_event_count);
 
-    // Aplicar límites y restricciones para el mercader
+    // Lógica especial para garantizar exactamente 2 mercaderes por escenario
     if (event_type == 1) {
-        // Verificar si el mercader ya apareció 2 veces o fue el último evento
+        // Verificar si ya aparecieron 2 mercaderes o fue el último evento
         if (merchant_count >= 2 || last_event_type == 1) {
-            // Elegir otro tipo de evento: priorizar combate, luego bonus/lore
-            event_type = (rand() % 2) ? 0 : ((rand() % 2) ? 2 : 3);
+            // Ya aparecieron suficientes mercaderes, elegir otro evento
+            event_type = (rand() % 3 == 0) ? 0 : ((rand() % 2) ? 2 : 3);
         } else {
-            // Permitir mercader e incrementar contadores
+            // Permitir mercader e incrementar contador
             merchant_count++;
-            forced_merchant++;
         }
     }
     
-    // Resetear contador de mercader forzado si no es mercader
-    if (event_type != 1) forced_merchant = 0;
-    
-    // Controlar que el contador de mercader no exceda 2
-    if (event_type != 1) merchant_count = (merchant_count > 2) ? 2 : merchant_count;
-
-    // Evitar que se repita el mismo tipo de evento consecutivamente
-    if (event_type == last_event_type) {
-        if (event_type == 0) event_type = (rand() % 2) ? 2 : 3;  // Si es combate, cambiar a bonus/lore
-        else event_type = 0;  // Si es otro tipo, cambiar a combate
+    // Si estamos en los últimos eventos y no han aparecido 2 mercaderes, forzar uno
+    if (scenario_event_count >= 8 && merchant_count < 2 && last_event_type != 1) {
+        event_type = 1; // Forzar mercader
+        merchant_count++;
     }
-    last_event_type = event_type;  // Actualizar el último tipo de evento
+
+    // Evitar repetición del mismo evento consecutivamente (excepto combate)
+    if (event_type == last_event_type && event_type != 0) {
+        // Si no es combate y se repite, cambiar a combate
+        event_type = 0;
+    }
+    
+    // Actualizar el último tipo de evento ejecutado
+    last_event_type = event_type;
 
     // --- Procesar el evento según su tipo ---
 

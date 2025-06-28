@@ -54,7 +54,8 @@ Para comenzar a trabajar con el sistema en tu equipo local, asegúrate de tener 
 - 👑 Enfrentamiento contra el jefe final.
 
 > #### ⚠️ Sin Problemas Conocidos
-> Si el usuario presiona muchas veces Enter, el programa los acumula y eso hace que se pierdan turnos o el juego avance rapido. Para manejar esto, se agrego una logica de juego para saltar animaciones con los Enter para no acumularlos.
+> - Si el usuario presiona muchas veces Enter, el programa los acumula y eso hace que se pierdan turnos o el juego avance rapido. Para manejar esto, se agrego una logica de juego para saltar animaciones con los Enter para no acumularlos.
+> - La funcion que maneja la logica del reinicio del juego, puede presentar problemas si se acumulan los ENTER, de igual manera, puede que esta funcion no sea ejecutada de manera correcta dependiendo del sistema que lo ejecute (caso excepcional).
 
 ## Ejemplo de Uso:
 

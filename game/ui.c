@@ -154,48 +154,13 @@ int ui_gameover_retry() {
     printf("  [2] Salir del juego                     \n");
     printf("╚════════════════════════════════════════╝\n");
     printf("\x1b[0m\n");
-    
-    // Bucle para manejar la entrada del usuario correctamente
-    while (1) {
-        printf("Tu elección: ");
-        fflush(stdout); // Asegurar que el prompt se muestre
-        
-        // Limpiar el buffer de entrada antes de leer
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF);
-        
-        char input[10];
-        if (fgets(input, sizeof(input), stdin) != NULL) {
-            // Limpiar el salto de línea si existe
-            size_t len = strlen(input);
-            if (len > 0 && input[len-1] == '\n') {
-                input[len-1] = '\0';
-            }
-            
-            // Verificar que la entrada no esté vacía y sea solo un carácter
-            if (strlen(input) == 1) {
-                // Comparar directamente con caracteres para mayor robustez
-                if (input[0] == '1') {
-                    printf("Reiniciando el juego...\n");
-                    return 1; // Volver a jugar
-                } else if (input[0] == '2') {
-                    printf("Saliendo del juego...\n");
-                    return 0; // Salir del juego
-                } else {
-                    printf("❌ Opción inválida. Por favor, ingresa 1 o 2.\n");
-                    continue; // Volver a pedir la entrada
-                }
-            } else {
-                printf("❌ Por favor, ingresa solo un número (1 o 2).\n");
-                continue; // Volver a pedir la entrada
-            }
-        } else {
-            // Error en la lectura, limpiar stdin y reintentar
-            printf("❌ Error en la entrada. Intentando de nuevo...\n");
-            clearerr(stdin);
-            continue;
-        }
+    printf("Tu elección: ");
+    char input[10];
+    if (fgets(input, sizeof(input), stdin) != NULL) {
+        int choice = atoi(input);
+        if (choice == 1) return 1;
     }
+    return 0;
 }
 
 void ui_choice_class() {
@@ -416,11 +381,11 @@ void ui_shop_items(Map* itemMap) {
             if (item->type == 1) {
                 printf("\033[1;31mDaño: %-3d.\033[0m", item->damage);
             } else if (item->type == 2) {
-                printf("\033[1;32mDefensa: %-3d.\033[0m", item->defense);
+                printf("\033[1;36mDefensa: %-3d.\033[0m", item->defense);
             } else if (item->type == 3) {
                 if (item->heal > 0) printf("\033[1;32mCura: %d HP. \033[0m", item->heal);
                 if (item->damage > 0) printf("\033[1;31mDaño Boost: +%d Atk \033[0m", item->damage);
-                if (item->defense > 0) printf("\033[1;32mDefensa Boost: +%d Def \033[0m", item->defense);
+                if (item->defense > 0) printf("\033[1;36mDefensa Boost: +%d Def \033[0m", item->defense);
                 if (item->damage > 0 || item->defense > 0) printf("por %d turnos. ", item->effectDuration);
             }
             printf("\n");
