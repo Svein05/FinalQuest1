@@ -13,12 +13,12 @@
 typedef struct {
     int id;                                
     char name[MAX_NAME_LENGTH];          
-    int type;                               // Tipo del item (1. Arma, 2. Armadura, 3. Consumible)
-    char rarity[MAX_RARITY_LENGTH];         // Rareza del Item 
-    int damage;                             
-    int defense;        
+    int type; // Tipo del item (1. Arma, 2. Armadura, 3. Consumible)
+    char rarity[MAX_RARITY_LENGTH];
+    int damage;
+    int defense;
     int heal;           // Solo para Pociones
-    int price;          // Valor del Item
+    int price;
     int difficulty;     // Enlazar a Mapa - Tienda
     int effectDuration;  
     char class[16];     // Clase a la que pertenece el item (Guerrero, Tanque, Asesino)
@@ -34,14 +34,14 @@ typedef struct {
     int defense;                       
     int gold;                           
     Item inventory[INVENTORY_SLOTS];    
-    int inventoryCount;                 // Cantidad de Items en Inventario
+    int inventoryCount;
     Item equippedWeapon;                
     Item equippedArmor;                  
-    int tempAttackBoost;    // Cantidad de boost de ataque en el jugador
-    int tempDefenseBoost;   // Cantidad de boost de defensa en el jugador
-    int attackBoostTurns;   // Turnos restantes para el boost de ataque
-    int defenseBoostTurns;  // Turnos restantes para el boost de defensa
-    int enemiesDefeated;    // cantidad de enemigos derrotados
+    int tempAttackBoost;  
+    int tempDefenseBoost;   
+    int attackBoostTurns;  
+    int defenseBoostTurns;
+    int enemiesDefeated; 
 } Player;
 
 // Struct de Enemy

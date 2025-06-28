@@ -595,7 +595,7 @@ void ui_boss_phase3() {
 
     waitForPress("\x1b[1m\x1b[31mPresiona ENTER...\x1b[0m");
     clearScreen();
-    
+
     const char* msg = "\x1b[\x1b[40m\x1b[31mTe ves a ti mismo, exhausto. Te rendiras?                   \x1b[0m";
     print_lore_text_animated_wrapped(msg, 85, 18);
 
@@ -761,7 +761,7 @@ void ui_bonus() {
 
 void ui_shop() {
     printf("\x1b[40m\x1b[93m");
-    print_lore_text_animated_wrapped("A la lejania ves una tienda                       ", 80, 18);
+    print_lore_text_animated_wrapped("A la distancia ves una tienda                     ", 80, 18);
     printf("\x1b[0m\n");
 
     ui_sleep_skip(500);

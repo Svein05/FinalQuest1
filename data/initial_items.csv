@@ -2,7 +2,7 @@ ID,Nombre,Tipo,Rareza,Damage,Heal,Defense,Costo,Dificultad,EffectDuration,Clase
 1001,Espada de Aprendiz,1,Comun,12,0,0,50,0,0,Guerrero
 1002,Armadura Acolchada,2,Comun,0,0,6,70,0,0,Guerrero
 1003,Pocion de Novato,3,Comun,0,50,0,25,0,0,Guerrero
-1004,Amuleto de Suerte,3,Rara,50,10,10,40,0,1,Guerrero
+1004,Amuleto de Suerte,3,Rara,50,0,10,40,0,1,Guerrero
 2001,Espada Pesada,1,Comun,10,0,0,50,0,0,Tanque
 2002,Armadura de Hierro,2,Comun,0,0,12,70,0,0,Tanque
 2003,Pocion de Resistencia,3,Comun,0,40,0,25,0,0,Tanque

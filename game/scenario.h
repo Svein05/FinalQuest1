@@ -14,18 +14,6 @@
 #define SCENARIO_TYPE_BOSS 4
 
 /**
- * @brief Obtiene el enemigo específico para un nodo de escenario de combate.
- * Este enemigo puede ser aleatorio según la dificultad del escenario,
- * o un enemigo predefinido si el escenario lo especifica.
- *
- * @param Scenario Puntero al nodo de escenario actual.
- * @param allEnemies Arreglo de todos los enemigos disponibles en el juego.
- * @param numEnemies Número total de enemigos en allEnemies.
- * @return Un puntero al enemigo que debe aparecer en este escenario.
- */
-Enemy* getEnemyForScenario(Scenario* Scenario, Enemy* allEnemies, int numEnemies);
-
-/**
  * @brief Gestiona un evento aleatorio cuando el jugador entra a un escenario de tipo EVENTO.
  * Puede resultar en un combate (con enemigo aleatorio), un encuentro con un mercader,
  * o una bonificación (oro, vida, estadísticas).

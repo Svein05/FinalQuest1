@@ -19,6 +19,7 @@
 #define MAX_DIFFICULTY 3    
 
 /**  --- FUNCIONES DE LECTURA ---
+ * 
  * @param tokens Arreglo de cadenas (char**) a parsear; cada linea del .csv 
  * @return true si el parseo fue exitoso, false en caso de error.
 */
@@ -147,6 +148,7 @@ bool parse_scenario(char** tokens, Scenario* node) {
 
 // --- FUNCIONES DE CARGA ---
 Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
+    // Abrir el archivo CSV de enemigos del juego
     FILE* file = fopen(ENEMIES_CSV_PATH, "r");
     if (!file) {
         perror("Error al abrir CSV");
@@ -154,6 +156,7 @@ Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
         return NULL;
     }
     
+    // Inicializar capacidad y contador para array dinámico de enemigos
     int capacity = 10;
     int count = 0;
     Enemy* enemies = malloc(sizeof(Enemy) * capacity);
@@ -163,14 +166,16 @@ Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
         *numEnemies = 0;
         return NULL;
     }
-    // Leer y descartar el encabezado
+    
+    // Leer y descartar la línea de encabezado del CSV
     char** tokens = read_csv_line(file, CSV_DELIMITER);
     free_tokens(tokens);
 
-    // Leer enemigos del CSV
+    // Procesar cada línea de enemigos del archivo
     while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
+        // Verificar si necesitamos expandir el array de enemigos
         if (count >= capacity) {
-            capacity *= 2;
+            capacity *= 2;  // Duplicar la capacidad del array
             Enemy* temp = realloc(enemies, sizeof(Enemy) * capacity);
             if (!temp) {
                 perror("Error al redimensionar memoria para enemigos");
@@ -179,25 +184,31 @@ Enemy* load_enemies(const char* ENEMIES_CSV_PATH, int* numEnemies) {
                 *numEnemies = 0;
                 return NULL;
             }
-            enemies = temp;
+            enemies = temp;  // Actualizar el puntero al array expandido
         }
 
+        // Crear enemigo temporal para el parseo
         Enemy parsedEnemy;
+        
+        // Intentar parsear el enemigo actual desde los tokens
         if (parse_enemy(tokens, &parsedEnemy)) {
-            enemies[count++] = parsedEnemy;
+            enemies[count++] = parsedEnemy;  // Copiar el enemigo al array y incrementar contador
         } else {
             printf("Advertencia: Error al parsear un enemigo. Saltando línea.\n");
         }
 
+        // Liberar los tokens de esta línea
         free_tokens(tokens);
     }
+    
     fclose(file);
-    *numEnemies = count;
+    *numEnemies = count;  // Retornar el número total de enemigos cargados
     return enemies;
 }
 
 
 Item* load_items(const char* ITEMS_CSV_PATH, int* numItems) {
+    // Abrir el archivo CSV de ítems del juego
     FILE* file = fopen(ITEMS_CSV_PATH, "r");
     if (file == NULL) {
         perror("Error al abrir el archivo de ítems");
@@ -205,6 +216,7 @@ Item* load_items(const char* ITEMS_CSV_PATH, int* numItems) {
         return NULL;
     }
 
+    // Inicializar capacidad y contador para array dinámico de ítems
     int capacity = 10;
     int count = 0;
     Item* items = malloc(sizeof(Item) * capacity);
@@ -215,13 +227,15 @@ Item* load_items(const char* ITEMS_CSV_PATH, int* numItems) {
         return NULL;
     }
 
-    // Leer encabezado
+    // Leer y descartar la línea de encabezado del CSV
     char** tokens = read_csv_line(file, CSV_DELIMITER);
     free_tokens(tokens);
 
+    // Procesar cada línea de ítems del archivo
     while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
+        // Verificar si necesitamos expandir el array de ítems
         if (count >= capacity) {
-            capacity *= 2;
+            capacity *= 2;  // Duplicar la capacidad del array
             Item* temp = realloc(items, sizeof(Item) * capacity);
             if (temp == NULL) {
                 perror("Error al redimensionar memoria para ítems");
@@ -230,22 +244,27 @@ Item* load_items(const char* ITEMS_CSV_PATH, int* numItems) {
                 *numItems = 0;
                 return NULL;
             }
-            items = temp;
+            items = temp;  // Actualizar el puntero al array expandido
         }
+        
+        // Intentar parsear el ítem actual usando la función básica
         if (parse_item_basic(tokens, &items[count])) {
-            count++;
+            count++;  // Incrementar contador solo si el parseo fue exitoso
         } else {
             printf("Advertencia: Error al parsear un ítem. Saltando línea.\n");
         }
+        
+        // Liberar los tokens de esta línea
         free_tokens(tokens);
     }
 
     fclose(file);
-    *numItems = count;
+    *numItems = count;  // Retornar el número total de ítems cargados
     return items;
 }
 
 Scenario* load_scenarios(const char* SCENARIOS_CSV_PATH, int* numScenarios) {
+    // Abrir el archivo CSV de escenarios
     FILE* file = fopen(SCENARIOS_CSV_PATH, "r");
     if (!file) {
         perror("Error al abrir el archivo de escenarios");
@@ -253,6 +272,7 @@ Scenario* load_scenarios(const char* SCENARIOS_CSV_PATH, int* numScenarios) {
         return NULL;
     }
 
+    // Inicializar capacidad y contador para array dinámico
     int capacity = 10;
     int count = 0;
     Scenario* scenarios = malloc(sizeof(Scenario) * capacity);
@@ -263,14 +283,15 @@ Scenario* load_scenarios(const char* SCENARIOS_CSV_PATH, int* numScenarios) {
         return NULL;
     }
 
-    // Leer encabezado
+    // Leer y descartar la línea de encabezado del CSV
     char** tokens = read_csv_line(file, CSV_DELIMITER);
     free_tokens(tokens);
 
-    // Leer escenario por escenario
+    // Procesar cada línea de escenarios del archivo
     while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
+        // Verificar si necesitamos expandir el array
         if (count >= capacity) {
-            capacity *= 2;
+            capacity *= 2;  // Duplicar la capacidad
             Scenario* temp = realloc(scenarios, sizeof(Scenario) * capacity);
             if (!temp) {
                 perror("Error al redimensionar memoria para escenarios");
@@ -279,21 +300,22 @@ Scenario* load_scenarios(const char* SCENARIOS_CSV_PATH, int* numScenarios) {
                 *numScenarios = 0;
                 return NULL;
             }
-            scenarios = temp;
+            scenarios = temp;  // Actualizar el puntero al array expandido
         }
 
+        // Intentar parsear el escenario actual
         if (parse_scenario(tokens, &scenarios[count])) {
-            count++;
+            count++;  // Incrementar contador solo si el parseo fue exitoso
         } else {
             printf("Advertencia: Error al parsear un escenario. Saltando línea.\n");
         }
 
+        // Liberar los tokens de esta línea
         free_tokens(tokens);
     }
 
     fclose(file);
-    *numScenarios = count;
-    // printf("Cargados %d escenarios desde %s.\n", count, SCENARIOS_CSV_PATH);
+    *numScenarios = count;  // Retornar el número total de escenarios cargados
     return scenarios;
 }
 
@@ -302,35 +324,53 @@ int string_equals(void* a, void* b) {
     return strcmp((const char*)a, (const char*)b) == 0;
 }
 
-// Carga los ítems iniciales en un Map: clave=clase, valor=List* de Item*
 Map* load_initial_items_map(const char* INITIAL_ITEMS_CSV_PATH) {
+    // Abrir el archivo CSV de ítems iniciales
     FILE* file = fopen(INITIAL_ITEMS_CSV_PATH, "r");
     if (!file) {
         perror("Error al abrir el archivo de ítems iniciales");
         return NULL;
     }
+    
+    // Crear mapa que relaciona clases de jugador con listas de ítems
     Map* clase_a_items = map_create(string_equals);
-    // Leer encabezado
+
+    // Leer y descartar la línea de encabezado del CSV
     char** tokens = read_csv_line(file, CSV_DELIMITER);
     free_tokens(tokens);
-    // Leer ítems iniciales
+
+    // Procesar cada línea de ítems iniciales
     while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
+        // Asignar memoria para un nuevo ítem
         Item* item = malloc(sizeof(Item));
+        
+        // Intentar parsear el ítem desde los tokens del CSV
         if (parse_item(tokens, item)) {
             List* lista = NULL;
+            
+            // Buscar si ya existe una lista para esta clase de jugador
             MapPair* pair = map_search(clase_a_items, item->class);
+            
             if (pair) {
+                // Ya existe una lista para esta clase, usarla
                 lista = (List*)pair->value;
             } else {
+                // Crear nueva lista para esta clase y añadirla al mapa
                 lista = list_create();
                 map_insert(clase_a_items, strdup(item->class), lista);
             }
+            
+            // Agregar el ítem a la lista correspondiente de su clase
             list_pushBack(lista, item);
         } else {
+            // Error al parsear el ítem, liberar memoria y continuar
             free(item);
         }
+        
+        // Liberar los tokens de esta línea
         free_tokens(tokens);
     }
+    
     fclose(file);
     return clase_a_items;
 }
@@ -341,35 +381,52 @@ int int_key_equal(void* a, void* b) {
 }
 
 Map* load_lore_map(const char* lore_csv_path) {
+    // Crear mapa con comparador de claves enteras para organizar lore por tipo
     Map* lore_map = map_create(int_key_equal);
     FILE* file = fopen(lore_csv_path, "r");
     if (!file) return NULL;
+    
     char** tokens;
-    // Leer encabezado
+    
+    // Leer y descartar la línea de encabezado del CSV
     tokens = read_csv_line(file, CSV_DELIMITER);
     free_tokens(tokens);
+    
+    // Procesar cada línea del archivo CSV
     while ((tokens = read_csv_line(file, CSV_DELIMITER)) != NULL) {
+        // Validar que los campos obligatorios no estén vacíos
         if (!tokens[0] || !tokens[1] || !tokens[3]) {
             free_tokens(tokens);
-            continue;
+            continue;  // Saltar líneas con datos incompletos
         }
+        
+        // Extraer el tipo de lore y el texto de la historia
         int tipo = atoi(tokens[1]);
         char* historia = tokens[3];
-        // Buscar lista para este tipo
+        
+        // Crear clave para buscar en el mapa
         int* key = malloc(sizeof(int));
         *key = tipo;
+        
+        // Buscar si ya existe una lista para este tipo de lore
         MapPair* pair = map_search(lore_map, key);
         List* lista;
+        
         if (pair) {
+            // Ya existe una lista para este tipo, usarla
             lista = (List*)pair->value;
-            free(key); // Ya existe la key
+            free(key); // Liberar la clave ya que no se necesita
         } else {
+            // Crear nueva lista para este tipo de lore
             lista = list_create();
             map_insert(lore_map, key, lista);
         }
+        
+        // Agregar la historia a la lista correspondiente
         list_pushBack(lista, strdup(historia));
         free_tokens(tokens);
     }
+    
     fclose(file);
     return lore_map;
 }

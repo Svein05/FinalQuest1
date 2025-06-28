@@ -11,9 +11,6 @@
 #include "data_loader.h"
 #include "../tdas/map.h"
 #include "../tdas/list.h"
-// Puedes necesitar includes adicionales para debug o IO si usas system("cls") etc.
-
-// --- FUNCIONES AUXILIARES INTERNAS ---
 
 /**
  * @brief Inicializa un Item como vacío (no equipado/no existente).
@@ -35,82 +32,90 @@ static void initializeEmptyItem(Item* item) {
     item->effectDuration = 0;
 }
 
-
-// --- IMPLEMENTACIÓN DE FUNCIONES DEL MÓDULO PLAYER ---
-
 /**
- * @brief Inicializa la estructura del jugador con sus estadísticas base y equipo vacío.
- * @param player Puntero a la estructura Player a inicializar.
- * @param name Nombre del jugador.
- * @param hp Vida máxima inicial del jugador.
- * @param atk Ataque inicial del jugador.
- * @param def Defensa inicial del jugador.
- * @param gold Oro inicial del jugador.
+ * Inicializa completamente la estructura del jugador con valores base y configuración inicial
+ * @param player Puntero a la estructura Player a inicializar
+ * @param name Nombre del jugador (se copia de forma segura)
+ * @param hp Vida máxima y actual inicial del jugador
+ * @param atk Valor de ataque base del jugador
+ * @param def Valor de defensa base del jugador
+ * @param gold Cantidad inicial de oro del jugador
  */
 void initializePlayer(Player* player, const char* name, int hp, int atk, int def, int gold) {
+    // Validar que el puntero del jugador no sea nulo
     if (player == NULL) {
         printf("Error: No se puede inicializar un jugador nulo.\n");
         return;
     }
 
+    // Copiar el nombre del jugador de forma segura, asegurando terminación nula
     strncpy(player->name, name, sizeof(player->name) - 1);
     player->name[sizeof(player->name) - 1] = '\0';
 
-    player->maxHP = hp;
+    // Configurar estadísticas básicas del jugador
+    player->maxHP = hp;    
     player->currentHP = hp;
-    player->attack = atk;
-    player->defense = def;
+    player->attack = atk;  
+    player->defense = def; 
     player->gold = gold;
-
     player->inventoryCount = 0;
 
-    // --- CAMBIO AQUÍ: Inicializar los slots de equipo como ítems vacíos ---
+    // Inicializar slots de equipo como ítems vacíos (sin equipo equipado)
     initializeEmptyItem(&player->equippedWeapon);
     initializeEmptyItem(&player->equippedArmor);
 
+    // Resetear todos los efectos temporales
     player->tempAttackBoost = 0;
     player->tempDefenseBoost = 0;
     player->attackBoostTurns = 0;
     player->defenseBoostTurns = 0;
-    player->enemiesDefeated = 0; // Inicializar enemigos derrotados en 0
+    
+    // Inicializar contador de logros
+    player->enemiesDefeated = 0;
 
-    // Inicializar los slots del inventario como vacíos
+    // Limpiar todos los slots del inventario
     for (int i = 0; i < INVENTORY_SLOTS; i++) {
-        player->inventory[i].id = ITEM_ID_EMPTY; // Marcar como slot vacío
-        initializeEmptyItem(&player->inventory[i]); // Asegurarse de que todos los campos estén limpios
+        player->inventory[i].id = ITEM_ID_EMPTY;        // Marcar slot como vacío
+        initializeEmptyItem(&player->inventory[i]);     // Limpiar completamente el slot
     }
 
+    // Mostrar la inicialización del jugador en la interfaz
     ui_player_init(player);
 }
 
 /**
- * @brief Remueve un ítem específico del inventario del jugador por su ID.
- * @param player Puntero al jugador.
- * @param item_id El ID del ítem a remover.
- * @return true si el ítem fue removido, false si no se encontró.
+ * Remueve un ítem específico del inventario del jugador mediante su ID único
+ * @param player Puntero al jugador del cual se removerá el ítem
+ * @param item_id ID único del ítem a eliminar del inventario
+ * @return true si el ítem fue encontrado y removido exitosamente, false si no se encontró
  */
 bool player_remove_item_from_inventory(Player* player, int item_id) {
+    // Validar parámetros de entrada (jugador válido e ID no vacío)
     if (player == NULL || item_id == ITEM_ID_EMPTY) return false;
 
+    // Buscar el índice del ítem con el ID especificado
     int found_index = -1;
     for (int i = 0; i < player->inventoryCount; i++) {
         if (player->inventory[i].id == item_id) {
-            found_index = i;
-            break;
+            found_index = i;  // Guardar la posición donde se encontró
+            break;           // Salir del bucle al encontrar el ítem
         }
     }
 
+    // Procesar la eliminación si se encontró el ítem
     if (found_index != -1) {
-        // Mover los ítems siguientes para rellenar el hueco
+        // Compactar el inventario moviendo todos los ítems posteriores una posición hacia atrás
         for (int i = found_index; i < player->inventoryCount - 1; i++) {
-            player->inventory[i] = player->inventory[i+1];
+            player->inventory[i] = player->inventory[i+1];  // Mover ítem siguiente a la posición actual
         }
+        
+        // Decrementar el contador total de ítems en el inventario
         player->inventoryCount--;
-        // Opcional: limpiar el último slot si es necesario, aunque inventoryCount ya lo manejará
-        // initializeEmptyItem(&player->inventory[player->inventoryCount]);
-        return true;
+        return true;  // Eliminación exitosa
     }
-    return false; // Ítem no encontrado
+    
+    // El ítem con el ID especificado no se encontró en el inventario
+    return false;
 }
 
 /**
@@ -121,25 +126,31 @@ bool player_remove_item_from_inventory(Player* player, int item_id) {
  * @param from_inventory Indica si el arma viene del inventario (true) o es nueva (false).
  */
 void player_equip_weapon(Player* player, Item weapon, bool from_inventory) {
-    if (player == NULL || weapon.type != 1) { // weapon.type == 1 para armas
+    // Validar que el jugador no sea nulo y que el ítem sea realmente un arma (tipo 1)
+    if (player == NULL || weapon.type != 1) {
         printf("Error: Arma inválida o jugador nulo.\n");
         return;
     }
 
-    Item old_weapon = player->equippedWeapon; // Guarda el arma vieja (copia por valor)
+    // Hacer una copia del arma actualmente equipada antes de cambiarla
+    Item old_weapon = player->equippedWeapon;
 
-    // Primero, desequipa el arma anterior si existe y no es un ítem vacío
+    // Desequipar el arma anterior si hay una equipada (no es un slot vacío)
     if (old_weapon.id != ITEM_ID_EMPTY) {
-        player->attack -= old_weapon.damage; // Quita el bono de ataque del arma vieja
-        // NO devolver el arma vieja al inventario, simplemente desaparece
+        // Restar el bono de ataque del arma anterior de las estadísticas del jugador
+        player->attack -= old_weapon.damage;
     }
 
-    // Equipa la nueva arma
-    player->equippedWeapon = weapon; // Copia la nueva arma al slot de equipado
-    player->attack += player->equippedWeapon.damage; // Añade el bono de ataque de la nueva arma
+    // Equipar la nueva arma copiándola al slot de arma equipada
+    player->equippedWeapon = weapon;
+    
+    // Añadir el bono de ataque de la nueva arma a las estadísticas del jugador
+    player->attack += player->equippedWeapon.damage;
+    
+    // Mostrar mensaje de confirmación con color amarillo indicando el bonus obtenido
     printf("\033[1;33mHas equipado %s. (+%d Atk)\033[0m\n", player->equippedWeapon.name, player->equippedWeapon.damage);
 
-    // Si el arma fue equipada desde el inventario, la removemos de ahí
+    // Si el arma proviene del inventario, removerla de ahí para evitar duplicados
     if (from_inventory) {
         player_remove_item_from_inventory(player, weapon.id);
     }
@@ -147,139 +158,144 @@ void player_equip_weapon(Player* player, Item weapon, bool from_inventory) {
 
 /**
  * @brief Equipa una armadura al jugador, actualizando su defensa.
- * Si ya hay una armadura equipada, la anterior va al inventario (si hay espacio).
  * @param player Puntero al jugador.
  * @param armor La armadura a equipar (se copia por valor).
  * @param from_inventory Indica si la armadura viene del inventario (true) o es nueva (false).
  */
 void player_equip_armor(Player* player, Item armor, bool from_inventory) {
-    if (player == NULL || armor.type != 2) { // armor.type == 2 para armaduras
+    // Validar que el jugador no sea nulo y que el ítem sea realmente una armadura (tipo 2)
+    if (player == NULL || armor.type != 2) {
         printf("Error: Armadura inválida o jugador nulo.\n");
         return;
     }
 
-    Item old_armor = player->equippedArmor; // Guarda la armadura vieja (copia por valor)
+    // Hacer una copia de la armadura actualmente equipada antes de cambiarla
+    Item old_armor = player->equippedArmor;
 
-    // Primero, desequipa la armadura anterior si existe y no es un ítem vacío
+    // Desequipar la armadura anterior si hay una equipada (no es un slot vacío)
     if (old_armor.id != ITEM_ID_EMPTY) {
-        player->defense -= old_armor.defense; // Quita el bono de defensa de la armadura vieja
-        // NO devolver la armadura vieja al inventario, simplemente desaparece
+        // Restar el bono de defensa de la armadura anterior de las estadísticas del jugador
+        player->defense -= old_armor.defense;
     }
 
-    // Equipa la nueva armadura
-    player->equippedArmor = armor; // Copia la nueva armadura al slot de equipado
-    player->defense += player->equippedArmor.defense; // Añade el bono de defensa de la nueva armadura
+    // Equipar la nueva armadura copiándola al slot de armadura equipada
+    player->equippedArmor = armor;
+    
+    // Añadir el bono de defensa de la nueva armadura a las estadísticas del jugador
+    player->defense += player->equippedArmor.defense;
+    
+    // Mostrar mensaje de confirmación con color azul indicando el bonus obtenido
     printf("\033[1;34mHas equipado %s. (+%d Def)\033[0m\n", player->equippedArmor.name, player->equippedArmor.defense);
 
-    // Si la armadura fue equipada desde el inventario, la removemos de ahí
+    // Si la armadura proviene del inventario, removerla de ahí para evitar duplicados
     if (from_inventory) {
         player_remove_item_from_inventory(player, armor.id);
     }
 }
 
-/**
- * @brief Añade un ítem al inventario del jugador.
- * Si el ítem es equipable (arma/armadura) y mejora el equipo actual, lo equipa automáticamente.
- * Si no es equipable o no mejora el equipo, se añade al inventario si hay espacio.
- * @param player Puntero al jugador.
- * @param item El ítem a añadir/considerar (se copia por valor).
- * @return true si el ítem se añadió/equipó correctamente, false si el inventario está lleno y no se pudo equipar.
- */
 bool player_add_item_to_inventory(Player* player, Item item) {
+    // Validar que el jugador no sea nulo antes de proceder
     if (player == NULL) {
         printf("Error: Jugador nulo al intentar añadir ítem.\n");
         return false;
     }
 
-    // Solo consumibles pueden ir al inventario
+    // Procesar según el tipo de ítem encontrado (arma, armadura o consumible)
+
     if (item.type == 1) { // Arma
+        // Comparar estadísticas: solo equipar si es mejor que la actual
         if (item.damage > player->equippedWeapon.damage) {
             printf("\033[1;32m¡Has cambiado a un arma mejor!\033[0m\n");
-            player_equip_weapon(player, item, false);
-            return true;
+            player_equip_weapon(player, item, false);  // false = no viene del inventario
+            return true;  // Equipamiento exitoso
         } else {
+            // El arma actual es igual o mejor, rechazar el ítem
             printf("Tu arma equipada es mejor que este item.\n");
-            return false;
+            return false;  // No se añadió al inventario
         }
     } else if (item.type == 2) { // Armadura
+        // Comparar estadísticas: solo equipar si es mejor que la actual
         if (item.defense > player->equippedArmor.defense) {
             printf("\033[1;32m¡Has cambiado a una armadura mejor!\033[0m\n");
-            player_equip_armor(player, item, false);
-            return true;
+            player_equip_armor(player, item, false);  // false = no viene del inventario
+            return true;  // Equipamiento exitoso
         } else {
+            // La armadura actual es igual o mejor, rechazar el ítem
             printf("Tu armadura equipada es mejor que este item.\n");
-            return false; 
+            return false;  // No se añadió al inventario
         }
     } else if (item.type == 3) { // Consumible
+        // Verificar si hay espacio disponible en el inventario
         if (player->inventoryCount >= INVENTORY_SLOTS) {
             printf("Inventario lleno. No se puede añadir %s.\n", item.name);
-            return false;
+            return false;  // Fallo por falta de espacio
         }
-        player->inventory[player->inventoryCount] = item;
-        player->inventoryCount++;
+        
+        // Hay espacio disponible, añadir el consumible al inventario
+        player->inventory[player->inventoryCount] = item;  // Copiar ítem al siguiente slot libre
+        player->inventoryCount++;  // Incrementar contador de ítems en inventario
+        
+        // Mostrar confirmación visual del ítem añadido con color cian
         printf("\033[1;36m%s ha sido añadido al inventario.\033[0m\n", item.name);
-        return true;
+        return true;  // Añadido exitosamente al inventario
     }
+    
+    // Tipo de ítem no reconocido o no válido
     return false;
 }
 
-// --- Funciones adicionales (ya estaban en player.c) ---
-
-/**
- * @brief Función para usar un consumible (ej. poción) desde el inventario del jugador.
- * @param player Puntero al jugador.
- * @param itemIndexInInventory El índice (0-basado) del ítem a usar en el inventario.
- */
 void player_use_consumable(Player* player, int itemIndexInInventory) {
+    // Verificar parámetros válidos
     if (player == NULL || itemIndexInInventory < 0 || itemIndexInInventory >= player->inventoryCount) {
         printf("Error: Indice de item invalido en el inventario.\n");
         return;
     }
 
+    // Obtener el ítem seleccionado del inventario
     Item* itemToUse = &player->inventory[itemIndexInInventory];
 
+    // Verificar que el ítem sea consumible
     if (itemToUse->type != 3) { // No es una poción (consumible)
         printf("%s no es un item consumible y no se puede usar de esta manera.\n", itemToUse->name);
         return;
     }
 
-    // Guardar el nombre antes de remover el ítem
+    // Guardar el nombre del ítem antes de removerlo del inventario
     char nombreConsumido[64];
     strncpy(nombreConsumido, itemToUse->name, sizeof(nombreConsumido) - 1);
     nombreConsumido[sizeof(nombreConsumido) - 1] = '\0';
 
     printf("Usando %s...\n", itemToUse->name);
 
-    // Aplicar curación (si tiene)
+    // Aplicar efectos de curación si el ítem tiene propiedades curativas
     if (itemToUse->heal > 0) {
         player->currentHP += itemToUse->heal;
+        // Evitar que la salud exceda el máximo
         if (player->currentHP > player->maxHP) {
             player->currentHP = player->maxHP;
         }
         printf("\033[1;32mHas recuperado %d HP. HP actual: %d/%d.\033[0m\n", itemToUse->heal, player->currentHP, player->maxHP);
     }
 
-    // Aplicar boosts temporales (si tiene)
+    // Aplicar boost temporal de ataque si el ítem lo proporciona
     if (itemToUse->damage > 0) {
         player->tempAttackBoost += itemToUse->damage;
         player->attackBoostTurns = itemToUse->effectDuration;
         printf("\033[1;33mTu ataque ha aumentado en %d por %d turnos.\033[0m\n", itemToUse->damage, itemToUse->effectDuration);
     }
+    
+    // Aplicar boost temporal de defensa si el ítem lo proporciona
     if (itemToUse->defense > 0) {
         player->tempDefenseBoost += itemToUse->defense;
         player->defenseBoostTurns = itemToUse->effectDuration;
         printf("\033[1;34mTu defensa ha aumentado en %d por %d turnos.\033[0m\n", itemToUse->defense, itemToUse->effectDuration);
     }
 
-    // Remover el ítem consumido del inventario
+    // Remover el ítem consumido del inventario y confirmar al jugador
     player_remove_item_from_inventory(player, itemToUse->id);
     printf("\033[1;34m%s ha sido consumido\033[0m\n", nombreConsumido);
 }
 
-/**
- * @brief Función para actualizar los efectos temporales del jugador al final de un turno.
- * @param player Puntero al jugador.
- */
 void player_update_temporary_boosts(Player* player) {
     if (player == NULL) return;
 
@@ -343,26 +359,39 @@ static int string_equals(void* a, void* b) {
     return strcmp((const char*)a, (const char*)b) == 0;
 }
 
-// Añade ítems al jugador de forma silenciosa (sin mensajes) y guarda resumen
 void player_add_initial_class_items(Player* player, const char* initial_items_csv) {
+    // Mostrar animación de carga y cargar el mapa de ítems iniciales
     ui_load_animation("Cargando datos del juego");
     Map* clase_a_items = load_initial_items_map(initial_items_csv);
     if (!clase_a_items) return;
+    
+    // Determinar el nombre de la clase según el ID del jugador
     char* clase = NULL;
     if (player->classID == 1) clase = "Guerrero";
     else if (player->classID == 2) clase = "Tanque";
     else if (player->classID == 3) clase = "Asesino";
+    
+    // Buscar la lista de ítems correspondiente a la clase del jugador
     MapPair* pair = map_search(clase_a_items, clase);
     List* lista = (List*)pair->value;
+    
+    // Mostrar encabezado visual del equipo inicial
     printf("\033[1;36m══════════════════════════════════════════════\033[0m\n");
     printf("\033[1;32m¡Has recibido tu equipo inicial!\033[0m\n");
     printf("\033[1;36m──────────────────────────────────────────────\033[0m\n");
+    
+    // Variable para controlar si se debe saltar la animación
     int skip = 0;
+    
+    // Iterar por todos los ítems de la clase y equiparlos/añadirlos
     for (Item* item = list_first(lista); item; item = list_next(lista)) {
+        // Permitir al jugador saltar la animación presionando Enter
         if (!skip && _kbhit()) {
             int ch = _getch();
             if (ch == 13) skip = 1;
         }
+        
+        // Procesar cada ítem según su tipo
         if (item->type == 1) { // Arma
             player->equippedWeapon = *item;
             player->attack += item->damage;
@@ -371,37 +400,40 @@ void player_add_initial_class_items(Player* player, const char* initial_items_cs
             player->equippedArmor = *item;
             player->defense += item->defense;
             printf("\033[1;34m- %s (+%d Def, equipada)\033[0m\n", item->name, item->defense);
-        } else {
+        } else { // Consumibles u otros ítems
             player->inventory[player->inventoryCount++] = *item;
             printf("\033[1;36m- %s (añadido al inventario)\033[0m\n", item->name);
         }
+        
+        // Asegurar que el texto se muestre inmediatamente
         fflush(stdout);
+        
+        // Pausa entre ítems si no se ha saltado la animación
         if (!skip) skip = ui_sleep_skip(500);
     }
+    
     printf("\033[1;36m══════════════════════════════════════════════\033[0m\n");
-    // Liberar memoria del Map y listas
+    
+    // Limpiar memoria: liberar todos los ítems y estructuras de datos
     map_first(clase_a_items);
     MapPair* p;
     while ((p = map_next(clase_a_items))) {
         List* l = (List*)p->value;
+        // Liberar cada ítem de la lista
         for (Item* item = list_first(l); item; item = list_next(l)) {
             free(item);
         }
+        // Limpiar la lista y liberar la clave
         list_clean(l);
         free(p->key);
     }
     map_destroy(clase_a_items);
 
+    // Mensaje final y esperar confirmación del jugador
     printf("Los items se equiparan automaticamente.\n");
     waitForKeyPress();
 }
 
-/**
- * @brief Muestra el inventario del jugador con formato visual, ocultando stats en 0.
- * @param player Puntero al jugador.
- * @param show_index Si es true, muestra el índice para selección.
- * @param show_use_option Si es true, muestra la opción de usar/cancelar.
- */
 void display_inventory(Player* player, bool show_index, bool show_use_option) {
     printf("\x1b[36m╔═══════════════════════════════════════════════╗\x1b[0m\n");
     printf("\x1b[36m║              \x1b[1m--- INVENTARIO ---\x1b[0m               \x1b[36m║\x1b[0m\n");

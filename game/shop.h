@@ -12,7 +12,6 @@
  * Esta función es llamada cuando se encuentra un mercader en un evento aleatorio.
  * @param item_array Arreglo global de ítems ya cargados.
  * @param numItems Cantidad de ítems en el arreglo global.
- * @param minDifficulty Dificultad mínima de los ítems a vender.
  * @param maxDifficulty Dificultad máxima de los ítems a vender.
  * @return Un Map* temporal (clave: ID del ítem, valor: puntero a Item) con los ítems seleccionados.
  */

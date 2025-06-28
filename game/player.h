@@ -2,46 +2,50 @@
 #define PLAYER_H
 
 #include <stdbool.h>
-#include "data_types.h" // Incluimos data_types.h para las definiciones de Player, Item, etc.
+#include "data_types.h"
 
 // --- DECLARACIONES DE FUNCIONES DEL MÓDULO PLAYER ---
 
 /**
- * @brief Añade un ítem al inventario del jugador.
- * Si el ítem es equipable (arma/armadura) y mejora el equipo actual, lo equipa automáticamente.
- * Si no es equipable o no mejora el equipo, se añade al inventario si hay espacio.
- * @param player Puntero al jugador.
- * @param item El ítem a añadir/considerar (se copia por valor).
- * @return true si el ítem se añadió/equipó correctamente, false si el inventario está lleno y no se pudo equipar.
+ * Gestiona la adición de ítems al inventario del jugador con lógica inteligente
+ * @param player Puntero al jugador que recibirá el ítem
+ * @param item Ítem a procesar (pasado por valor para hacer una copia)
+ * @return true si se pudo equipar o añadir al inventario, false si no hay espacio o falló
  */
 bool player_add_item_to_inventory(Player* player, Item item);
 
 /**
- * @brief Pregunta al usuario por la clase y asigna los valores al jugador.
- * @param player Puntero al jugador.
+ * Gestiona el proceso completo de selección de clase del jugador
+ * @param player Puntero al jugador al que se asignará la clase
  */
 void player_choose_and_assign_class(Player* player);
 
 /**
- * @brief Añade ítems iniciales al inventario del jugador según su clase.
- * @param player Puntero al jugador.
- * @param initial_items_csv Cadena CSV con los ítems iniciales (id,cantidad) para añadir.
+ * Procesa y añade los ítems iniciales correspondientes a la clase del jugador
+ * @param player Puntero al jugador que recibirá los ítems iniciales
+ * @param initial_items_csv Cadena CSV con los ítems iniciales (formato: "id,cant,id,cant,...")
  */
 void player_add_initial_class_items(Player* player, const char* initial_items_csv);
 
 /**
- * @brief Muestra el inventario del jugador con formato visual, ocultando stats en 0.
- * @param player Puntero al jugador.
- * @param show_index Si es true, muestra el índice para selección.
- * @param show_use_option Si es true, muestra la opción de usar/cancelar.
+ * Muestra el inventario completo del jugador con formato visual mejorado
+ * @param player Puntero al jugador cuyo inventario se mostrará
+ * @param show_index Si es true, muestra números de índice para cada ítem
+ * @param show_use_option Si es true, muestra opciones de usar/cancelar al final
  */
 void display_inventory(Player* player, bool show_index, bool show_use_option);
 
-// --- DECLARACIONES DE FUNCIONES ADICIONALES (que ya estaban en player.c) ---
-// Función para usar un consumible (ej. poción) desde el inventario del jugador
+/**
+ * Ejecuta el uso de un ítem consumible desde el inventario del jugador
+ * @param player Puntero al jugador que usará el consumible
+ * @param itemIndexInInventory Índice del ítem en el inventario (base 0)
+ */
 void player_use_consumable(Player* player, int itemIndexInInventory);
 
-// Función para actualizar los efectos temporales del jugador al final de un turno
+/**
+ * Actualiza y gestiona todos los efectos temporales activos del jugador
+ * @param player Puntero al jugador cuyos efectos temporales se actualizarán
+ */
 void player_update_temporary_boosts(Player* player);
 
 
